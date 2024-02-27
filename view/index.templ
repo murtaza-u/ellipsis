@@ -1,5 +1,21 @@
 package view
 
+import "github.com/murtaza-u/account/view/partial"
+
 templ Index() {
-	<h1 class="text-4xl text-center font-bold my-10">Account</h1>
+	<!-- hero -->
+	<section class="h-screen overflow-hidden">
+		<header class="py-2">
+			@partial.Nav()
+		</header>
+		<div class="h-screen flex justify-center items-center">
+			<h1
+				class="bg-gradient-to-r from-blue-500 via-pink-500
+				to-purple-700 bg-clip-text py-1 text-center text-5xl
+				font-bold text-transparent"
+			>
+				Authentication & Session Management Service
+			</h1>
+		</div>
+	</section>
 }

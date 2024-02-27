@@ -6,11 +6,22 @@ package sqlc
 
 import (
 	"database/sql"
+	"time"
 )
 
-type ClientKey struct {
+type AuthorizationHistory struct {
+	UserID       int64
 	ClientID     string
-	ClientSecret string
+	AuthorizedAt time.Time
+}
+
+type Client struct {
+	ID              string
+	SecretHash      string
+	Name            string
+	PictureUrl      sql.NullString
+	CallbackUrls    string
+	TokenExpiration int64
 }
 
 type User struct {

@@ -1,0 +1,50 @@
+package console
+
+import (
+	"fmt"
+
+	"github.com/murtaza-u/account/view/partial/icon"
+)
+
+templ Overview(appCount, userCount int) {
+	@stats(appCount, userCount)
+	<div hx-boost="true" class="flex flex-col lg:flex-row my-5 ">
+		<div
+			class="w-full rounded-3xl shadow-xl flex justify-center items-center
+			bg-gradient-to-r from-[#0800ff] to-[#e32be3] h-56 lg:h-96"
+		>
+			<a
+				href="/console/app/create"
+				class="flex items-center justify-center font-bold text-white text-2xl md:text-3xl hover:underline"
+			>
+				@icon.Grid(32)
+				<span class="ml-2">Create New Application</span>
+			</a>
+		</div>
+		<div class="w-full flex justify-center items-center bg-temple h-56 lg:h-96">
+			<a href="/console/user" class="flex items-center justify-center font-bold text-2xl md:text-3xl hover:underline">
+				@icon.Users(32)
+				<span class="ml-2">Manage Users</span>
+			</a>
+		</div>
+	</div>
+}
+
+templ stats(appCount, userCount int) {
+	<div class="stats shadow">
+		<div class="stat">
+			<div class="stat-figure text-secondary">
+				@icon.Grid()
+			</div>
+			<div class="stat-title">Apps</div>
+			<div class="stat-value">{ fmt.Sprint(appCount) }</div>
+		</div>
+		<div class="stat">
+			<div class="stat-figure text-secondary">
+				@icon.User()
+			</div>
+			<div class="stat-title">Users</div>
+			<div class="stat-value">{ fmt.Sprint(userCount) }</div>
+		</div>
+	</div>
+}

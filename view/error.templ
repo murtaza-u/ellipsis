@@ -1,0 +1,18 @@
+package view
+
+import "fmt"
+
+templ Error(err string, code int) {
+	<div class="hero bg-skulls min-h-screen">
+		<div class="hero-overlay bg-opacity-95 bg-base-100"></div>
+		<div class="hero-content text-center">
+			<div hx-boost="true" class="max-w-md">
+				<h1 class="mb-5 text-5xl font-bold">
+					{ fmt.Sprintf("Oops! - %d", code) }
+				</h1>
+				<p class="mb-5 text-md">{ err }</p>
+				<a href="/" class="btn btn-primary">Homepage</a>
+			</div>
+		</div>
+	</div>
+}

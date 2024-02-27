@@ -24,6 +24,10 @@
           tailwindcss-language-server
           prettierd
         ];
+
+        ACCOUNT_MYSQL_USER = "root";
+        ACCOUNT_MYSQL_PASSWORD = "toor";
+        ACCOUNT_MYSQL_DATABASE = "account";
       };
     };
 }

@@ -10,6 +10,40 @@ import (
 	"database/sql"
 )
 
+const createClient = `-- name: CreateClient :exec
+INSERT INTO client (
+	id,
+	secret_hash,
+	name,
+	callback_urls,
+	picture_url,
+	token_expiration
+) VALUES (
+	?, ?, ?, ?, ?, ?
+)
+`
+
+type CreateClientParams struct {
+	ID              string
+	SecretHash      string
+	Name            string
+	CallbackUrls    string
+	PictureUrl      sql.NullString
+	TokenExpiration int64
+}
+
+func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) error {
+	_, err := q.db.ExecContext(ctx, createClient,
+		arg.ID,
+		arg.SecretHash,
+		arg.Name,
+		arg.CallbackUrls,
+		arg.PictureUrl,
+		arg.TokenExpiration,
+	)
+	return err
+}
+
 const createUser = `-- name: CreateUser :execresult
 INSERT INTO user (email, hashed_password, avatar_url) VALUES (
   ?, ?, ?
@@ -24,6 +58,16 @@ type CreateUserParams struct {
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, createUser, arg.Email, arg.HashedPassword, arg.AvatarUrl)
+}
+
+const deleteClient = `-- name: DeleteClient :exec
+DELETE FROM client
+WHERE id = ?
+`
+
+func (q *Queries) DeleteClient(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, deleteClient, id)
+	return err
 }
 
 const deleteUser = `-- name: DeleteUser :exec
@@ -46,6 +90,102 @@ func (q *Queries) DeleteUserByEmail(ctx context.Context, email string) error {
 	return err
 }
 
+const getClient = `-- name: GetClient :one
+SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration FROM client
+WHERE id = ?
+`
+
+func (q *Queries) GetClient(ctx context.Context, id string) (Client, error) {
+	row := q.db.QueryRowContext(ctx, getClient, id)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.SecretHash,
+		&i.Name,
+		&i.PictureUrl,
+		&i.CallbackUrls,
+		&i.TokenExpiration,
+	)
+	return i, err
+}
+
+const getClientByName = `-- name: GetClientByName :one
+SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration FROM client
+WHERE name = ?
+`
+
+func (q *Queries) GetClientByName(ctx context.Context, name string) (Client, error) {
+	row := q.db.QueryRowContext(ctx, getClientByName, name)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.SecretHash,
+		&i.Name,
+		&i.PictureUrl,
+		&i.CallbackUrls,
+		&i.TokenExpiration,
+	)
+	return i, err
+}
+
+const getClientByNameForUnmatchingID = `-- name: GetClientByNameForUnmatchingID :one
+SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration FROM client
+WHERE name = ? AND id != ?
+`
+
+type GetClientByNameForUnmatchingIDParams struct {
+	Name string
+	ID   string
+}
+
+func (q *Queries) GetClientByNameForUnmatchingID(ctx context.Context, arg GetClientByNameForUnmatchingIDParams) (Client, error) {
+	row := q.db.QueryRowContext(ctx, getClientByNameForUnmatchingID, arg.Name, arg.ID)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.SecretHash,
+		&i.Name,
+		&i.PictureUrl,
+		&i.CallbackUrls,
+		&i.TokenExpiration,
+	)
+	return i, err
+}
+
+const getClients = `-- name: GetClients :many
+SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration FROM client
+`
+
+func (q *Queries) GetClients(ctx context.Context) ([]Client, error) {
+	rows, err := q.db.QueryContext(ctx, getClients)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Client
+	for rows.Next() {
+		var i Client
+		if err := rows.Scan(
+			&i.ID,
+			&i.SecretHash,
+			&i.Name,
+			&i.PictureUrl,
+			&i.CallbackUrls,
+			&i.TokenExpiration,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, email, avatar_url, hashed_password, is_admin FROM user
 WHERE id = ? LIMIT 1
@@ -61,6 +201,24 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.HashedPassword,
 		&i.IsAdmin,
 	)
+	return i, err
+}
+
+const getUserAndClientCount = `-- name: GetUserAndClientCount :one
+SELECT
+	(SELECT COUNT(*) FROM user) as user_count,
+	(SELECT COUNT(*) FROM client) as client_count
+`
+
+type GetUserAndClientCountRow struct {
+	UserCount   int64
+	ClientCount int64
+}
+
+func (q *Queries) GetUserAndClientCount(ctx context.Context) (GetUserAndClientCountRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserAndClientCount)
+	var i GetUserAndClientCountRow
+	err := row.Scan(&i.UserCount, &i.ClientCount)
 	return i, err
 }
 
@@ -80,4 +238,65 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.IsAdmin,
 	)
 	return i, err
+}
+
+const getUsers = `-- name: GetUsers :many
+SELECT id, email, avatar_url, hashed_password, is_admin FROM user
+`
+
+func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Email,
+			&i.AvatarUrl,
+			&i.HashedPassword,
+			&i.IsAdmin,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateClient = `-- name: UpdateClient :exec
+UPDATE client
+SET name = ?,
+	  callback_urls = ?,
+		picture_url = ?,
+		token_expiration = ?
+WHERE id = ?
+`
+
+type UpdateClientParams struct {
+	Name            string
+	CallbackUrls    string
+	PictureUrl      sql.NullString
+	TokenExpiration int64
+	ID              string
+}
+
+func (q *Queries) UpdateClient(ctx context.Context, arg UpdateClientParams) error {
+	_, err := q.db.ExecContext(ctx, updateClient,
+		arg.Name,
+		arg.CallbackUrls,
+		arg.PictureUrl,
+		arg.TokenExpiration,
+		arg.ID,
+	)
+	return err
 }

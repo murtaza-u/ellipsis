@@ -36,7 +36,15 @@ func Base(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><!-- tailwind css --><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"></head><body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><!-- Google fonts -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = fonts().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- favicon --><link rel=\"icon\" type=\"image/png\" href=\"/static/favicon.png\"><!-- tailwind css --><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"></head><body class=\"font-sans\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -47,6 +55,30 @@ func Base(title string, children ...templ.Component) templ.Component {
 			}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- htmx --><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script></body></html>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if !templ_7745c5c3_IsBuffer {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteTo(templ_7745c5c3_W)
+		}
+		return templ_7745c5c3_Err
+	})
+}
+
+func fonts() templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
+		if !templ_7745c5c3_IsBuffer {
+			templ_7745c5c3_Buffer = templ.GetBuffer()
+			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Roboto&amp;family=Ubuntu+Mono&amp;display=swap\" rel=\"stylesheet\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

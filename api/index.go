@@ -1,12 +1,16 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
-
+	"github.com/murtaza-u/account/api/render"
 	"github.com/murtaza-u/account/view"
 	"github.com/murtaza-u/account/view/layout"
+
+	"github.com/labstack/echo/v4"
 )
 
-func (Server) index(c echo.Context) error {
-	return render(c, layout.Base("Account", view.Index()))
+func (Server) indexPage(c echo.Context) error {
+	return render.Do(render.Params{
+		Ctx:       c,
+		Component: layout.Base("Account", view.Index()),
+	})
 }

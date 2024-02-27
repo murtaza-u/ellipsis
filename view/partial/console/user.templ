@@ -1,0 +1,30 @@
+package console
+
+import (
+	"database/sql"
+
+	"github.com/murtaza-u/account/internal/sqlc"
+)
+
+templ Users(users []sqlc.User) {
+	<ul class="space-y-4">
+		for _, u := range users {
+			<li class="flex items-center space-x-4 p-4 border-b-2">
+				@getAvatar(u.AvatarUrl, u.IsAdmin)
+				<h2>{ u.Email }</h2>
+			</li>
+		}
+	</ul>
+}
+
+templ getAvatar(url sql.NullString, isAdmin bool) {
+	<div class={ "avatar" , templ.KV("online", isAdmin) }>
+		<div class="w-8 rounded-full">
+			if url.Valid {
+				<img src={ url.String } alt="User's avatar"/>
+			} else {
+				<img src="/static/default-user.svg" alt="User's avatar"/>
+			}
+		</div>
+	</div>
+}
