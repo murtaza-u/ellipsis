@@ -8,6 +8,11 @@ import (
 	"database/sql"
 )
 
+type ClientKey struct {
+	ClientID     string
+	ClientSecret string
+}
+
 type User struct {
 	ID             int64
 	Email          string
