@@ -18,4 +18,5 @@ type User struct {
 	Email          string
 	AvatarUrl      sql.NullString
 	HashedPassword sql.NullString
+	IsAdmin        bool
 }

@@ -47,7 +47,7 @@ func (q *Queries) DeleteUserByEmail(ctx context.Context, email string) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, email, avatar_url, hashed_password FROM user
+SELECT id, email, avatar_url, hashed_password, is_admin FROM user
 WHERE id = ? LIMIT 1
 `
 
@@ -59,12 +59,13 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.Email,
 		&i.AvatarUrl,
 		&i.HashedPassword,
+		&i.IsAdmin,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, avatar_url, hashed_password FROM user
+SELECT id, email, avatar_url, hashed_password, is_admin FROM user
 WHERE email = ? LIMIT 1
 `
 
@@ -76,6 +77,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Email,
 		&i.AvatarUrl,
 		&i.HashedPassword,
+		&i.IsAdmin,
 	)
 	return i, err
 }
