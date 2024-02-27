@@ -16,6 +16,13 @@
           sqlc
           awscli2
           mycli
+          air
+          nodejs
+          nodePackages.pnpm
+          nodePackages.vscode-langservers-extracted
+          nodePackages.typescript-language-server
+          tailwindcss-language-server
+          prettierd
         ];
       };
     };

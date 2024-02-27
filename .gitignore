@@ -26,3 +26,7 @@ go.work.sum
 /result
 /.direnv
 /.envrc
+
+/node_modules
+/bin
+*_templ.txt
