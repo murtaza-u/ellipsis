@@ -65,3 +65,8 @@ WHERE id = ?;
 -- name: DeleteClient :exec
 DELETE FROM client
 WHERE id = ?;
+
+-- name: CreateSession :execresult
+INSERT INTO session (id, user_id, client_id, expires_at, os, browser) VALUES (
+    ?, ?, ?, ?, ?, ?
+);

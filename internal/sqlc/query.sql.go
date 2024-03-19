@@ -8,6 +8,7 @@ package sqlc
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createClient = `-- name: CreateClient :exec
@@ -42,6 +43,32 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) erro
 		arg.TokenExpiration,
 	)
 	return err
+}
+
+const createSession = `-- name: CreateSession :execresult
+INSERT INTO session (id, user_id, client_id, expires_at, os, browser) VALUES (
+    ?, ?, ?, ?, ?, ?
+)
+`
+
+type CreateSessionParams struct {
+	ID        string
+	UserID    int64
+	ClientID  sql.NullString
+	ExpiresAt time.Time
+	Os        sql.NullString
+	Browser   sql.NullString
+}
+
+func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createSession,
+		arg.ID,
+		arg.UserID,
+		arg.ClientID,
+		arg.ExpiresAt,
+		arg.Os,
+		arg.Browser,
+	)
 }
 
 const createUser = `-- name: CreateUser :execresult

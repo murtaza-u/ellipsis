@@ -2,18 +2,17 @@ package view
 
 import "github.com/murtaza-u/account/view/partial/icon"
 
-type SignUpParams struct {
-	Email           string `form:"email"`
-	Password        string `form:"password"`
-	ConfirmPassword string `form:"confirm_password"`
-	ReturnTo        string
+type LoginParams struct {
+	Email    string `form:"email"`
+	Password string `form:"password"`
+	ReturnTo string
 }
 
-templ SignUpForm(values SignUpParams, err map[string]error) {
+templ LoginForm(values LoginParams, err map[string]error) {
 	<div class="w-full lg:w-1/2 bg-base-100">
 		<form
 			class="block w-full mx-auto lg:w-4/5 space-y-2"
-			action={ templ.URL("/signup?return_to=" + values.ReturnTo) }
+			action={ templ.URL("/login?return_to=" + values.ReturnTo) }
 			method="post"
 			hx-boost="true"
 		>
@@ -34,14 +33,13 @@ templ SignUpForm(values SignUpParams, err map[string]error) {
 						templ.KV("input-error", err["email"] != nil),
 					}
 				/>
-				<div class="label">
-					if err["email"] != nil {
+				if err["email"] != nil {
+					<div class="label">
 						<span class="label-text-alt text-error first-letter:uppercase">
 							{ err["email"].Error() }
 						</span>
-					}
-					<span class="label-text-alt">Must be less than 50 characters</span>
-				</div>
+					</div>
+				}
 			</label>
 			<label class="form-control w-full">
 				<div class="label">
@@ -61,56 +59,28 @@ templ SignUpForm(values SignUpParams, err map[string]error) {
 						templ.KV("input-error", err["password"] != nil),
 					}
 				/>
-				<div class="label">
-					if err["password"] != nil {
+				if err["password"] != nil {
+					<div class="label">
 						<span class="label-text-alt text-error first-letter:uppercase">
 							{ err["password"].Error() }
 						</span>
-					}
-					<span class="label-text-alt">Must be less than 70 characters</span>
-				</div>
-			</label>
-			<label class="form-control w-full">
-				<div class="label">
-					<span class="label-text">Confirm Password</span>
-					<span class="label-text-alt text-error text-xl">*</span>
-				</div>
-				<input
-					required
-					name="confirm_password"
-					type="password"
-					minlength="8"
-					maxlength="70"
-					value={ values.ConfirmPassword }
-					placeholder="********"
-					class={
-						"input input-bordered w-full",
-						templ.KV("input-error", err["confirm_password"] != nil),
-					}
-				/>
-				<div class="label">
-					if err["confirm_password"] != nil {
-						<span class="label-text-alt text-error first-letter:uppercase">
-							{ err["confirm_password"].Error() }
-						</span>
-					}
-					<span class="label-text-alt">Must be same as above</span>
-				</div>
+					</div>
+				}
 			</label>
 			<div class="flex items-center justify-end">
-				<button class="my-4 btn btn-primary w-full md:w-fit">Sign Up</button>
+				<button class="my-4 btn btn-primary w-full md:w-fit">Login</button>
 			</div>
 			<div class="text-sm text-center">
-				Already have an account?
-				<a href="/login" class="link link-primary">Login</a>
+				Do not have an account?
+				<a href="/signup" class="link link-primary">Sign Up</a>
 			</div>
 		</form>
 	</div>
 }
 
-templ SignUp(values SignUpParams, err map[string]error) {
+templ Login(values LoginParams, err map[string]error) {
 	<main class="min-h-screen flex flex-col justify-center items-center mx-3 lg:mx-3 lg:flex-row lg:justify-evenly">
-		@SignUpForm(values, err)
+		@LoginForm(values, err)
 		<div class="divider my-8 lg:my-0 lg:divider-horizontal">OR</div>
 		<div class="flex items-center justify-center w-1/2">
 			<a href="#" class="flex btn btn-neutral tracking-wide">

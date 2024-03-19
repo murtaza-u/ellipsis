@@ -22,3 +22,15 @@ CREATE TABLE IF NOT EXISTS authorization_history (
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS session (
+    id CHAR(25) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL,
+    client_id CHAR(25),
+    os VARCHAR(15),
+    browser VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
+);

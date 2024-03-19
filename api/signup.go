@@ -18,18 +18,24 @@ import (
 )
 
 func (Server) SignUpPage(c echo.Context) error {
+	returnTo := c.QueryParam("return_to")
+	if returnTo == "" {
+		returnTo = "/login"
+	}
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"Sign Up | Account",
-			view.SignUp(view.Credentials{}, map[string]error{}),
+			view.SignUp(view.SignUpParams{
+				ReturnTo: returnTo,
+			}, map[string]error{}),
 		),
 	})
 }
 
 func (s Server) SignUp(c echo.Context) error {
-	form := new(view.Credentials)
-	if err := c.Bind(form); err != nil {
+	params := new(view.SignUpParams)
+	if err := c.Bind(params); err != nil {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
@@ -42,13 +48,13 @@ func (s Server) SignUp(c echo.Context) error {
 
 	errMap := make(map[string]error)
 
-	if err := validateEmail(form.Email); err != nil {
+	if err := validateEmail(params.Email); err != nil {
 		errMap["email"] = err
 	}
-	if err := validatePassword(form.Password); err != nil {
+	if err := validatePassword(params.Password); err != nil {
 		errMap["password"] = err
 	}
-	if form.Password != form.ConfirmPassword {
+	if params.Password != params.ConfirmPassword {
 		errMap["password"] = errors.New("passwords do not match")
 		errMap["confirm_password"] = errMap["password"]
 	}
@@ -58,13 +64,13 @@ func (s Server) SignUp(c echo.Context) error {
 			Ctx: c,
 			Component: layout.Base(
 				"Sign Up | Account",
-				view.SignUp(*form, errMap),
+				view.SignUp(*params, errMap),
 			),
 			Status: http.StatusBadRequest,
 		})
 	}
 
-	hash, err := argon2id.CreateHash(form.Password, argon2id.DefaultParams)
+	hash, err := argon2id.CreateHash(params.Password, argon2id.DefaultParams)
 	if err != nil {
 		return render.Do(render.Params{
 			Ctx: c,
@@ -77,7 +83,7 @@ func (s Server) SignUp(c echo.Context) error {
 	}
 
 	_, err = s.queries.CreateUser(c.Request().Context(), sqlc.CreateUserParams{
-		Email:          form.Email,
+		Email:          params.Email,
 		HashedPassword: sql.NullString{String: hash, Valid: true},
 	})
 	if err != nil {
@@ -91,14 +97,18 @@ func (s Server) SignUp(c echo.Context) error {
 		})
 	}
 
-	isBoosted := c.Request().Header.Get("HX-Boosted") != ""
-	if !isBoosted {
-		c.Redirect(http.StatusFound, "/login")
+	returnTo := c.QueryParam("return_to")
+	if returnTo == "" {
+		returnTo = "/login"
 	}
 
-	// redirect to "/login"
+	isBoosted := c.Request().Header.Get("HX-Boosted") != ""
+	if !isBoosted {
+		return c.Redirect(http.StatusFound, returnTo)
+	}
+
 	r := c.Response()
-	r.Header().Set("HX-Redirect", "/login")
+	r.Header().Set("HX-Redirect", returnTo)
 
 	// render empty template
 	h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))

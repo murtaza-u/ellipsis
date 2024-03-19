@@ -52,6 +52,8 @@ func (s Server) Start() error {
 	s.app.GET("/", s.indexPage)
 	s.app.GET("/signup", s.SignUpPage)
 	s.app.POST("/signup", s.SignUp)
+	s.app.GET("/login", s.LoginPage)
+	s.app.POST("/login", s.Login)
 
 	// console
 	console.New(s.queries).Register(s.app)

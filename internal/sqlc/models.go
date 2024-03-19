@@ -24,6 +24,16 @@ type Client struct {
 	TokenExpiration int64
 }
 
+type Session struct {
+	ID        string
+	UserID    int64
+	CreatedAt time.Time
+	ExpiresAt time.Time
+	ClientID  sql.NullString
+	Os        sql.NullString
+	Browser   sql.NullString
+}
+
 type User struct {
 	ID             int64
 	Email          string
