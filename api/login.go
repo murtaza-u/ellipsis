@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"net/http"
 	"time"
 
@@ -20,16 +19,12 @@ import (
 )
 
 func (Server) LoginPage(c echo.Context) error {
-	returnTo := c.QueryParam("return_to")
-	if returnTo == "" {
-		returnTo = "/"
-	}
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"Login | Account",
 			view.Login(view.LoginParams{
-				ReturnTo: returnTo,
+				ReturnTo: c.QueryParam("return_to"),
 			}, map[string]error{}),
 		),
 	})
@@ -47,6 +42,7 @@ func (s Server) Login(c echo.Context) error {
 			Status: http.StatusBadRequest,
 		})
 	}
+	params.ReturnTo = c.QueryParam("return_to")
 
 	errMap := make(map[string]error)
 
@@ -86,7 +82,10 @@ func (s Server) Login(c echo.Context) error {
 			Ctx: c,
 			Component: layout.Base(
 				"Login | Account",
-				view.Error("Database operation failed", http.StatusInternalServerError),
+				view.Error(
+					"Database operation failed",
+					http.StatusInternalServerError,
+				),
 			),
 			Status: http.StatusInternalServerError,
 		})
@@ -169,7 +168,6 @@ func (s Server) Login(c echo.Context) error {
 		},
 	)
 	if err != nil {
-		log.Println(err)
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
@@ -188,7 +186,7 @@ func (s Server) Login(c echo.Context) error {
 		Value: sessionID,
 	})
 
-	returnTo := c.QueryParam("return_to")
+	returnTo := params.ReturnTo
 	if returnTo == "" {
 		returnTo = "/"
 	}

@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/murtaza-u/account/api/middleware"
 	"github.com/murtaza-u/account/api/render"
 	"github.com/murtaza-u/account/api/util"
 	"github.com/murtaza-u/account/view"
@@ -55,9 +56,10 @@ func (a authorizeErr) AttachTo(baseURL string) string {
 		baseURL, a.Name(), a.Desc())
 }
 
-type clientIDWithScopes struct {
-	ID     string   `json:"id"`
-	Scopes []string `json:"scopes"`
+type authorizeMetadata struct {
+	ClientID string   `json:"client_id"`
+	UserID   int64    `json:"user_id"`
+	Scopes   []string `json:"scopes"`
 }
 
 func (a API) authorize(c echo.Context) error {
@@ -159,16 +161,35 @@ func (a API) authorize(c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
 	}
 
-	v, err := json.Marshal(clientIDWithScopes{
-		ID:     client.ID,
-		Scopes: scopes,
+	var userID int64
+	if ctx, ok := c.(middleware.CtxWithUserID); ok {
+		userID = ctx.UserID
+	}
+	if userID == 0 {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"Authorization - Account",
+				view.Error(
+					"Unauthorized user",
+					http.StatusInternalServerError,
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+
+	v, err := json.Marshal(authorizeMetadata{
+		ClientID: client.ID,
+		UserID:   userID,
+		Scopes:   scopes,
 	})
 	if err != nil {
 		err := newAuthorizeErr("internal_server_error",
 			"database operation failed")
 		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
 	}
-	a.dream.Put(code, v)
+	a.cache.Put(code, v)
 
 	return c.Redirect(http.StatusFound, fmt.Sprintf(
 		"%s?code=%s&state=%s",

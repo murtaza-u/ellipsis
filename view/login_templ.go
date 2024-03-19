@@ -10,7 +10,11 @@ import "context"
 import "io"
 import "bytes"
 
-import "github.com/murtaza-u/account/view/partial/icon"
+import (
+	"net/url"
+
+	"github.com/murtaza-u/account/view/partial/icon"
+)
 
 type LoginParams struct {
 	Email    string `form:"email"`
@@ -35,7 +39,7 @@ func LoginForm(values LoginParams, err map[string]error) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.SafeURL = templ.URL("/login?return_to=" + values.ReturnTo)
+		var templ_7745c5c3_Var2 templ.SafeURL = templ.URL(loginWithReturnTo(values.ReturnTo))
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var2)))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -59,7 +63,7 @@ func LoginForm(values LoginParams, err map[string]error) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(values.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/login.templ`, Line: 29, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/login.templ`, Line: 33, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -90,7 +94,7 @@ func LoginForm(values LoginParams, err map[string]error) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(err["email"].Error())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/login.templ`, Line: 39, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/login.templ`, Line: 43, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -120,7 +124,7 @@ func LoginForm(values LoginParams, err map[string]error) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(values.Password)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/login.templ`, Line: 55, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/login.templ`, Line: 59, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -151,7 +155,7 @@ func LoginForm(values LoginParams, err map[string]error) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(err["password"].Error())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/login.templ`, Line: 65, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/login.templ`, Line: 69, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -162,7 +166,16 @@ func LoginForm(values LoginParams, err map[string]error) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label><div class=\"flex items-center justify-end\"><button class=\"my-4 btn btn-primary w-full md:w-fit\">Login</button></div><div class=\"text-sm text-center\">Do not have an account? <a href=\"/signup\" class=\"link link-primary\">Sign Up</a></div></form></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label><div class=\"flex items-center justify-end\"><button class=\"my-4 btn btn-primary w-full md:w-fit\">Login</button></div><div class=\"text-sm text-center\">Do not have an account? <a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var11 templ.SafeURL = templ.URL(signupWithReturnTo(loginWithReturnTo(values.ReturnTo)))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var11)))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"link link-primary\">Sign Up</a></div></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -181,9 +194,9 @@ func Login(values LoginParams, err map[string]error) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var11 == nil {
-			templ_7745c5c3_Var11 = templ.NopComponent
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main class=\"min-h-screen flex flex-col justify-center items-center mx-3 lg:mx-3 lg:flex-row lg:justify-evenly\">")
@@ -211,4 +224,11 @@ func Login(values LoginParams, err map[string]error) templ.Component {
 		}
 		return templ_7745c5c3_Err
 	})
+}
+
+func loginWithReturnTo(returnTo string) string {
+	if returnTo == "" {
+		return "/login"
+	}
+	return "/login?return_to=" + url.QueryEscape(returnTo)
 }

@@ -70,3 +70,7 @@ WHERE id = ?;
 INSERT INTO session (id, user_id, client_id, expires_at, os, browser) VALUES (
     ?, ?, ?, ?, ?, ?
 );
+
+-- name: GetSession :one
+SELECT * FROM session
+WHERE id = ? LIMIT 1;

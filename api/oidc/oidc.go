@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"github.com/murtaza-u/account/api/middleware"
 	"github.com/murtaza-u/account/internal/sqlc"
 	"github.com/murtaza-u/dream"
 
@@ -14,17 +15,19 @@ const (
 
 type API struct {
 	db    *sqlc.Queries
-	dream *dream.Store
+	cache *dream.Store
 }
 
-func New(db *sqlc.Queries, dream *dream.Store) API {
+func New(db *sqlc.Queries, cache *dream.Store) API {
 	return API{
 		db:    db,
-		dream: dream,
+		cache: cache,
 	}
 }
 
 func (a API) Register(app *echo.Echo) {
 	app.GET("/.well-known/openid-configuration", a.configuration)
-	app.GET("/authorize", a.authorize)
+
+	auth := middleware.NewAuthMiddleware(a.db)
+	app.GET("/authorize", a.authorize, auth.Required)
 }

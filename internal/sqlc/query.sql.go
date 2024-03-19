@@ -213,6 +213,26 @@ func (q *Queries) GetClients(ctx context.Context) ([]Client, error) {
 	return items, nil
 }
 
+const getSession = `-- name: GetSession :one
+SELECT id, user_id, created_at, expires_at, client_id, os, browser FROM session
+WHERE id = ? LIMIT 1
+`
+
+func (q *Queries) GetSession(ctx context.Context, id string) (Session, error) {
+	row := q.db.QueryRowContext(ctx, getSession, id)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.CreatedAt,
+		&i.ExpiresAt,
+		&i.ClientID,
+		&i.Os,
+		&i.Browser,
+	)
+	return i, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, email, avatar_url, hashed_password, is_admin FROM user
 WHERE id = ? LIMIT 1

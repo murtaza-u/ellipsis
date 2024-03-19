@@ -1,6 +1,10 @@
 package view
 
-import "github.com/murtaza-u/account/view/partial/icon"
+import (
+	"net/url"
+
+	"github.com/murtaza-u/account/view/partial/icon"
+)
 
 type SignUpParams struct {
 	Email           string `form:"email"`
@@ -13,7 +17,7 @@ templ SignUpForm(values SignUpParams, err map[string]error) {
 	<div class="w-full lg:w-1/2 bg-base-100">
 		<form
 			class="block w-full mx-auto lg:w-4/5 space-y-2"
-			action={ templ.URL("/signup?return_to=" + values.ReturnTo) }
+			action={ templ.URL(signupWithReturnTo(values.ReturnTo)) }
 			method="post"
 			hx-boost="true"
 		>
@@ -121,4 +125,11 @@ templ SignUp(values SignUpParams, err map[string]error) {
 			</a>
 		</div>
 	</main>
+}
+
+func signupWithReturnTo(returnTo string) string {
+	if returnTo == "" {
+		return "/signup"
+	}
+	return "/signup?return_to=" + url.QueryEscape(returnTo)
 }

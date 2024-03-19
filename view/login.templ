@@ -1,6 +1,10 @@
 package view
 
-import "github.com/murtaza-u/account/view/partial/icon"
+import (
+	"net/url"
+
+	"github.com/murtaza-u/account/view/partial/icon"
+)
 
 type LoginParams struct {
 	Email    string `form:"email"`
@@ -12,7 +16,7 @@ templ LoginForm(values LoginParams, err map[string]error) {
 	<div class="w-full lg:w-1/2 bg-base-100">
 		<form
 			class="block w-full mx-auto lg:w-4/5 space-y-2"
-			action={ templ.URL("/login?return_to=" + values.ReturnTo) }
+			action={ templ.URL(loginWithReturnTo(values.ReturnTo)) }
 			method="post"
 			hx-boost="true"
 		>
@@ -72,7 +76,10 @@ templ LoginForm(values LoginParams, err map[string]error) {
 			</div>
 			<div class="text-sm text-center">
 				Do not have an account?
-				<a href="/signup" class="link link-primary">Sign Up</a>
+				<a
+					href={ templ.URL(signupWithReturnTo(loginWithReturnTo(values.ReturnTo))) }
+					class="link link-primary"
+				>Sign Up</a>
 			</div>
 		</form>
 	</div>
@@ -91,4 +98,11 @@ templ Login(values LoginParams, err map[string]error) {
 			</a>
 		</div>
 	</main>
+}
+
+func loginWithReturnTo(returnTo string) string {
+	if returnTo == "" {
+		return "/login"
+	}
+	return "/login?return_to=" + url.QueryEscape(returnTo)
 }

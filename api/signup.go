@@ -18,16 +18,12 @@ import (
 )
 
 func (Server) SignUpPage(c echo.Context) error {
-	returnTo := c.QueryParam("return_to")
-	if returnTo == "" {
-		returnTo = "/login"
-	}
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"Sign Up | Account",
 			view.SignUp(view.SignUpParams{
-				ReturnTo: returnTo,
+				ReturnTo: c.QueryParam("return_to"),
 			}, map[string]error{}),
 		),
 	})
@@ -45,6 +41,7 @@ func (s Server) SignUp(c echo.Context) error {
 			Status: http.StatusBadRequest,
 		})
 	}
+	params.ReturnTo = c.QueryParam("return_to")
 
 	errMap := make(map[string]error)
 
@@ -76,7 +73,10 @@ func (s Server) SignUp(c echo.Context) error {
 			Ctx: c,
 			Component: layout.Base(
 				"Sign Up | Account",
-				view.Error("Failed to hash password", http.StatusInternalServerError),
+				view.Error(
+					"Failed to hash password",
+					http.StatusInternalServerError,
+				),
 			),
 			Status: http.StatusInternalServerError,
 		})
@@ -91,13 +91,16 @@ func (s Server) SignUp(c echo.Context) error {
 			Ctx: c,
 			Component: layout.Base(
 				"Sign Up | Account",
-				view.Error("Database operation failed", http.StatusInternalServerError),
+				view.Error(
+					"Database operation failed",
+					http.StatusInternalServerError,
+				),
 			),
 			Status: http.StatusInternalServerError,
 		})
 	}
 
-	returnTo := c.QueryParam("return_to")
+	returnTo := params.ReturnTo
 	if returnTo == "" {
 		returnTo = "/login"
 	}

@@ -1,6 +1,7 @@
 package console
 
 import (
+	"github.com/murtaza-u/account/api/middleware"
 	"github.com/murtaza-u/account/internal/sqlc"
 
 	"github.com/labstack/echo/v4"
@@ -17,17 +18,21 @@ func New(db *sqlc.Queries) API {
 }
 
 func (a API) Register(app *echo.Echo) {
+	auth := middleware.NewAuthMiddleware(a.db)
+
+	grp := app.Group("/console", auth.Required)
+
 	// overview
-	app.GET("/console", a.overviewPage)
+	grp.GET("", a.overviewPage)
 
 	// app
-	app.GET("/console/app", a.appsPage)
-	app.GET("/console/app/:id", a.appPage)
-	app.GET("/console/app/create", a.createAppPage)
-	app.POST("/console/app/create", a.createApp)
-	app.POST("/console/app/:id/update", a.updateApp)
-	app.DELETE("/console/app/:id/delete", a.deleteApp)
+	grp.GET("/app", a.appsPage)
+	grp.GET("/app/:id", a.appPage)
+	grp.GET("/app/create", a.createAppPage)
+	grp.POST("/app/create", a.createApp)
+	grp.POST("/app/:id/update", a.updateApp)
+	grp.DELETE("/app/:id/delete", a.deleteApp)
 
 	// user
-	app.GET("/console/user", a.userPage)
+	grp.GET("/user", a.userPage)
 }
