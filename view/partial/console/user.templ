@@ -19,7 +19,7 @@ templ Users(users []sqlc.User) {
 
 templ getAvatar(url sql.NullString, isAdmin bool) {
 	<div class={ "avatar" , templ.KV("online", isAdmin) }>
-		<div class="w-8 rounded-full">
+		<div class="w-8 h-8 rounded-full">
 			if url.Valid {
 				<img src={ url.String } alt="User's avatar"/>
 			} else {

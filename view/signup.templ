@@ -1,0 +1,123 @@
+package view
+
+import "github.com/murtaza-u/account/view/partial/icon"
+
+type Credentials struct {
+	Email           string `form:"email"`
+	Password        string `form:"password"`
+	ConfirmPassword string `form:"confirm_password"`
+}
+
+templ SignUpForm(values Credentials, err map[string]error) {
+	<div class="w-full lg:w-1/2 bg-base-100">
+		<form
+			class="block w-full mx-auto lg:w-4/5 space-y-2"
+			action="/signup"
+			method="post"
+			hx-boost="true"
+		>
+			<label class="form-control w-full">
+				<div class="label">
+					<span class="label-text">E-Mail</span>
+					<span class="label-text-alt text-error text-xl">*</span>
+				</div>
+				<input
+					required
+					name="email"
+					type="email"
+					maxlength="50"
+					value={ values.Email }
+					placeholder="Eg: foo.bar@example.com"
+					class={
+						"input input-bordered w-full",
+						templ.KV("input-error", err["email"] != nil),
+					}
+				/>
+				<div class="label">
+					if err["email"] != nil {
+						<span class="label-text-alt text-error first-letter:uppercase">
+							{ err["email"].Error() }
+						</span>
+					}
+					<span class="label-text-alt">Must be less than 50 characters</span>
+				</div>
+			</label>
+			<label class="form-control w-full">
+				<div class="label">
+					<span class="label-text">Password</span>
+					<span class="label-text-alt text-error text-xl">*</span>
+				</div>
+				<input
+					required
+					name="password"
+					type="password"
+					minlength="8"
+					maxlength="70"
+					value={ values.Password }
+					placeholder="********"
+					class={
+						"input input-bordered w-full",
+						templ.KV("input-error", err["password"] != nil),
+					}
+				/>
+				<div class="label">
+					if err["password"] != nil {
+						<span class="label-text-alt text-error first-letter:uppercase">
+							{ err["password"].Error() }
+						</span>
+					}
+					<span class="label-text-alt">Must be less than 70 characters</span>
+				</div>
+			</label>
+			<label class="form-control w-full">
+				<div class="label">
+					<span class="label-text">Confirm Password</span>
+					<span class="label-text-alt text-error text-xl">*</span>
+				</div>
+				<input
+					required
+					name="confirm_password"
+					type="password"
+					minlength="8"
+					maxlength="70"
+					value={ values.ConfirmPassword }
+					placeholder="********"
+					class={
+						"input input-bordered w-full",
+						templ.KV("input-error", err["confirm_password"] != nil),
+					}
+				/>
+				<div class="label">
+					if err["confirm_password"] != nil {
+						<span class="label-text-alt text-error first-letter:uppercase">
+							{ err["confirm_password"].Error() }
+						</span>
+					}
+					<span class="label-text-alt">Must be same as above</span>
+				</div>
+			</label>
+			<div class="flex items-center justify-end">
+				<button class="my-4 btn btn-primary w-full md:w-fit">Sign Up</button>
+			</div>
+			<div class="text-sm text-center">
+				Already have an account?
+				<a href="/login" class="link link-primary">Login</a>
+			</div>
+		</form>
+	</div>
+}
+
+templ SignUp(values Credentials, err map[string]error) {
+	<main class="min-h-screen flex flex-col justify-center items-center mx-3 lg:mx-3 lg:flex-row lg:justify-evenly">
+		@SignUpForm(values, err)
+		<div class="divider my-8 lg:my-0 lg:divider-horizontal">OR</div>
+		<div class="flex items-center justify-center w-1/2">
+			<a href="#" class="flex btn btn-neutral tracking-wide">
+				<span class="mr-0.5">
+					@icon.Github()
+				</span>
+				Sign in with GitHub
+			</a>
+		</div>
+	</main>
+}

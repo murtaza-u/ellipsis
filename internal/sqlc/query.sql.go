@@ -12,12 +12,12 @@ import (
 
 const createClient = `-- name: CreateClient :exec
 INSERT INTO client (
-	id,
-	secret_hash,
-	name,
-	callback_urls,
-	picture_url,
-	token_expiration
+    id,
+    secret_hash,
+    name,
+    callback_urls,
+    picture_url,
+    token_expiration
 ) VALUES (
 	?, ?, ?, ?, ?, ?
 )
@@ -46,7 +46,7 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) erro
 
 const createUser = `-- name: CreateUser :execresult
 INSERT INTO user (email, hashed_password, avatar_url) VALUES (
-  ?, ?, ?
+    ?, ?, ?
 )
 `
 
@@ -206,8 +206,8 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 
 const getUserAndClientCount = `-- name: GetUserAndClientCount :one
 SELECT
-	(SELECT COUNT(*) FROM user) as user_count,
-	(SELECT COUNT(*) FROM client) as client_count
+    (SELECT COUNT(*) FROM user) as user_count,
+    (SELECT COUNT(*) FROM client) as client_count
 `
 
 type GetUserAndClientCountRow struct {
@@ -276,9 +276,9 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 const updateClient = `-- name: UpdateClient :exec
 UPDATE client
 SET name = ?,
-	  callback_urls = ?,
-		picture_url = ?,
-		token_expiration = ?
+    callback_urls = ?,
+    picture_url = ?,
+    token_expiration = ?
 WHERE id = ?
 `
 

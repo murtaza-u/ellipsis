@@ -11,7 +11,7 @@ WHERE email = ? LIMIT 1;
 
 -- name: CreateUser :execresult
 INSERT INTO user (email, hashed_password, avatar_url) VALUES (
-  ?, ?, ?
+    ?, ?, ?
 );
 
 -- name: DeleteUser :exec
@@ -35,17 +35,17 @@ WHERE name = ?;
 
 -- name: GetUserAndClientCount :one
 SELECT
-	(SELECT COUNT(*) FROM user) as user_count,
-	(SELECT COUNT(*) FROM client) as client_count;
+    (SELECT COUNT(*) FROM user) as user_count,
+    (SELECT COUNT(*) FROM client) as client_count;
 
 -- name: CreateClient :exec
 INSERT INTO client (
-	id,
-	secret_hash,
-	name,
-	callback_urls,
-	picture_url,
-	token_expiration
+    id,
+    secret_hash,
+    name,
+    callback_urls,
+    picture_url,
+    token_expiration
 ) VALUES (
 	?, ?, ?, ?, ?, ?
 );
@@ -57,9 +57,9 @@ WHERE name = ? AND id != ?;
 -- name: UpdateClient :exec
 UPDATE client
 SET name = ?,
-	  callback_urls = ?,
-		picture_url = ?,
-		token_expiration = ?
+    callback_urls = ?,
+    picture_url = ?,
+    token_expiration = ?
 WHERE id = ?;
 
 -- name: DeleteClient :exec

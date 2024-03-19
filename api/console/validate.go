@@ -71,6 +71,7 @@ func (v *AppValidator) validateCallbackURLs() error {
 
 	for _, callback := range strings.Split(v.CallbackURLs, ",") {
 		callback = strings.TrimSpace(callback)
+		callback = strings.TrimSuffix(callback, "/")
 		_, err := url.ParseRequestURI(callback)
 		if err != nil {
 			return errors.New("one or more invalid URL")

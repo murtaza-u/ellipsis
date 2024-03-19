@@ -76,7 +76,7 @@ templ AppCreateForm(values AppParams, err map[string]error) {
 				/>
 				if err["name"] != nil {
 					<div class="label">
-						<span class="label-text-alt text-error">
+						<span class="label-text-alt text-error first-letter:uppercase">
 							{ err["name"].Error() }
 						</span>
 					</div>
@@ -99,7 +99,7 @@ templ AppCreateForm(values AppParams, err map[string]error) {
 				/>
 				<div class="label">
 					if err["logo"] != nil {
-						<span class="label-text-alt text-error">
+						<span class="label-text-alt text-error first-letter:uppercase">
 							{ err["logo"].Error() }
 						</span>
 					}
@@ -134,7 +134,7 @@ templ AppCreateForm(values AppParams, err map[string]error) {
 				/>
 				<div class="label">
 					if err["callback_urls"] != nil {
-						<span class="label-text-alt text-error">
+						<span class="label-text-alt text-error first-letter:uppercase">
 							{ err["callback_urls"].Error() }
 						</span>
 					}
@@ -160,7 +160,7 @@ templ AppCreateForm(values AppParams, err map[string]error) {
 				/>
 				<div class="label">
 					if err["id_token_expiration"] != nil {
-						<span class="label-text-alt text-error">
+						<span class="label-text-alt text-error first-letter:uppercase">
 							{ err["id_token_expiration"].Error() }
 						</span>
 					}
@@ -208,7 +208,7 @@ templ AppUpdateForm(values AppParams, success bool, err map[string]error) {
 			/>
 			if err["name"] != nil {
 				<div class="label">
-					<span class="label-text-alt text-error">
+					<span class="label-text-alt text-error first-letter:uppercase">
 						{ err["name"].Error() }
 					</span>
 				</div>
@@ -231,7 +231,7 @@ templ AppUpdateForm(values AppParams, success bool, err map[string]error) {
 			/>
 			<div class="label">
 				if err["logo"] != nil {
-					<span class="label-text-alt text-error">
+					<span class="label-text-alt text-error first-letter:uppercase">
 						{ err["logo"].Error() }
 					</span>
 				}
@@ -266,7 +266,7 @@ templ AppUpdateForm(values AppParams, success bool, err map[string]error) {
 			/>
 			<div class="label">
 				if err["callback_urls"] != nil {
-					<span class="label-text-alt text-error">
+					<span class="label-text-alt text-error first-letter:uppercase">
 						{ err["callback_urls"].Error() }
 					</span>
 				}
@@ -292,7 +292,7 @@ templ AppUpdateForm(values AppParams, success bool, err map[string]error) {
 			/>
 			<div class="label">
 				if err["id_token_expiration"] != nil {
-					<span class="label-text-alt text-error">
+					<span class="label-text-alt text-error first-letter:uppercase">
 						{ err["id_token_expiration"].Error() }
 					</span>
 				}
