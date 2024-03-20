@@ -10,7 +10,7 @@ import "context"
 import "io"
 import "bytes"
 
-import "github.com/murtaza-u/account/view/partial"
+import "github.com/murtaza-u/account/view/partial/icon"
 
 func Index() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
@@ -25,15 +25,15 @@ func Index() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- hero --><section class=\"h-screen overflow-hidden\"><header class=\"py-2\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- hero --><section class=\"h-screen overflow-hidden flex flex-col justify-center items-center space-y-6\" hx-boost=\"true\"><h1 class=\"bg-gradient-to-r from-blue-500 via-pink-500 to-purple-700 bg-clip-text py-1 text-center text-5xl font-bold text-transparent\">Authentication & Session Management Service</h1><a href=\"/me\" class=\"btn btn-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = partial.Nav().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icon.Goto().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</header><div class=\"h-screen flex justify-center items-center\"><h1 class=\"bg-gradient-to-r from-blue-500 via-pink-500\n				to-purple-700 bg-clip-text py-1 text-center text-5xl\n				font-bold text-transparent\">Authentication & Session Management Service</h1></div></section>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("My Account</a></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

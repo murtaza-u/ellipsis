@@ -97,6 +97,16 @@ func (q *Queries) DeleteClient(ctx context.Context, id string) error {
 	return err
 }
 
+const deleteSession = `-- name: DeleteSession :exec
+DELETE FROM session
+WHERE id = ? OR expires_at <= NOW()
+`
+
+func (q *Queries) DeleteSession(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, deleteSession, id)
+	return err
+}
+
 const deleteUser = `-- name: DeleteUser :exec
 DELETE FROM user
 WHERE id = ?

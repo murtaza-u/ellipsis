@@ -74,3 +74,7 @@ INSERT INTO session (id, user_id, client_id, expires_at, os, browser) VALUES (
 -- name: GetSession :one
 SELECT * FROM session
 WHERE id = ? LIMIT 1;
+
+-- name: DeleteSession :exec
+DELETE FROM session
+WHERE id = ? OR expires_at <= NOW();

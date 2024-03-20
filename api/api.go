@@ -58,6 +58,7 @@ func (s Server) Start() error {
 	s.app.POST("/signup", s.SignUp, auth.AlreadyAuthenticated)
 	s.app.GET("/login", s.LoginPage, auth.AlreadyAuthenticated)
 	s.app.POST("/login", s.Login, auth.AlreadyAuthenticated)
+	s.app.GET("/logout", s.Logout)
 
 	// console
 	console.New(s.queries).Register(s.app)

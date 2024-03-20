@@ -1,21 +1,19 @@
 package view
 
-import "github.com/murtaza-u/account/view/partial"
+import "github.com/murtaza-u/account/view/partial/icon"
 
 templ Index() {
 	<!-- hero -->
-	<section class="h-screen overflow-hidden">
-		<header class="py-2">
-			@partial.Nav()
-		</header>
-		<div class="h-screen flex justify-center items-center">
-			<h1
-				class="bg-gradient-to-r from-blue-500 via-pink-500
-				to-purple-700 bg-clip-text py-1 text-center text-5xl
-				font-bold text-transparent"
-			>
-				Authentication & Session Management Service
-			</h1>
-		</div>
+	<section
+		class="h-screen overflow-hidden flex flex-col justify-center items-center space-y-6"
+		hx-boost="true"
+	>
+		<h1 class="bg-gradient-to-r from-blue-500 via-pink-500 to-purple-700 bg-clip-text py-1 text-center text-5xl font-bold text-transparent">
+			Authentication & Session Management Service
+		</h1>
+		<a href="/me" class="btn btn-primary">
+			@icon.Goto()
+			My Account
+		</a>
 	</section>
 }
