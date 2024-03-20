@@ -157,12 +157,14 @@ func (s Server) Login(c echo.Context) error {
 		browser.Valid = true
 	}
 
+	expiresAt := time.Now().Add(time.Hour * 4)
+
 	_, err = s.queries.CreateSession(
 		c.Request().Context(),
 		sqlc.CreateSessionParams{
 			ID:        sessionID,
 			UserID:    u.ID,
-			ExpiresAt: time.Now(),
+			ExpiresAt: expiresAt,
 			Os:        sql.NullString{String: ua.OS, Valid: true},
 			Browser:   browser,
 		},
@@ -182,8 +184,12 @@ func (s Server) Login(c echo.Context) error {
 	}
 
 	c.SetCookie(&http.Cookie{
-		Name:  "session",
-		Value: sessionID,
+		Name:     "auth_session",
+		Value:    sessionID,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  expiresAt,
 	})
 
 	returnTo := params.ReturnTo

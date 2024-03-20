@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/murtaza-u/account/api/render"
 	"github.com/murtaza-u/account/internal/sqlc"
@@ -32,7 +33,7 @@ func (m AuthMiddleware) Required(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		returnTo := url.QueryEscape(c.Request().URL.RequestURI())
 		redirectTo := "/login?return_to=" + returnTo
-		cookie, err := c.Cookie("session")
+		cookie, err := c.Cookie("auth_session")
 		if err != nil {
 			return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
 		}
@@ -50,6 +51,9 @@ func (m AuthMiddleware) Required(next echo.HandlerFunc) echo.HandlerFunc {
 				Status: http.StatusInternalServerError,
 			})
 		}
+		if time.Until(sess.ExpiresAt) <= 0 {
+			return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
+		}
 		return next(CtxWithUserID{
 			Context: c,
 			UserID:  sess.UserID,
@@ -59,11 +63,11 @@ func (m AuthMiddleware) Required(next echo.HandlerFunc) echo.HandlerFunc {
 
 func (m AuthMiddleware) AlreadyAuthenticated(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		cookie, err := c.Cookie("session")
+		cookie, err := c.Cookie("auth_session")
 		if err != nil {
 			return next(c)
 		}
-		_, err = m.db.GetSession(c.Request().Context(), cookie.Value)
+		sess, err := m.db.GetSession(c.Request().Context(), cookie.Value)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return next(c)
@@ -76,6 +80,9 @@ func (m AuthMiddleware) AlreadyAuthenticated(next echo.HandlerFunc) echo.Handler
 				),
 				Status: http.StatusInternalServerError,
 			})
+		}
+		if time.Until(sess.ExpiresAt) <= 0 {
+			return next(c)
 		}
 		return c.Redirect(http.StatusTemporaryRedirect, "/me")
 	}
