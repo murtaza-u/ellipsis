@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/mileusna/useragent"
 	"github.com/murtaza-u/account/api/middleware"
 	"github.com/murtaza-u/account/api/render"
 	"github.com/murtaza-u/account/api/util"
@@ -59,6 +60,8 @@ type authorizeMetadata struct {
 	ClientID string   `json:"client_id"`
 	UserID   int64    `json:"user_id"`
 	Scopes   []string `json:"scopes"`
+	Browser  string   `json:"browser"`
+	OS       string   `json:"os"`
 }
 
 func (a API) authorize(c echo.Context) error {
@@ -178,10 +181,22 @@ func (a API) authorize(c echo.Context) error {
 		})
 	}
 
+	var ua useragent.UserAgent
+	uaRaw := c.Request().Header.Get("User-Agent")
+	if uaRaw != "" {
+		ua = useragent.Parse(uaRaw)
+	}
+	var browser string
+	if b := util.BrowserFromUA(ua); b != "" {
+		browser = b
+	}
+
 	a.cache.Put(code, authorizeMetadata{
 		ClientID: client.ID,
 		UserID:   userID,
 		Scopes:   scopes,
+		OS:       ua.OS,
+		Browser:  browser,
 	})
 
 	return c.Redirect(http.StatusFound, fmt.Sprintf(

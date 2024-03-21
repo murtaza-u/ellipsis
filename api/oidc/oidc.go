@@ -66,4 +66,5 @@ func (a API) Register(app *echo.Echo) {
 	app.GET("/authorize", a.authorize, auth.Required)
 
 	app.POST("/oauth/token", a.Token)
+	app.GET("/.well-known/jwks.json", a.JWKs)
 }

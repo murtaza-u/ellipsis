@@ -152,7 +152,7 @@ func (s Server) Login(c echo.Context) error {
 		ua = useragent.Parse(uaRaw)
 	}
 	var browser sql.NullString
-	if b := browserFromUA(ua); b != "" {
+	if b := util.BrowserFromUA(ua); b != "" {
 		browser.String = b
 		browser.Valid = true
 	}
@@ -208,26 +208,4 @@ func (s Server) Login(c echo.Context) error {
 	// render empty template
 	h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
 	return h.Component.Render(c.Request().Context(), r)
-}
-
-func browserFromUA(ua useragent.UserAgent) string {
-	if ua.IsChrome() {
-		return "Chrome"
-	}
-	if ua.IsEdge() {
-		return "Edge"
-	}
-	if ua.IsFirefox() {
-		return "Firefox"
-	}
-	if ua.IsInternetExplorer() {
-		return "IE"
-	}
-	if ua.IsOpera() {
-		return "Opera"
-	}
-	if ua.IsOperaMini() {
-		return "Opera Mini"
-	}
-	return ""
 }

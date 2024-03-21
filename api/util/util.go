@@ -7,6 +7,8 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
+
+	"github.com/mileusna/useragent"
 )
 
 const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
@@ -53,4 +55,26 @@ func PEMToEd25519PubKey(data []byte) (*ed25519.PublicKey, error) {
 		return nil, fmt.Errorf("failed to parse public key")
 	}
 	return &ed25519Pub, nil
+}
+
+func BrowserFromUA(ua useragent.UserAgent) string {
+	if ua.IsChrome() {
+		return "Chrome"
+	}
+	if ua.IsEdge() {
+		return "Edge"
+	}
+	if ua.IsFirefox() {
+		return "Firefox"
+	}
+	if ua.IsInternetExplorer() {
+		return "IE"
+	}
+	if ua.IsOpera() {
+		return "Opera"
+	}
+	if ua.IsOperaMini() {
+		return "Opera Mini"
+	}
+	return ""
 }

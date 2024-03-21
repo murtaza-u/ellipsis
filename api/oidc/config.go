@@ -11,6 +11,7 @@ type config struct {
 	AuthzEndp                      string   `json:"authorization_endpoint"`
 	TknEndp                        string   `json:"token_endpoint"`
 	UserinfoEndp                   string   `json:"userinfo_endpoint"`
+	JWKsURI                        string   `json:"jwks_uri"`
 	ScopesSupported                []string `json:"scopes_supported"`
 	ResponseTypesSupported         []string `json:"response_types_supported"`
 	ResponseModesSupported         []string `json:"response_modes_supported"`
@@ -29,6 +30,7 @@ func (API) configuration(c echo.Context) error {
 		AuthzEndp:                      "http://localhost:3000/authorize",
 		TknEndp:                        "http://localhost:3000/oauth/token",
 		UserinfoEndp:                   "http://localhost:3000/userinfo",
+		JWKsURI:                        "http://localhost:3000/.well-known/jwks.json",
 		ScopesSupported:                []string{"openid", "profile"},
 		ResponseTypesSupported:         []string{"code"},
 		ResponseModesSupported:         []string{"query"},

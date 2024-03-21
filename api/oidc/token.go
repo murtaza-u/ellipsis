@@ -1,14 +1,17 @@
 package oidc
 
 import (
+	"database/sql"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/murtaza-u/account/api/util"
+	"github.com/murtaza-u/account/internal/sqlc"
+
 	"github.com/alexedwards/argon2id"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
-	"github.com/murtaza-u/account/api/util"
 )
 
 type tknParams struct {
@@ -80,8 +83,8 @@ func (a API) Token(c echo.Context) error {
 	accessTkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, AccessTknClaims{
 		UserID: metadata.UserID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "https://localhost:3000/oauth/token",
-			Subject:   "https://localhost:3000/userinfo",
+			Issuer:    "http://localhost:3000/",
+			Subject:   "http://localhost:3000/userinfo",
 			Audience:  jwt.ClaimStrings{metadata.ClientID},
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
@@ -104,15 +107,16 @@ func (a API) Token(c echo.Context) error {
 		})
 	}
 
+	idTknExp := time.Now().Add(time.Second * time.Duration(client.TokenExpiration))
 	idTkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, IDTknClaims{
 		AuthSessionID: sessionID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "https://localhost:3000/oauth/token",
+			Issuer:    "http://localhost:3000/",
 			Subject:   metadata.ClientID,
 			Audience:  jwt.ClaimStrings{metadata.ClientID},
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(client.TokenExpiration))),
+			ExpiresAt: jwt.NewNumericDate(idTknExp),
 		},
 	})
 	idTknStr, err := idTkn.SignedString(a.key.priv)
@@ -120,6 +124,31 @@ func (a API) Token(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, tknResp{
 			Err:     "internal_error",
 			ErrDesc: "failed to generate id token",
+		})
+	}
+
+	var os, browser sql.NullString
+	if metadata.OS != "" {
+		os.String = metadata.OS
+		os.Valid = true
+	}
+	if metadata.Browser != "" {
+		browser.String = metadata.Browser
+		browser.Valid = true
+	}
+
+	_, err = a.db.CreateSession(c.Request().Context(), sqlc.CreateSessionParams{
+		ID:        sessionID,
+		UserID:    metadata.UserID,
+		ClientID:  sql.NullString{String: metadata.ClientID, Valid: true},
+		ExpiresAt: idTknExp,
+		Os:        os,
+		Browser:   browser,
+	})
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "internal_error",
+			ErrDesc: "database operation failed",
 		})
 	}
 
