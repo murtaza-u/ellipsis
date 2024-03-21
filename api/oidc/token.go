@@ -152,6 +152,9 @@ func (a API) Token(c echo.Context) error {
 		})
 	}
 
+	// invalidate auth code
+	a.cache.Delete(params.Code)
+
 	return c.JSON(http.StatusOK, tknResp{
 		AccessTkn: accessTknStr,
 		TknType:   "bearer",
