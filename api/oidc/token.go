@@ -157,7 +157,7 @@ func (a API) Token(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, tknResp{
 		AccessTkn: accessTknStr,
-		TknType:   "bearer",
+		TknType:   "Bearer",
 		ExpiresIn: 1800,
 		Scope:     strings.Join(metadata.Scopes, " "),
 		IDTkn:     idTknStr,
