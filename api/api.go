@@ -64,7 +64,11 @@ func (s Server) Start() error {
 	console.New(s.queries).Register(s.app)
 
 	// oidc
-	oidc.New(s.queries, s.cache).Register(s.app)
+	oidcAPI, err := oidc.New(s.queries, s.cache, s.KeyStore)
+	if err != nil {
+		return fmt.Errorf("failed to setup OIDC APIs: %w", err)
+	}
+	oidcAPI.Register(s.app)
 
 	return s.app.Start(fmt.Sprintf(":%d", s.Port))
 }

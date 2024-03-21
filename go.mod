@@ -7,6 +7,7 @@ require (
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/coreos/go-oidc/v3 v3.9.0
 	github.com/go-sql-driver/mysql v1.8.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/mileusna/useragent v1.3.4
 	github.com/murtaza-u/dream v0.0.1

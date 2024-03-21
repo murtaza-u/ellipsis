@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -179,17 +178,11 @@ func (a API) authorize(c echo.Context) error {
 		})
 	}
 
-	v, err := json.Marshal(authorizeMetadata{
+	a.cache.Put(code, authorizeMetadata{
 		ClientID: client.ID,
 		UserID:   userID,
 		Scopes:   scopes,
 	})
-	if err != nil {
-		err := newAuthorizeErr("internal_server_error",
-			"database operation failed")
-		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
-	}
-	a.cache.Put(code, v)
 
 	return c.Redirect(http.StatusFound, fmt.Sprintf(
 		"%s?code=%s&state=%s",

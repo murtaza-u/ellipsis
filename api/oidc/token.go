@@ -1,0 +1,105 @@
+package oidc
+
+import (
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/alexedwards/argon2id"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/labstack/echo/v4"
+)
+
+type tknParams struct {
+	ClientID     string `form:"client_id"`
+	ClientSecret string `form:"client_secret"`
+	Code         string `form:"code"`
+	GrantType    string `form:"grant_type"`
+}
+
+type tknResp struct {
+	Err       string `json:"error,omitempty"`
+	ErrDesc   string `json:"error_description,omitempty"`
+	AccessTkn string `json:"access_token,omitempty"`
+	TknType   string `json:"token_type,omitempty"`
+	ExpiresIn int    `json:"expires_in,omitempty"`
+	Scope     string `json:"scope,omitempty"`
+	IDTkn     string `json:"id_token,omitempty"`
+}
+
+func (a API) Token(c echo.Context) error {
+	params := new(tknParams)
+	if err := c.Bind(params); err != nil {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "bad_request",
+			ErrDesc: "failed to parse form data",
+		})
+	}
+	if params.GrantType != "authorization_code" {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "bad_request",
+			ErrDesc: "invalid or unsupported grant_type",
+		})
+	}
+	v := a.cache.Get(params.Code)
+	if v == nil {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "bad_request",
+			ErrDesc: "invalid or malformed authorization code",
+		})
+	}
+	metadata, ok := v.(authorizeMetadata)
+	if !ok {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "bad_request",
+			ErrDesc: "invalid or malformed authorization code",
+		})
+	}
+	if metadata.ClientID != params.ClientID {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "unauthorized",
+			ErrDesc: "invalid client id or secret",
+		})
+	}
+	client, err := a.db.GetClient(c.Request().Context(), metadata.ClientID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "unauthorized",
+			ErrDesc: "invalid client id or secret",
+		})
+	}
+	match, err := argon2id.ComparePasswordAndHash(params.ClientSecret, client.SecretHash)
+	if err != nil || !match {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "unauthorized",
+			ErrDesc: "invalid client id or secret",
+		})
+	}
+
+	tkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, AccessTknClaims{
+		UserID: metadata.UserID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    "https://localhost:3000/oauth/token",
+			Subject:   "https://localhost:3000/userinfo",
+			Audience:  jwt.ClaimStrings{metadata.ClientID},
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 1800)),
+		},
+	})
+	tknStr, err := tkn.SignedString(a.key.priv)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "internal_error",
+			ErrDesc: "failed to generate access token",
+		})
+	}
+
+	return c.JSON(http.StatusOK, tknResp{
+		AccessTkn: tknStr,
+		TknType:   "bearer",
+		ExpiresIn: 1800,
+		Scope:     strings.Join(metadata.Scopes, " "),
+		IDTkn:     "id_token",
+	})
+}

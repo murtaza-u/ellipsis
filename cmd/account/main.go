@@ -20,15 +20,21 @@ func main() {
 	if database == "" {
 		log.Fatal("ACCOUNT_MYSQL_DATABASE not set")
 	}
+	keyStore := os.Getenv("ACCOUNT_KEY_STORE")
+	if keyStore == "" {
+		log.Fatal("ACCOUNT_KEY_STORE not set")
+	}
 
 	s, err := api.New(api.Config{
 		DatabaseUser:     user,
 		DatabasePassword: pass,
 		Database:         database,
+		KeyStore:         keyStore,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	err = s.Start()
 	if err != nil {
 		log.Fatal(err)
