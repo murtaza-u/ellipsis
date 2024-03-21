@@ -8,6 +8,7 @@ import (
 	"github.com/alexedwards/argon2id"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"github.com/murtaza-u/account/api/util"
 )
 
 type tknParams struct {
@@ -76,7 +77,7 @@ func (a API) Token(c echo.Context) error {
 		})
 	}
 
-	tkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, AccessTknClaims{
+	accessTkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, AccessTknClaims{
 		UserID: metadata.UserID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "https://localhost:3000/oauth/token",
@@ -87,7 +88,7 @@ func (a API) Token(c echo.Context) error {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 1800)),
 		},
 	})
-	tknStr, err := tkn.SignedString(a.key.priv)
+	accessTknStr, err := accessTkn.SignedString(a.key.priv)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, tknResp{
 			Err:     "internal_error",
@@ -95,11 +96,38 @@ func (a API) Token(c echo.Context) error {
 		})
 	}
 
+	sessionID, err := util.GenerateRandom(25)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "internal_error",
+			ErrDesc: "failed to generate auth session id",
+		})
+	}
+
+	idTkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, IDTknClaims{
+		AuthSessionID: sessionID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    "https://localhost:3000/oauth/token",
+			Subject:   metadata.ClientID,
+			Audience:  jwt.ClaimStrings{metadata.ClientID},
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(client.TokenExpiration))),
+		},
+	})
+	idTknStr, err := idTkn.SignedString(a.key.priv)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, tknResp{
+			Err:     "internal_error",
+			ErrDesc: "failed to generate id token",
+		})
+	}
+
 	return c.JSON(http.StatusOK, tknResp{
-		AccessTkn: tknStr,
+		AccessTkn: accessTknStr,
 		TknType:   "bearer",
 		ExpiresIn: 1800,
 		Scope:     strings.Join(metadata.Scopes, " "),
-		IDTkn:     "id_token",
+		IDTkn:     idTknStr,
 	})
 }
