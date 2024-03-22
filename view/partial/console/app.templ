@@ -201,7 +201,7 @@ templ AppUpdateForm(values AppParams, success bool, err map[string]error) {
 	}
 	<form
 		class="block w-full space-y-2"
-		hx-post={ fmt.Sprintf("/console/app/%s/update", values.ID) }
+		hx-put={ fmt.Sprintf("/console/app/%s", values.ID) }
 		hx-swap="outerHTML"
 	>
 		<label class="form-control w-full">
@@ -332,12 +332,18 @@ templ AppCreate() {
 	</section>
 }
 
-templ ConfirmDelete() {
+templ ConfirmDelete(id string) {
 	<dialog id="confirm_delete" class="modal modal-bottom sm:modal-middle">
 		<div class="modal-box">
-			<h3 class="font-bold text-lg">Hello!</h3>
-			<p class="py-4">Press ESC key or click the button below to close</p>
+			<h3 class="font-bold text-lg">Are you sure you want to continue?</h3>
+			<p class="py-4">This will delete this app permanently</p>
 			<div class="modal-action">
+				<form
+					hx-delete={ fmt.Sprintf("/console/app/%s", id) }
+					hx-swap="outerHTML"
+				>
+					<button type="submit" class="btn btn-error">Delete</button>
+				</form>
 				<form method="dialog">
 					<!-- if there is a button in form, it will close the modal -->
 					<button class="btn">Cancel</button>
@@ -348,7 +354,7 @@ templ ConfirmDelete() {
 }
 
 templ App(app sqlc.Client) {
-	@ConfirmDelete()
+	@ConfirmDelete(app.ID)
 	<section class="flex justify-between items-center bg-temple mb-5">
 		<div class="hidden w-1/3 justify-center items-center lg:flex">
 			@icon.Grid(80)
@@ -362,14 +368,15 @@ templ App(app sqlc.Client) {
 				IDTokenExpiration: time.Duration(app.TokenExpiration),
 			}, false, map[string]error{})
 			<hr class="my-10"/>
-			<form
-				class="flex items-center justify-around mt-5"
-				hx-delete={ fmt.Sprintf("/console/app/%s/delete", app.ID) }
-				hx-swap="outerHTML"
-			>
+			<div class="flex items-center justify-around mt-5">
 				<h2 class="text-3xl font-bold">Danger Zone</h2>
-				<button type="submit" class="btn btn-error">Delete App</button>
-			</form>
+				<button
+					onclick="confirm_delete.showModal()"
+					class="btn btn-error"
+				>
+					Delete App
+				</button>
+			</div>
 		</div>
 	</section>
 }

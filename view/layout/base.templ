@@ -11,8 +11,9 @@ templ Base(title string, children ...templ.Component) {
 			@fonts()
 			<!-- favicon -->
 			<link rel="icon" type="image/png" href="/static/favicon.png"/>
-			<!-- tailwind css -->
+			<!-- css -->
 			<link href="/static/css/tailwind.css" rel="stylesheet"/>
+			<link href="/static/css/style.css" rel="stylesheet"/>
 		</head>
 		<body class="font-sans">
 			for _, child := range children {

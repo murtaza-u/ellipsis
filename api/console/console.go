@@ -28,10 +28,10 @@ func (a API) Register(app *echo.Echo) {
 	// app
 	grp.GET("/app", a.appsPage)
 	grp.GET("/app/:id", a.appPage)
+	grp.PUT("/app/:id", a.updateApp)
+	grp.DELETE("/app/:id", a.deleteApp)
 	grp.GET("/app/create", a.createAppPage)
 	grp.POST("/app/create", a.createApp)
-	grp.POST("/app/:id/update", a.updateApp)
-	grp.DELETE("/app/:id/delete", a.deleteApp)
 
 	// user
 	grp.GET("/user", a.userPage)

@@ -24,4 +24,5 @@ func (a API) Register(app *echo.Echo) {
 	grp.GET("", a.ProfilePage)
 	grp.POST("/change-password", a.ChangePassword)
 	grp.GET("/session", a.SessionPage)
+	grp.DELETE("/session/:id", a.DeleteSession)
 }

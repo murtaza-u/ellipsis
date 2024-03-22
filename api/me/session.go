@@ -68,3 +68,32 @@ func (a API) SessionPage(c echo.Context) error {
 		),
 	})
 }
+
+func (a API) DeleteSession(c echo.Context) error {
+	id := c.Param("id")
+	err := a.db.DeleteSession(c.Request().Context(), id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return render.Do(render.Params{
+				Ctx: c,
+				Component: view.Error(
+					"invalid session id",
+					http.StatusBadRequest,
+				),
+				Status: http.StatusBadRequest,
+			})
+		}
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: view.Error(
+				"database operation failed",
+				http.StatusInternalServerError,
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+	return render.Do(render.Params{
+		Ctx:       c,
+		Component: view.Empty(),
+	})
+}

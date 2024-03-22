@@ -1,7 +1,10 @@
 package me
 
 import (
+	"fmt"
+
 	"github.com/murtaza-u/account/internal/sqlc"
+	"github.com/murtaza-u/account/view/partial/icon"
 
 	"github.com/xeonx/timeago"
 )
@@ -17,9 +20,10 @@ templ Sessions(sessions []sqlc.GetSessionForUserIDRow, curr string) {
 					<th>Expiry</th>
 					<th>OS</th>
 					<th>Browser</th>
+					<th></th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody hx-target="closest tr" hx-swap="outerHTML swap:0.5s">
 				for _, s := range sessions {
 					<tr>
 						<td>
@@ -38,6 +42,15 @@ templ Sessions(sessions []sqlc.GetSessionForUserIDRow, curr string) {
 						<td>{ timeago.English.Format(s.ExpiresAt) }</td>
 						<td>{ s.Os.String }</td>
 						<td>{ s.Browser.String }</td>
+						<td>
+							if s.ID != curr {
+								<form hx-delete={ fmt.Sprintf("/me/session/%s", s.ID) }>
+									<button type="submit" class="text-error">
+										@icon.Trash()
+									</button>
+								</form>
+							}
+						</td>
 					</tr>
 				}
 			</tbody>
