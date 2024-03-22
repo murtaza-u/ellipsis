@@ -19,11 +19,12 @@ import (
 )
 
 type authorizeParams struct {
-	ClientID     string `query:"client_id"`
-	ResponseType string `query:"response_type"`
-	Scope        string `query:"scope"`
-	State        string `query:"state"`
-	RedirectURI  string `query:"redirect_uri"`
+	ClientID           string `query:"client_id"`
+	ResponseType       string `query:"response_type"`
+	Scope              string `query:"scope"`
+	State              string `query:"state"`
+	RedirectURI        string `query:"redirect_uri"`
+	IDTknSignedRespAlg string `query:"id_token_signed_response_alg"`
 }
 
 type authorizeErr struct {
@@ -133,17 +134,24 @@ func (a API) authorize(c echo.Context) error {
 		})
 	}
 
+	redirectStat := http.StatusTemporaryRedirect
+
 	if p.ResponseType != "code" {
 		err := newAuthorizeErr("bad_request", "response type not supported")
-		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
+		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
+	}
+
+	if p.IDTknSignedRespAlg != "" && p.IDTknSignedRespAlg != "EdDSA" {
+		err := newAuthorizeErr("bad_request",
+			"unsupported id token signing algorithm")
+		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
 	}
 
 	scopes := strings.Split(p.Scope, " ")
 	if len(scopes) == 0 {
 		err := newAuthorizeErr("bad_request", "missing scope")
-		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
+		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
 	}
-
 	var hasOpenIDScope, hasInvalidScope bool
 	for _, s := range scopes {
 		if s == ScopeOIDC {
@@ -156,18 +164,18 @@ func (a API) authorize(c echo.Context) error {
 	}
 	if hasInvalidScope {
 		err := newAuthorizeErr("bad_request", "unsupported scope")
-		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
+		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
 	}
 	if !hasOpenIDScope {
 		err := newAuthorizeErr("bad_request", "missing openid scope")
-		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
+		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
 	}
 
 	code, err := util.GenerateRandom(13)
 	if err != nil {
 		err := newAuthorizeErr("internal_server_error",
 			"failed to generate authorization code")
-		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
+		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
 	}
 
 	var userID int64
