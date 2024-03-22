@@ -47,6 +47,7 @@ func (a API) UserInfo(c echo.Context) error {
 			ErrDesc: "invalid or expired access token",
 		})
 	}
+
 	exp, err := tkn.Claims.GetExpirationTime()
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, UserInfo{
@@ -60,6 +61,7 @@ func (a API) UserInfo(c echo.Context) error {
 			ErrDesc: "invalid or expired access token",
 		})
 	}
+
 	claims, ok := tkn.Claims.(*AccessTknClaims)
 	if !ok {
 		return c.JSON(http.StatusBadRequest, UserInfo{
@@ -67,6 +69,20 @@ func (a API) UserInfo(c echo.Context) error {
 			ErrDesc: "invalid or expired access token",
 		})
 	}
+
+	var isAuthz bool
+	for _, s := range claims.Scopes {
+		if s == ScopeProfile {
+			isAuthz = true
+		}
+	}
+	if !isAuthz {
+		return c.JSON(http.StatusBadRequest, UserInfo{
+			Err:     "unauthorized",
+			ErrDesc: "access token does not contain the required scope",
+		})
+	}
+
 	u, err := a.db.GetUser(c.Request().Context(), claims.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -80,6 +96,7 @@ func (a API) UserInfo(c echo.Context) error {
 			ErrDesc: "database operation failed",
 		})
 	}
+
 	return c.JSON(http.StatusOK, UserInfo{
 		Email:     u.Email,
 		AvatarURL: u.AvatarUrl.String,

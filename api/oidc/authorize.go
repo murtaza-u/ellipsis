@@ -144,15 +144,22 @@ func (a API) authorize(c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
 	}
 
-	var validScope bool
+	var hasOpenIDScope, hasInvalidScope bool
 	for _, s := range scopes {
-		if s == ScopeOIDC || s == ScopeProfile {
-			validScope = true
+		if s == ScopeOIDC {
+			hasOpenIDScope = true
+		}
+		if s != ScopeOIDC && s != ScopeProfile {
+			hasInvalidScope = true
 			break
 		}
 	}
-	if !validScope {
+	if hasInvalidScope {
 		err := newAuthorizeErr("bad_request", "unsupported scope")
+		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
+	}
+	if !hasOpenIDScope {
+		err := newAuthorizeErr("bad_request", "missing openid scope")
 		return c.Redirect(http.StatusTemporaryRedirect, err.AttachTo(redirectTo))
 	}
 

@@ -82,6 +82,7 @@ func (a API) Token(c echo.Context) error {
 
 	accessTkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, AccessTknClaims{
 		UserID: metadata.UserID,
+		Scopes: metadata.Scopes,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "http://localhost:3000/",
 			Subject:   "http://localhost:3000/userinfo",
