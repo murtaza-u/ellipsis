@@ -22,6 +22,11 @@ WHERE id = ?;
 DELETE FROM user
 WHERE email = ?;
 
+-- name: UpdateUserPasswordHash :exec
+UPDATE user
+SET hashed_password = ?
+WHERE id = ?;
+
 -- name: GetClients :many
 SELECT * FROM client;
 
@@ -78,3 +83,17 @@ WHERE id = ? LIMIT 1;
 -- name: DeleteSession :exec
 DELETE FROM session
 WHERE id = ? OR expires_at <= NOW();
+
+-- name: GetSessionForUserID :many
+SELECT
+    session.id,
+    session.created_at,
+    session.expires_at,
+    session.os,
+    session.browser,
+    client.name as client_name
+FROM
+    session
+LEFT JOIN client
+ON session.client_id = client.id
+WHERE session.user_id = ?;

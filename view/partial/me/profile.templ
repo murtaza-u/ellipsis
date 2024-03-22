@@ -1,0 +1,116 @@
+package me
+
+import "github.com/murtaza-u/account/view/partial/icon"
+
+templ Profile() {
+	@ChangePassword(ChangePasswordParams{}, map[string]error{}, false)
+}
+
+type ChangePasswordParams struct {
+	OldPassword        string `form:"old_password"`
+	NewPassword        string `form:"new_password"`
+	NewConfirmPassword string `form:"new_confirm_password"`
+}
+
+templ ChangePassword(values ChangePasswordParams, err map[string]error, success bool) {
+	if (success) {
+		<div class="toast toast-start">
+			<div class="alert alert-success">
+				@icon.Trophy()
+				<span>Password Changed</span>
+			</div>
+		</div>
+	}
+	<form
+		class="w-full lg:w-1/2 space-y-2"
+		hx-post="/me/change-password"
+		hx-swap="outerHTML"
+		hx-boost="true"
+	>
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">Old Password</span>
+				<span class="label-text-alt text-error text-xl">*</span>
+			</div>
+			<input
+				required
+				name="old_password"
+				type="password"
+				minlength="8"
+				maxlength="70"
+				value={ values.OldPassword }
+				placeholder="********"
+				class={
+					"input input-bordered w-full",
+					templ.KV("input-error", err["old_password"] != nil),
+				}
+			/>
+			if err["old_password"] != nil {
+				<div class="label">
+					<span class="label-text-alt text-error first-letter:uppercase">
+						{ err["old_password"].Error() }
+					</span>
+				</div>
+			}
+		</label>
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">New Password</span>
+				<span class="label-text-alt text-error text-xl">*</span>
+			</div>
+			<input
+				required
+				name="new_password"
+				type="password"
+				minlength="8"
+				maxlength="70"
+				value={ values.NewPassword }
+				placeholder="********"
+				class={
+					"input input-bordered w-full",
+					templ.KV("input-error", err["new_password"] != nil),
+				}
+			/>
+			<div class="label">
+				if err["new_password"] != nil {
+					<span class="label-text-alt text-error first-letter:uppercase">
+						{ err["new_password"].Error() }
+					</span>
+				}
+				<span class="label-text-alt">Must be less than 70 characters</span>
+			</div>
+		</label>
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">New Confirm Password</span>
+				<span class="label-text-alt text-error text-xl">*</span>
+			</div>
+			<input
+				required
+				name="new_confirm_password"
+				type="password"
+				minlength="8"
+				maxlength="70"
+				value={ values.NewConfirmPassword }
+				placeholder="********"
+				class={
+					"input input-bordered w-full",
+					templ.KV("input-error", err["new_confirm_password"] != nil),
+				}
+			/>
+			<div class="label">
+				if err["new_confirm_password"] != nil {
+					<span class="label-text-alt text-error first-letter:uppercase">
+						{ err["new_confirm_password"].Error() }
+					</span>
+				}
+				<span class="label-text-alt">Must be same as above</span>
+			</div>
+		</label>
+		<div class="flex items-center justify-end">
+			<button class="my-4 btn btn-primary w-full md:w-fit">
+				Change Password
+			</button>
+		</div>
+	</form>
+}

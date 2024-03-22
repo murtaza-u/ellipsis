@@ -10,7 +10,7 @@ templ Error(err string, code int) {
 				<h1 class="mb-5 text-5xl font-bold">
 					{ fmt.Sprintf("Oops! - %d", code) }
 				</h1>
-				<p class="mb-5 text-md">{ err }</p>
+				<p class="mb-5 text-md first-letter:uppercase">{ err }</p>
 				<a href="/" class="btn btn-primary">Homepage</a>
 			</div>
 		</div>

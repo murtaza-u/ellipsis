@@ -1,0 +1,49 @@
+package view
+
+import "strings"
+
+templ Me(route string, child templ.Component) {
+	<header>
+		<div class="mx-3 my-5 lg:mx-5">
+			<h1 class="mb-8 text-4xl font-bold">My Account</h1>
+			<nav>
+				<ul
+					class="flex w-full items-center rounded-lg bg-base-200 px-2 py-3 lg:w-fit"
+					hx-boost="true"
+				>
+					<li>
+						<a
+							href="/me"
+							class={
+								"rounded-lg p-2",
+								templ.KV(
+									"bg-base-100 shadow-md",
+									strings.EqualFold(route, "/me"),
+								),
+							}
+						>
+							Profile
+						</a>
+					</li>
+					<li>
+						<a
+							href="/me/session"
+							class={
+								"rounded-lg p-2",
+								templ.KV(
+									"bg-base-100 shadow-md",
+									strings.EqualFold(route, "/me/session"),
+								),
+							}
+						>
+							Sessions
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+	<main class="mx-3 lg:mx-5">
+		@child
+	</main>
+}

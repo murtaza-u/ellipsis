@@ -24,9 +24,10 @@ func NewAuthMiddleware(db *sqlc.Queries) AuthMiddleware {
 	}
 }
 
-type CtxWithUserID struct {
+type CtxWithIDs struct {
 	echo.Context
-	UserID int64
+	UserID    int64
+	SessionID string
 }
 
 func (m AuthMiddleware) Required(next echo.HandlerFunc) echo.HandlerFunc {
@@ -54,9 +55,10 @@ func (m AuthMiddleware) Required(next echo.HandlerFunc) echo.HandlerFunc {
 		if time.Until(sess.ExpiresAt) <= 0 {
 			return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
 		}
-		return next(CtxWithUserID{
-			Context: c,
-			UserID:  sess.UserID,
+		return next(CtxWithIDs{
+			Context:   c,
+			UserID:    sess.UserID,
+			SessionID: sess.ID,
 		})
 	}
 }

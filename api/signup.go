@@ -7,6 +7,7 @@ import (
 	"net/mail"
 
 	"github.com/murtaza-u/account/api/render"
+	"github.com/murtaza-u/account/api/util"
 	"github.com/murtaza-u/account/internal/sqlc"
 	"github.com/murtaza-u/account/view"
 	"github.com/murtaza-u/account/view/layout"
@@ -14,7 +15,6 @@ import (
 	"github.com/a-h/templ"
 	"github.com/alexedwards/argon2id"
 	"github.com/labstack/echo/v4"
-	pswdValidator "github.com/wagslane/go-password-validator"
 )
 
 func (Server) SignUpPage(c echo.Context) error {
@@ -48,7 +48,7 @@ func (s Server) SignUp(c echo.Context) error {
 	if err := validateEmail(params.Email); err != nil {
 		errMap["email"] = err
 	}
-	if err := validatePassword(params.Password); err != nil {
+	if err := util.ValidatePassword(params.Password); err != nil {
 		errMap["password"] = err
 	}
 	if params.Password != params.ConfirmPassword {
@@ -125,17 +125,6 @@ func validateEmail(email string) error {
 	_, err := mail.ParseAddress(email)
 	if err != nil {
 		return errors.New("invalid E-Mail")
-	}
-	return nil
-}
-
-func validatePassword(pswd string) error {
-	if len(pswd) < 8 || len(pswd) > 70 {
-		return errors.New("password must be between 8 and 70 characters")
-	}
-	err := pswdValidator.Validate(pswd, 60)
-	if err != nil {
-		return err
 	}
 	return nil
 }

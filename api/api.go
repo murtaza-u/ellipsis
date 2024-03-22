@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/murtaza-u/account/api/console"
+	"github.com/murtaza-u/account/api/me"
 	"github.com/murtaza-u/account/api/middleware"
 	"github.com/murtaza-u/account/api/oidc"
 	"github.com/murtaza-u/account/db"
@@ -69,6 +70,8 @@ func (s Server) Start() error {
 		return fmt.Errorf("failed to setup OIDC APIs: %w", err)
 	}
 	oidcAPI.Register(s.app)
+
+	me.New(s.queries).Register(s.app)
 
 	return s.app.Start(fmt.Sprintf(":%d", s.Port))
 }

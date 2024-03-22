@@ -5,10 +5,12 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"math/big"
 
 	"github.com/mileusna/useragent"
+	pswdValidator "github.com/wagslane/go-password-validator"
 )
 
 const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
@@ -77,4 +79,15 @@ func BrowserFromUA(ua useragent.UserAgent) string {
 		return "Opera Mini"
 	}
 	return ""
+}
+
+func ValidatePassword(pswd string) error {
+	if len(pswd) < 8 || len(pswd) > 70 {
+		return errors.New("password must be between 8 and 70 characters")
+	}
+	err := pswdValidator.Validate(pswd, 60)
+	if err != nil {
+		return err
+	}
+	return nil
 }

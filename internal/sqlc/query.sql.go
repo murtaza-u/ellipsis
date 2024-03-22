@@ -247,6 +247,60 @@ func (q *Queries) GetSession(ctx context.Context, id string) (Session, error) {
 	return i, err
 }
 
+const getSessionForUserID = `-- name: GetSessionForUserID :many
+SELECT
+    session.id,
+    session.created_at,
+    session.expires_at,
+    session.os,
+    session.browser,
+    client.name as client_name
+FROM
+    session
+LEFT JOIN client
+ON session.client_id = client.id
+WHERE session.user_id = ?
+`
+
+type GetSessionForUserIDRow struct {
+	ID         string
+	CreatedAt  time.Time
+	ExpiresAt  time.Time
+	Os         sql.NullString
+	Browser    sql.NullString
+	ClientName sql.NullString
+}
+
+func (q *Queries) GetSessionForUserID(ctx context.Context, userID int64) ([]GetSessionForUserIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSessionForUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSessionForUserIDRow
+	for rows.Next() {
+		var i GetSessionForUserIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.ExpiresAt,
+			&i.Os,
+			&i.Browser,
+			&i.ClientName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, email, avatar_url, hashed_password, is_admin, created_at FROM user
 WHERE id = ? LIMIT 1
@@ -362,5 +416,21 @@ func (q *Queries) UpdateClient(ctx context.Context, arg UpdateClientParams) erro
 		arg.TokenExpiration,
 		arg.ID,
 	)
+	return err
+}
+
+const updateUserPasswordHash = `-- name: UpdateUserPasswordHash :exec
+UPDATE user
+SET hashed_password = ?
+WHERE id = ?
+`
+
+type UpdateUserPasswordHashParams struct {
+	HashedPassword sql.NullString
+	ID             int64
+}
+
+func (q *Queries) UpdateUserPasswordHash(ctx context.Context, arg UpdateUserPasswordHashParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserPasswordHash, arg.HashedPassword, arg.ID)
 	return err
 }

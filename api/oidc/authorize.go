@@ -179,7 +179,7 @@ func (a API) authorize(c echo.Context) error {
 	}
 
 	var userID int64
-	if ctx, ok := c.(middleware.CtxWithUserID); ok {
+	if ctx, ok := c.(middleware.CtxWithIDs); ok {
 		userID = ctx.UserID
 	}
 	if userID == 0 {

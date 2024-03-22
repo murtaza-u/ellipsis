@@ -38,14 +38,14 @@ func Error(err string, code int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><p class=\"mb-5 text-md\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><p class=\"mb-5 text-md first-letter:uppercase\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(err)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/error.templ`, Line: 13, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/error.templ`, Line: 13, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {

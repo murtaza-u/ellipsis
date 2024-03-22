@@ -1,0 +1,46 @@
+package me
+
+import (
+	"github.com/murtaza-u/account/internal/sqlc"
+
+	"github.com/xeonx/timeago"
+)
+
+templ Sessions(sessions []sqlc.GetSessionForUserIDRow, curr string) {
+	<div class="overflow-x-auto">
+		<table class="table whitespace-nowrap">
+			<thead>
+				<tr>
+					<th></th>
+					<th>App</th>
+					<th>Created</th>
+					<th>Expiry</th>
+					<th>OS</th>
+					<th>Browser</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, s := range sessions {
+					<tr>
+						<td>
+							if s.ID == curr {
+								<span class="badge badge-outline mr-1">CURRENT</span>
+							}
+						</td>
+						<td>
+							if s.ClientName.Valid {
+								{ s.ClientName.String }
+							} else {
+								*
+							}
+						</td>
+						<td>{ timeago.English.Format(s.CreatedAt) }</td>
+						<td>{ timeago.English.Format(s.ExpiresAt) }</td>
+						<td>{ s.Os.String }</td>
+						<td>{ s.Browser.String }</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
