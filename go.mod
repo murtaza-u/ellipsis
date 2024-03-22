@@ -12,6 +12,7 @@ require (
 	github.com/mileusna/useragent v1.3.4
 	github.com/murtaza-u/dream v0.0.1
 	github.com/wagslane/go-password-validator v0.3.0
+	github.com/xeonx/timeago v1.0.0-rc5
 	golang.org/x/oauth2 v0.18.0
 )
 

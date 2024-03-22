@@ -7,6 +7,8 @@ import (
 
 	"github.com/murtaza-u/account/internal/sqlc"
 	"github.com/murtaza-u/account/view/partial/icon"
+
+	"github.com/xeonx/timeago"
 )
 
 templ Apps(apps []sqlc.Client) {
@@ -16,28 +18,42 @@ templ Apps(apps []sqlc.Client) {
 			Create Application
 		</a>
 	</div>
-	<ul class="space-y-4" hx-boost="true">
-		for _, app := range apps {
-			<li class="flex justify-between items-center py-2 px-4 border-b-2 border-x-2 rounded-lg shadow-sm">
-				<a href={ templ.SafeURL(fmt.Sprintf("/console/app/%s", app.ID)) } class="block">
-					<div class="flex items-center space-x-4">
-						<div class="avatar">
+	<div class="overflow-x-auto">
+		<table class="table whitespace-nowrap">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Branding</th>
+					<th>Name</th>
+					<th>Created</th>
+					<th class="hidden lg:table-cell">Client ID</th>
+				</tr>
+			</thead>
+			<tbody hx-boost="true">
+				for _, app := range apps {
+					<tr>
+						<td>
+							<a href={ templ.SafeURL(fmt.Sprintf("/console/app/%s", app.ID)) }>
+								@icon.Goto()
+							</a>
+						</td>
+						<td class="avatar">
 							<div class="w-8 h-8 rounded">
 								<img src={ getPictureURL(app.PictureUrl) }/>
 							</div>
-						</div>
-						<h2 class="text-lg hover:underline">{ app.Name }</h2>
-					</div>
-				</a>
-				<div class="hidden items-center lg:flex">
-					Client ID:
-					<span class="ml-1 bg-base-200 p-1 font-mono">
-						{ app.ID }
-					</span>
-				</div>
-			</li>
-		}
-	</ul>
+						</td>
+						<td>{ app.Name }</td>
+						<td>{ timeago.English.Format(app.CreatedAt) }</td>
+						<td class="hidden lg:table-cell">
+							<span class="p-1 bg-base-200 font-mono">
+								{ app.ID }
+							</span>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
 }
 
 type AppParams struct {

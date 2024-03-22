@@ -128,7 +128,7 @@ func (q *Queries) DeleteUserByEmail(ctx context.Context, email string) error {
 }
 
 const getClient = `-- name: GetClient :one
-SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration FROM client
+SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration, created_at FROM client
 WHERE id = ?
 `
 
@@ -142,12 +142,13 @@ func (q *Queries) GetClient(ctx context.Context, id string) (Client, error) {
 		&i.PictureUrl,
 		&i.CallbackUrls,
 		&i.TokenExpiration,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getClientByName = `-- name: GetClientByName :one
-SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration FROM client
+SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration, created_at FROM client
 WHERE name = ?
 `
 
@@ -161,12 +162,13 @@ func (q *Queries) GetClientByName(ctx context.Context, name string) (Client, err
 		&i.PictureUrl,
 		&i.CallbackUrls,
 		&i.TokenExpiration,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getClientByNameForUnmatchingID = `-- name: GetClientByNameForUnmatchingID :one
-SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration FROM client
+SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration, created_at FROM client
 WHERE name = ? AND id != ?
 `
 
@@ -185,12 +187,13 @@ func (q *Queries) GetClientByNameForUnmatchingID(ctx context.Context, arg GetCli
 		&i.PictureUrl,
 		&i.CallbackUrls,
 		&i.TokenExpiration,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getClients = `-- name: GetClients :many
-SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration FROM client
+SELECT id, secret_hash, name, picture_url, callback_urls, token_expiration, created_at FROM client
 `
 
 func (q *Queries) GetClients(ctx context.Context) ([]Client, error) {
@@ -209,6 +212,7 @@ func (q *Queries) GetClients(ctx context.Context) ([]Client, error) {
 			&i.PictureUrl,
 			&i.CallbackUrls,
 			&i.TokenExpiration,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -244,7 +248,7 @@ func (q *Queries) GetSession(ctx context.Context, id string) (Session, error) {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, email, avatar_url, hashed_password, is_admin FROM user
+SELECT id, email, avatar_url, hashed_password, is_admin, created_at FROM user
 WHERE id = ? LIMIT 1
 `
 
@@ -257,6 +261,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.AvatarUrl,
 		&i.HashedPassword,
 		&i.IsAdmin,
+		&i.CreatedAt,
 	)
 	return i, err
 }
@@ -280,7 +285,7 @@ func (q *Queries) GetUserAndClientCount(ctx context.Context) (GetUserAndClientCo
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, avatar_url, hashed_password, is_admin FROM user
+SELECT id, email, avatar_url, hashed_password, is_admin, created_at FROM user
 WHERE email = ? LIMIT 1
 `
 
@@ -293,12 +298,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.AvatarUrl,
 		&i.HashedPassword,
 		&i.IsAdmin,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT id, email, avatar_url, hashed_password, is_admin FROM user
+SELECT id, email, avatar_url, hashed_password, is_admin, created_at FROM user
 `
 
 func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
@@ -316,6 +322,7 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 			&i.AvatarUrl,
 			&i.HashedPassword,
 			&i.IsAdmin,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}

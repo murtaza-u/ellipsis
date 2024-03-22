@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS user (
     email VARCHAR(50) NOT NULL UNIQUE,
     avatar_url VARCHAR(100),
     hashed_password VARCHAR(255),
-    is_admin BOOLEAN NOT NULL DEFAULT false
+    is_admin BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS client (
@@ -12,7 +13,8 @@ CREATE TABLE IF NOT EXISTS client (
     name VARCHAR(50) NOT NULL UNIQUE,
     picture_url VARCHAR(100),
     callback_urls VARCHAR(1000) NOT NULL,
-    token_expiration bigint NOT NULL DEFAULT 28800
+    token_expiration bigint NOT NULL DEFAULT 28800,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS authorization_history (

@@ -4,17 +4,42 @@ import (
 	"database/sql"
 
 	"github.com/murtaza-u/account/internal/sqlc"
+	"github.com/murtaza-u/account/view/partial/icon"
+
+	"github.com/xeonx/timeago"
 )
 
 templ Users(users []sqlc.User) {
-	<ul class="space-y-4">
-		for _, u := range users {
-			<li class="flex items-center space-x-4 p-4 border-b-2">
-				@getAvatar(u.AvatarUrl, u.IsAdmin)
-				<h2>{ u.Email }</h2>
-			</li>
-		}
-	</ul>
+	<div class="overflow-x-auto">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Avatar</th>
+					<th>E-Mail</th>
+					<th>Created</th>
+					<th>Is Admin</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, u := range users {
+					<tr>
+						<td>
+							@getAvatar(u.AvatarUrl, u.IsAdmin)
+						</td>
+						<td>{ u.Email }</td>
+						<td>{ timeago.English.Format(u.CreatedAt) }</td>
+						<td>
+							if u.IsAdmin {
+								<span class="text-success">
+									@icon.Dot(32)
+								</span>
+							}
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
 }
 
 templ getAvatar(url sql.NullString, isAdmin bool) {

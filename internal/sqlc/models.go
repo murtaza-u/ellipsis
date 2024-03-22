@@ -22,6 +22,7 @@ type Client struct {
 	PictureUrl      sql.NullString
 	CallbackUrls    string
 	TokenExpiration int64
+	CreatedAt       time.Time
 }
 
 type Session struct {
@@ -40,4 +41,5 @@ type User struct {
 	AvatarUrl      sql.NullString
 	HashedPassword sql.NullString
 	IsAdmin        bool
+	CreatedAt      time.Time
 }
