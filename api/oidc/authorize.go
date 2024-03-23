@@ -72,7 +72,7 @@ func (a API) consent(c echo.Context) error {
 		return h.Component.Render(c.Request().Context(), r)
 	}
 
-	client, err := a.db.GetClient(c.Request().Context(), form.ClientID)
+	client, err := a.DB.GetClient(c.Request().Context(), form.ClientID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return render.Do(render.Params{
@@ -99,7 +99,7 @@ func (a API) consent(c echo.Context) error {
 		userID = ctx.UserID
 	}
 
-	_, err = a.db.CreateAuthzHistory(
+	_, err = a.DB.CreateAuthzHistory(
 		c.Request().Context(),
 		sqlc.CreateAuthzHistoryParams{
 			UserID:   userID,
@@ -152,7 +152,7 @@ func (a API) authorize(c echo.Context) error {
 		})
 	}
 
-	client, err := a.db.GetClient(c.Request().Context(), p.ClientID)
+	client, err := a.DB.GetClient(c.Request().Context(), p.ClientID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return render.Do(render.Params{
@@ -222,7 +222,7 @@ func (a API) authorize(c echo.Context) error {
 			Status: http.StatusInternalServerError,
 		})
 	}
-	u, err := a.db.GetUser(c.Request().Context(), userID)
+	u, err := a.DB.GetUser(c.Request().Context(), userID)
 	if err != nil {
 		return render.Do(render.Params{
 			Ctx: c,
@@ -237,7 +237,7 @@ func (a API) authorize(c echo.Context) error {
 		})
 	}
 
-	_, err = a.db.GetAuthzHistory(
+	_, err = a.DB.GetAuthzHistory(
 		c.Request().Context(),
 		sqlc.GetAuthzHistoryParams{
 			UserID:   u.ID,
@@ -285,15 +285,18 @@ func (a API) authorize(c echo.Context) error {
 		err := newAuthorizeErr("bad_request", "missing scope")
 		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
 	}
-	var hasOpenIDScope, hasInvalidScope bool
+	var hasOpenIDScope, hasProfileScope, hasInvalidScope bool
 	for _, s := range scopes {
 		if s == ScopeOIDC {
 			hasOpenIDScope = true
+			continue
 		}
-		if s != ScopeOIDC && s != ScopeProfile {
-			hasInvalidScope = true
-			break
+		if s == ScopeProfile {
+			hasProfileScope = true
+			continue
 		}
+		hasInvalidScope = true
+		break
 	}
 	if hasInvalidScope {
 		err := newAuthorizeErr("bad_request", "unsupported scope")
@@ -301,6 +304,10 @@ func (a API) authorize(c echo.Context) error {
 	}
 	if !hasOpenIDScope {
 		err := newAuthorizeErr("bad_request", "missing openid scope")
+		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
+	}
+	if !hasProfileScope {
+		err := newAuthorizeErr("bad_request", "missing profile scope")
 		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
 	}
 
@@ -321,7 +328,7 @@ func (a API) authorize(c echo.Context) error {
 		browser = b
 	}
 
-	a.cache.Put(code, authorizeMetadata{
+	a.Cache.Put(code, authorizeMetadata{
 		ClientID: client.ID,
 		UserID:   userID,
 		Scopes:   scopes,

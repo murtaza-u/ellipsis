@@ -5,32 +5,28 @@ import (
 	"os"
 
 	"github.com/murtaza-u/account/api"
+	"github.com/murtaza-u/account/internal/conf"
 )
 
+const defaultConfPath = "/etc/account/config.yaml"
+
 func main() {
-	user := os.Getenv("ACCOUNT_MYSQL_USER")
-	if user == "" {
-		log.Fatal("ACCOUNT_MYSQL_USER not set")
-	}
-	pass := os.Getenv("ACCOUNT_MYSQL_PASSWORD")
-	if pass == "" {
-		log.Fatal("ACCOUNT_MYSQL_PASS not set")
-	}
-	database := os.Getenv("ACCOUNT_MYSQL_DATABASE")
-	if database == "" {
-		log.Fatal("ACCOUNT_MYSQL_DATABASE not set")
-	}
-	keyStore := os.Getenv("ACCOUNT_KEY_STORE")
-	if keyStore == "" {
-		log.Fatal("ACCOUNT_KEY_STORE not set")
+	path := os.Getenv("ACCOUNT_CONFIG")
+	if path == "" {
+		path = defaultConfPath
 	}
 
-	s, err := api.New(api.Config{
-		DatabaseUser:     user,
-		DatabasePassword: pass,
-		Database:         database,
-		KeyStore:         keyStore,
-	})
+	c, err := conf.New(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = c.Validate()
+	if err != nil {
+		log.Fatalf("failed to validate config %s", err.Error())
+	}
+
+	s, err := api.New(*c)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -12,6 +12,7 @@ func (s Server) Logout(c echo.Context) error {
 		Name:    "auth_session",
 		Value:   "",
 		Expires: time.Unix(0, 0),
+		Path:    "/",
 	})
 
 	cookie, err := c.Cookie("auth_session")

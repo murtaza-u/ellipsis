@@ -25,10 +25,7 @@
           prettierd
         ];
 
-        ACCOUNT_MYSQL_USER = "root";
-        ACCOUNT_MYSQL_PASSWORD = "toor";
-        ACCOUNT_MYSQL_DATABASE = "account";
-        ACCOUNT_KEY_STORE = "./keys";
+        ACCOUNT_CONFIG = "./config.yaml";
       };
     };
 }

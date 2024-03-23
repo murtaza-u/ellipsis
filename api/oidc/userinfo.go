@@ -83,7 +83,7 @@ func (a API) UserInfo(c echo.Context) error {
 		})
 	}
 
-	u, err := a.db.GetUser(c.Request().Context(), claims.UserID)
+	u, err := a.DB.GetUser(c.Request().Context(), claims.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return c.JSON(http.StatusBadRequest, UserInfo{

@@ -45,7 +45,7 @@ func (a API) Token(c echo.Context) error {
 			ErrDesc: "invalid or unsupported grant_type",
 		})
 	}
-	v := a.cache.Get(params.Code)
+	v := a.Cache.Get(params.Code)
 	if v == nil {
 		return c.JSON(http.StatusBadRequest, tknResp{
 			Err:     "bad_request",
@@ -65,7 +65,7 @@ func (a API) Token(c echo.Context) error {
 			ErrDesc: "invalid client id or secret",
 		})
 	}
-	client, err := a.db.GetClient(c.Request().Context(), metadata.ClientID)
+	client, err := a.DB.GetClient(c.Request().Context(), metadata.ClientID)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, tknResp{
 			Err:     "unauthorized",
@@ -138,7 +138,7 @@ func (a API) Token(c echo.Context) error {
 		browser.Valid = true
 	}
 
-	_, err = a.db.CreateSession(c.Request().Context(), sqlc.CreateSessionParams{
+	_, err = a.DB.CreateSession(c.Request().Context(), sqlc.CreateSessionParams{
 		ID:        sessionID,
 		UserID:    metadata.UserID,
 		ClientID:  sql.NullString{String: metadata.ClientID, Valid: true},
@@ -154,7 +154,7 @@ func (a API) Token(c echo.Context) error {
 	}
 
 	// invalidate auth code
-	a.cache.Delete(params.Code)
+	a.Cache.Delete(params.Code)
 
 	return c.JSON(http.StatusOK, tknResp{
 		AccessTkn: accessTknStr,

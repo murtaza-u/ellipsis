@@ -190,6 +190,7 @@ func (s Server) Login(c echo.Context) error {
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 		Expires:  expiresAt,
+		Path:     "/",
 	})
 
 	returnTo := params.ReturnTo
