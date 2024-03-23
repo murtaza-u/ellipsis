@@ -1,0 +1,117 @@
+package view
+
+import (
+	"database/sql"
+
+	"github.com/murtaza-u/account/internal/sqlc"
+	"github.com/murtaza-u/account/view/partial/icon"
+)
+
+templ Authorize(callback, returnTo string, user sqlc.User, client sqlc.Client) {
+	<div class="bg-temple">
+		<main class="min-h-screen w-full lg:w-1/2 lg:mx-auto flex flex-col justify-center items-center space-y-8 bg-base-100">
+			<div class="w-full flex justify-evenly items-center">
+				<div class="tooltip" data-tip={ user.Email }>
+					@userAvatar(user.AvatarUrl)
+				</div>
+				@icon.DoubleArrow(32)
+				@appAvatar(client.PictureUrl)
+			</div>
+			<h1 class="text-xl text-center">
+				<em>{ client.Name }</em> wants to
+			</h1>
+			<ul class="w-full bg-base-200 rounded-lg">
+				<li class="flex items-center space-x-4 p-2">
+					<figure>
+						@icon.Fingerprint(32)
+					</figure>
+					<div>
+						Sign you in to their service using your Account's identity
+					</div>
+				</li>
+				<li class="flex items-center space-x-4 p-2">
+					<figure>
+						@icon.User(32)
+					</figure>
+					<div>
+						Read your profile (email and avatar)
+					</div>
+				</li>
+			</ul>
+			<div class="w-full px-3 flex justify-end items-center space-x-2">
+				<form method="post" action="/authorize">
+					<input
+						name="consent"
+						type="text"
+						value="cancel"
+						class="hidden"
+					/>
+					<input
+						name="callback"
+						type="text"
+						value={ callback }
+						class="hidden"
+					/>
+					<input
+						name="return_to"
+						type="text"
+						value={ returnTo }
+						class="hidden"
+					/>
+					<input
+						name="client_id"
+						type="text"
+						value={ client.ID }
+						class="hidden"
+					/>
+					<button type="submit" class="btn btn-error btn-outline">
+						Cancel
+					</button>
+				</form>
+				<form method="post" action="/authorize">
+					<input
+						name="consent"
+						type="text"
+						value="granted"
+						class="hidden"
+					/>
+					<input
+						name="callback"
+						type="text"
+						value={ callback }
+						class="hidden"
+					/>
+					<input
+						name="return_to"
+						type="text"
+						value={ returnTo }
+						class="hidden"
+					/>
+					<input
+						name="client_id"
+						type="text"
+						value={ client.ID }
+						class="hidden"
+					/>
+					<button class="btn btn-success">Authorize</button>
+				</form>
+			</div>
+		</main>
+	</div>
+}
+
+templ userAvatar(url sql.NullString) {
+	if url.Valid {
+		<img class="mask mask-circle w-12 h-12" src={ url.String }/>
+	} else {
+		<img class="mask mask-circle w-12 h-12" src="/static/default-user.svg"/>
+	}
+}
+
+templ appAvatar(url sql.NullString) {
+	if url.Valid {
+		<img class="mask mask-circle w-12 h-12" src={ url.String }/>
+	} else {
+		<img class="mask mask-circle w-12 h-12" src="/static/default-app.svg"/>
+	}
+}

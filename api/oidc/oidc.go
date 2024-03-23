@@ -64,6 +64,7 @@ func (a API) Register(app *echo.Echo) {
 
 	auth := middleware.NewAuthMiddleware(a.db)
 	app.GET("/authorize", a.authorize, auth.Required)
+	app.POST("/authorize", a.consent, auth.Required)
 
 	app.POST("/oauth/token", a.Token)
 	app.GET("/.well-known/jwks.json", a.JWKs)

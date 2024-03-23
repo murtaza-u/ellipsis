@@ -11,6 +11,21 @@ import (
 	"time"
 )
 
+const createAuthzHistory = `-- name: CreateAuthzHistory :execresult
+INSERT INTO authorization_history (user_id, client_id) VALUES (
+    ?, ?
+)
+`
+
+type CreateAuthzHistoryParams struct {
+	UserID   int64
+	ClientID string
+}
+
+func (q *Queries) CreateAuthzHistory(ctx context.Context, arg CreateAuthzHistoryParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createAuthzHistory, arg.UserID, arg.ClientID)
+}
+
 const createClient = `-- name: CreateClient :exec
 INSERT INTO client (
     id,
@@ -125,6 +140,23 @@ WHERE email = ?
 func (q *Queries) DeleteUserByEmail(ctx context.Context, email string) error {
 	_, err := q.db.ExecContext(ctx, deleteUserByEmail, email)
 	return err
+}
+
+const getAuthzHistory = `-- name: GetAuthzHistory :one
+SELECT user_id, client_id, authorized_at FROM authorization_history
+WHERE user_id = ? AND client_id = ?
+`
+
+type GetAuthzHistoryParams struct {
+	UserID   int64
+	ClientID string
+}
+
+func (q *Queries) GetAuthzHistory(ctx context.Context, arg GetAuthzHistoryParams) (AuthorizationHistory, error) {
+	row := q.db.QueryRowContext(ctx, getAuthzHistory, arg.UserID, arg.ClientID)
+	var i AuthorizationHistory
+	err := row.Scan(&i.UserID, &i.ClientID, &i.AuthorizedAt)
+	return i, err
 }
 
 const getClient = `-- name: GetClient :one

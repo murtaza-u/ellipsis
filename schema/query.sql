@@ -97,3 +97,12 @@ FROM
 LEFT JOIN client
 ON session.client_id = client.id
 WHERE session.user_id = ?;
+
+-- name: GetAuthzHistory :one
+SELECT * FROM authorization_history
+WHERE user_id = ? AND client_id = ?;
+
+-- name: CreateAuthzHistory :execresult
+INSERT INTO authorization_history (user_id, client_id) VALUES (
+    ?, ?
+);

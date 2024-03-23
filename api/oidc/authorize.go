@@ -8,61 +8,132 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/mileusna/useragent"
 	"github.com/murtaza-u/account/api/middleware"
 	"github.com/murtaza-u/account/api/render"
 	"github.com/murtaza-u/account/api/util"
+	"github.com/murtaza-u/account/internal/sqlc"
 	"github.com/murtaza-u/account/view"
 	"github.com/murtaza-u/account/view/layout"
 
+	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
+	"github.com/mileusna/useragent"
 )
 
-type authorizeParams struct {
-	ClientID           string `query:"client_id"`
-	ResponseType       string `query:"response_type"`
-	Scope              string `query:"scope"`
-	State              string `query:"state"`
-	RedirectURI        string `query:"redirect_uri"`
-	IDTknSignedRespAlg string `query:"id_token_signed_response_alg"`
-}
+func (a API) consent(c echo.Context) error {
+	isBoosted := c.Request().Header.Get("HX-Boosted") != ""
 
-type authorizeErr struct {
-	name string
-	desc string
-}
-
-func newAuthorizeErr(name, desc string) authorizeErr {
-	return authorizeErr{
-		name: name,
-		desc: desc,
+	form := new(consentParams)
+	if err := c.Bind(form); err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: view.Error(
+				"failed to parse form",
+				http.StatusBadRequest,
+			),
+			Status: http.StatusBadRequest,
+		})
 	}
+
+	if form.ReturnTo == "" {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: view.Error(
+				"missing returning URL",
+				http.StatusBadRequest,
+			),
+			Status: http.StatusBadRequest,
+		})
+	}
+	if form.Callback == "" {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: view.Error(
+				"missing callback URL",
+				http.StatusBadRequest,
+			),
+			Status: http.StatusBadRequest,
+		})
+	}
+
+	if form.Consent != "granted" {
+		err := newAuthorizeErr("denied", "user did not consent")
+		callback := err.AttachTo(form.Callback)
+
+		if !isBoosted {
+			return c.Redirect(http.StatusTemporaryRedirect, callback)
+		}
+
+		r := c.Response()
+		r.Header().Set("HX-Redirect", callback)
+
+		// render empty template
+		h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
+		return h.Component.Render(c.Request().Context(), r)
+	}
+
+	client, err := a.db.GetClient(c.Request().Context(), form.ClientID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return render.Do(render.Params{
+				Ctx: c,
+				Component: view.Error(
+					"Invalid client id",
+					http.StatusBadRequest,
+				),
+				Status: http.StatusBadRequest,
+			})
+		}
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: view.Error(
+				"Database operation failed",
+				http.StatusInternalServerError,
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+
+	var userID int64
+	if ctx, ok := c.(middleware.CtxWithIDs); ok {
+		userID = ctx.UserID
+	}
+
+	_, err = a.db.CreateAuthzHistory(
+		c.Request().Context(),
+		sqlc.CreateAuthzHistoryParams{
+			UserID:   userID,
+			ClientID: client.ID,
+		},
+	)
+	if err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: view.Error(
+				"Database operation failed",
+				http.StatusInternalServerError,
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+
+	if !isBoosted {
+		return c.Redirect(http.StatusFound, form.ReturnTo)
+	}
+
+	r := c.Response()
+	r.Header().Set("HX-Redirect", form.ReturnTo)
+
+	// render empty template
+	h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
+	return h.Component.Render(c.Request().Context(), r)
 }
 
-func (a authorizeErr) Error() string {
-	return fmt.Sprintf("%s - %s", a.name, a.desc)
-}
-
-func (a authorizeErr) Name() string {
-	return url.QueryEscape(a.name)
-}
-
-func (a authorizeErr) Desc() string {
-	return url.QueryEscape(a.desc)
-}
-
-func (a authorizeErr) AttachTo(baseURL string) string {
-	return fmt.Sprintf(
-		"%s?error=%s&error_description=%s",
-		baseURL, a.Name(), a.Desc())
-}
-
-type authorizeMetadata struct {
-	ClientID string   `json:"client_id"`
-	UserID   int64    `json:"user_id"`
-	Scopes   []string `json:"scopes"`
-	Browser  string   `json:"browser"`
-	OS       string   `json:"os"`
+type consentParams struct {
+	Consent  string `form:"consent"`
+	Callback string `form:"callback"`
+	ReturnTo string `form:"return_to"`
+	ClientID string `form:"client_id"`
 }
 
 func (a API) authorize(c echo.Context) error {
@@ -71,7 +142,7 @@ func (a API) authorize(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Authorization - Account",
+				"Authorization | Account",
 				view.Error(
 					"Failed to parse query parameters",
 					http.StatusBadRequest,
@@ -87,7 +158,7 @@ func (a API) authorize(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Authorization - Account",
+					"Authorization | Account",
 					view.Error(
 						"Invalid client id",
 						http.StatusBadRequest,
@@ -99,7 +170,7 @@ func (a API) authorize(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Authorization - Account",
+				"Authorization | Account",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
@@ -124,13 +195,75 @@ func (a API) authorize(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Authorization - Account",
+				"Authorization | Account",
 				view.Error(
 					"Unauthorized redirect URI",
 					http.StatusBadRequest,
 				),
 			),
 			Status: http.StatusBadRequest,
+		})
+	}
+
+	var userID int64
+	if ctx, ok := c.(middleware.CtxWithIDs); ok {
+		userID = ctx.UserID
+	}
+	if userID == 0 {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"Authorization | Account",
+				view.Error(
+					"An internal error occured",
+					http.StatusInternalServerError,
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+	u, err := a.db.GetUser(c.Request().Context(), userID)
+	if err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"Authorization | Account",
+				view.Error(
+					"An internal error occured",
+					http.StatusInternalServerError,
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+
+	_, err = a.db.GetAuthzHistory(
+		c.Request().Context(),
+		sqlc.GetAuthzHistoryParams{
+			UserID:   u.ID,
+			ClientID: client.ID,
+		},
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return render.Do(render.Params{
+				Ctx: c,
+				Component: layout.Base(
+					"Authorize | Account",
+					view.Authorize(redirectTo, c.Request().RequestURI, u, client),
+				),
+			})
+		}
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"Authorization | Account",
+				view.Error(
+					"Database operation failed",
+					http.StatusInternalServerError,
+				),
+			),
+			Status: http.StatusInternalServerError,
 		})
 	}
 
@@ -178,24 +311,6 @@ func (a API) authorize(c echo.Context) error {
 		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
 	}
 
-	var userID int64
-	if ctx, ok := c.(middleware.CtxWithIDs); ok {
-		userID = ctx.UserID
-	}
-	if userID == 0 {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
-				"Authorization - Account",
-				view.Error(
-					"Unauthorized user",
-					http.StatusInternalServerError,
-				),
-			),
-			Status: http.StatusInternalServerError,
-		})
-	}
-
 	var ua useragent.UserAgent
 	uaRaw := c.Request().Header.Get("User-Agent")
 	if uaRaw != "" {
@@ -220,4 +335,51 @@ func (a API) authorize(c echo.Context) error {
 		url.QueryEscape(code),
 		url.QueryEscape(p.State),
 	))
+}
+
+type authorizeParams struct {
+	ClientID           string `query:"client_id"`
+	ResponseType       string `query:"response_type"`
+	Scope              string `query:"scope"`
+	State              string `query:"state"`
+	RedirectURI        string `query:"redirect_uri"`
+	IDTknSignedRespAlg string `query:"id_token_signed_response_alg"`
+}
+
+type authorizeErr struct {
+	name string
+	desc string
+}
+
+func newAuthorizeErr(name, desc string) authorizeErr {
+	return authorizeErr{
+		name: name,
+		desc: desc,
+	}
+}
+
+func (a authorizeErr) Error() string {
+	return fmt.Sprintf("%s - %s", a.name, a.desc)
+}
+
+func (a authorizeErr) Name() string {
+	return url.QueryEscape(a.name)
+}
+
+func (a authorizeErr) Desc() string {
+	return url.QueryEscape(a.desc)
+}
+
+func (a authorizeErr) AttachTo(baseURL string) string {
+	return fmt.Sprintf(
+		"%s?error=%s&error_description=%s",
+		baseURL, a.Name(), a.Desc())
+}
+
+type authorizeMetadata struct {
+	ClientID string   `json:"client_id"`
+	UserID   int64    `json:"user_id"`
+	Scopes   []string `json:"scopes"`
+	Browser  string   `json:"browser"`
+	OS       string   `json:"os"`
 }
