@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"net/http"
@@ -48,6 +49,24 @@ func (s Server) SignUp(c echo.Context) error {
 	if err := validateEmail(params.Email); err != nil {
 		errMap["email"] = err
 	}
+	exists, err := s.userExists(c.Request().Context(), params.Email)
+	if err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"Sign Up | Account",
+				view.Error(
+					"Database operation failed",
+					http.StatusInternalServerError,
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+	if exists {
+		errMap["email"] = errors.New("user already exists")
+	}
+
 	if err := util.ValidatePassword(params.Password); err != nil {
 		errMap["password"] = err
 	}
@@ -116,6 +135,17 @@ func (s Server) SignUp(c echo.Context) error {
 	// render empty template
 	h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
 	return h.Component.Render(c.Request().Context(), r)
+}
+
+func (s Server) userExists(ctx context.Context, email string) (bool, error) {
+	_, err := s.queries.GetUserByEmail(ctx, email)
+	if err == nil {
+		return true, nil
+	}
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, nil
+	}
+	return false, err
 }
 
 func validateEmail(email string) error {
