@@ -273,7 +273,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Callback - GitHub | Account",
+					"Callback - Google | Account",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -303,7 +303,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Callback - GitHub | Account",
+					"Callback - Google | Account",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -317,7 +317,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Callback - GitHub | Account",
+					"Callback - Google | Account",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -333,7 +333,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - Google | Account",
 				view.Error(
 					"failed to generate session ID",
 					http.StatusInternalServerError,
@@ -372,7 +372,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - Google | Account",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
