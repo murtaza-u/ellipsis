@@ -1,0 +1,44 @@
+package partial
+
+import (
+	"net/url"
+
+	"github.com/murtaza-u/account/view/partial/icon"
+)
+
+templ SocialLogins(returnTo string) {
+	<div class="w-full flex flex-col items-center justify-center space-y-2 space-x-0 lg:space-x-2 lg:space-y-0 lg:flex-row lg:w-1/2">
+		<a
+			href={ templ.URL(githubLoginWithReturnTo(returnTo)) }
+			class="w-full md:w-fit btn bg-[#323232] hover:bg-black text-white tracking-wide"
+		>
+			<span class="mr-0.5">
+				@icon.Github()
+			</span>
+			Sign in with GitHub
+		</a>
+		<a
+			href={ templ.URL(googleLoginWithReturnTo(returnTo)) }
+			class="w-full md:w-fit  btn bg-[#db4a39] hover:bg-[#b80f08] text-white tracking-wide"
+		>
+			<span class="mr-0.5">
+				@icon.Google()
+			</span>
+			Sign in with Google
+		</a>
+	</div>
+}
+
+func githubLoginWithReturnTo(returnTo string) string {
+	if returnTo == "" {
+		return "/github/login"
+	}
+	return "/github/login?return_to=" + url.QueryEscape(returnTo)
+}
+
+func googleLoginWithReturnTo(returnTo string) string {
+	if returnTo == "" {
+		return "/google/login"
+	}
+	return "/google/login?return_to=" + url.QueryEscape(returnTo)
+}

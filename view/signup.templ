@@ -3,7 +3,7 @@ package view
 import (
 	"net/url"
 
-	"github.com/murtaza-u/account/view/partial/icon"
+	"github.com/murtaza-u/account/view/partial"
 )
 
 type SignUpParams struct {
@@ -123,26 +123,7 @@ templ SignUp(values SignUpParams, err map[string]error) {
 	<main class="min-h-screen flex flex-col justify-center items-center mx-3 lg:mx-3 lg:flex-row lg:justify-evenly">
 		@SignUpForm(values, err)
 		<div class="divider my-8 lg:my-0 lg:divider-horizontal">OR</div>
-		<div class="w-full flex flex-col items-center justify-center space-y-2 space-x-0 lg:space-x-2 lg:space-y-0 lg:flex-row lg:w-1/2">
-			<a
-				href={ templ.URL(githubLoginWithReturnTo(values.ReturnTo)) }
-				class="w-full md:w-fit btn bg-[#323232] hover:bg-black text-white tracking-wide"
-			>
-				<span class="mr-0.5">
-					@icon.Github()
-				</span>
-				Sign in with GitHub
-			</a>
-			<a
-				href={ templ.URL(googleLoginWithReturnTo(values.ReturnTo)) }
-				class="w-full md:w-fit  btn bg-[#db4a39] hover:bg-[#b80f08] text-white tracking-wide"
-			>
-				<span class="mr-0.5">
-					@icon.Google()
-				</span>
-				Sign in with Google
-			</a>
-		</div>
+		@partial.SocialLogins(values.ReturnTo)
 	</main>
 }
 

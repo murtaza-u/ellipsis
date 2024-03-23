@@ -2,14 +2,17 @@ package me
 
 import "github.com/murtaza-u/account/view/partial/icon"
 
-templ Profile() {
-	@ChangePassword(ChangePasswordParams{}, map[string]error{}, false)
+templ Profile(hasPswd bool) {
+	@ChangePassword(ChangePasswordParams{
+		HasPswd: hasPswd,
+	}, map[string]error{}, false)
 }
 
 type ChangePasswordParams struct {
 	OldPassword        string `form:"old_password"`
 	NewPassword        string `form:"new_password"`
 	NewConfirmPassword string `form:"new_confirm_password"`
+	HasPswd            bool
 }
 
 templ ChangePassword(values ChangePasswordParams, err map[string]error, success bool) {
@@ -28,32 +31,34 @@ templ ChangePassword(values ChangePasswordParams, err map[string]error, success 
 		hx-boost="true"
 		hx-indicator="#spinner"
 	>
-		<label class="form-control w-full">
-			<div class="label">
-				<span class="label-text">Old Password</span>
-				<span class="label-text-alt text-error text-xl">*</span>
-			</div>
-			<input
-				required
-				name="old_password"
-				type="password"
-				minlength="8"
-				maxlength="70"
-				value={ values.OldPassword }
-				placeholder="********"
-				class={
-					"input input-bordered w-full",
-					templ.KV("input-error", err["old_password"] != nil),
-				}
-			/>
-			if err["old_password"] != nil {
+		if values.HasPswd {
+			<label class="form-control w-full">
 				<div class="label">
-					<span class="label-text-alt text-error first-letter:uppercase">
-						{ err["old_password"].Error() }
-					</span>
+					<span class="label-text">Old Password</span>
+					<span class="label-text-alt text-error text-xl">*</span>
 				</div>
-			}
-		</label>
+				<input
+					required
+					name="old_password"
+					type="password"
+					minlength="8"
+					maxlength="70"
+					value={ values.OldPassword }
+					placeholder="********"
+					class={
+						"input input-bordered w-full",
+						templ.KV("input-error", err["old_password"] != nil),
+					}
+				/>
+				if err["old_password"] != nil {
+					<div class="label">
+						<span class="label-text-alt text-error first-letter:uppercase">
+							{ err["old_password"].Error() }
+						</span>
+					</div>
+				}
+			</label>
+		}
 		<label class="form-control w-full">
 			<div class="label">
 				<span class="label-text">New Password</span>

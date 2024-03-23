@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/a-h/templ"
-	"github.com/alexedwards/argon2id"
 	"github.com/murtaza-u/account/api/middleware"
 	"github.com/murtaza-u/account/api/render"
 	"github.com/murtaza-u/account/api/util"
@@ -16,17 +14,46 @@ import (
 	"github.com/murtaza-u/account/view/layout"
 	"github.com/murtaza-u/account/view/partial/me"
 
+	"github.com/a-h/templ"
+	"github.com/alexedwards/argon2id"
 	"github.com/labstack/echo/v4"
 )
 
-func (API) ProfilePage(c echo.Context) error {
+func (a API) ProfilePage(c echo.Context) error {
+	var userID int64
+	if ctx, ok := c.(middleware.CtxWithIDs); ok {
+		userID = ctx.UserID
+	}
+	u, err := a.db.GetUser(c.Request().Context(), userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			r := c.Response()
+			r.Header().Set("HX-Redirect", "/logout")
+
+			// render empty template
+			h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
+			return h.Component.Render(c.Request().Context(), r)
+		}
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"My Account | Account",
+				view.Error(
+					"database operation failed",
+					http.StatusInternalServerError,
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"My Account | Account",
 			view.Me(
 				"/me",
-				me.Profile(),
+				me.Profile(u.HashedPassword.Valid),
 			),
 		),
 	})
@@ -78,31 +105,24 @@ func (a API) ChangePassword(c echo.Context) error {
 		})
 	}
 
+	var match bool
 	hash := u.HashedPassword
-	if !hash.Valid {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
-				"user is signed up using an identity provider",
-				http.StatusBadRequest,
-			),
-			Status: http.StatusBadRequest,
-		})
-	}
-	match, err := argon2id.ComparePasswordAndHash(form.OldPassword, hash.String)
-	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
-				"failed to validate old password",
-				http.StatusInternalServerError,
-			),
-			Status: http.StatusInternalServerError,
-		})
+	if hash.Valid {
+		match, err = argon2id.ComparePasswordAndHash(form.OldPassword, hash.String)
+		if err != nil {
+			return render.Do(render.Params{
+				Ctx: c,
+				Component: view.Error(
+					"failed to validate old password",
+					http.StatusInternalServerError,
+				),
+				Status: http.StatusInternalServerError,
+			})
+		}
 	}
 
 	errMap := make(map[string]error)
-	if !match {
+	if hash.Valid && !match {
 		errMap["old_password"] = fmt.Errorf("incorrect password")
 	}
 	if err := util.ValidatePassword(form.NewPassword); err != nil {
@@ -112,6 +132,8 @@ func (a API) ChangePassword(c echo.Context) error {
 		errMap["new_password"] = fmt.Errorf("passwords do not match")
 		errMap["new_confirm_password"] = errMap["new_password"]
 	}
+
+	form.HasPswd = hash.Valid
 
 	if len(errMap) != 0 {
 		return render.Do(render.Params{
@@ -154,7 +176,7 @@ func (a API) ChangePassword(c echo.Context) error {
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: me.ChangePassword(
-			me.ChangePasswordParams{},
+			me.ChangePasswordParams{HasPswd: true},
 			map[string]error{},
 			true,
 		),
