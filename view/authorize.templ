@@ -39,7 +39,12 @@ templ Authorize(callback, returnTo string, user sqlc.User, client sqlc.Client) {
 				</li>
 			</ul>
 			<div class="w-full px-3 flex justify-end items-center space-x-2">
-				<form method="post" action="/authorize">
+				<form
+					method="post"
+					action="/authorize"
+					hx-boost="true"
+					hx-indicator="#spinner-cancel"
+				>
 					<input
 						name="consent"
 						type="text"
@@ -66,9 +71,18 @@ templ Authorize(callback, returnTo string, user sqlc.User, client sqlc.Client) {
 					/>
 					<button type="submit" class="btn btn-error btn-outline">
 						Cancel
+						<span
+							id="spinner-cancel"
+							class="ml-1 hidden loading loading-spinner"
+						></span>
 					</button>
 				</form>
-				<form method="post" action="/authorize">
+				<form
+					method="post"
+					action="/authorize"
+					hx-boost="true"
+					hx-indicator="#spinner-authorize"
+				>
 					<input
 						name="consent"
 						type="text"
@@ -93,7 +107,13 @@ templ Authorize(callback, returnTo string, user sqlc.User, client sqlc.Client) {
 						value={ client.ID }
 						class="hidden"
 					/>
-					<button class="btn btn-success">Authorize</button>
+					<button class="btn btn-success">
+						Authorize
+						<span
+							id="spinner-authorize"
+							class="ml-1 hidden loading loading-spinner"
+						></span>
+					</button>
 				</form>
 			</div>
 		</main>

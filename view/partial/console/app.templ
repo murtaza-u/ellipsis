@@ -71,6 +71,7 @@ templ AppCreateForm(values AppParams, err map[string]error) {
 			hx-post="/console/app/create"
 			hx-swap="innerHTML"
 			hx-target="#app-create-container"
+			hx-indicator="#spinner"
 		>
 			<label class="form-control w-full">
 				<div class="label">
@@ -184,7 +185,13 @@ templ AppCreateForm(values AppParams, err map[string]error) {
 				</div>
 			</label>
 			<div class="flex items-center justify-end">
-				<button class="btn btn-primary w-full md:w-fit">Create</button>
+				<button class="btn btn-primary w-full md:w-fit">
+					Create
+					<span
+						id="spinner"
+						class="ml-1 hidden loading loading-spinner"
+					></span>
+				</button>
 			</div>
 		</form>
 	</div>
@@ -203,6 +210,7 @@ templ AppUpdateForm(values AppParams, success bool, err map[string]error) {
 		class="block w-full space-y-2"
 		hx-put={ fmt.Sprintf("/console/app/%s", values.ID) }
 		hx-swap="outerHTML"
+		hx-indicator="#spinner"
 	>
 		<label class="form-control w-full">
 			<div class="label">
@@ -316,7 +324,13 @@ templ AppUpdateForm(values AppParams, success bool, err map[string]error) {
 			</div>
 		</label>
 		<div class="flex items-center justify-end">
-			<button class="btn btn-primary w-full md:w-fit">Update</button>
+			<button class="btn btn-primary w-full md:w-fit">
+				Update
+				<span
+					id="spinner"
+					class="ml-1 hidden loading loading-spinner"
+				></span>
+			</button>
 		</div>
 	</form>
 }
@@ -341,8 +355,15 @@ templ ConfirmDelete(id string) {
 				<form
 					hx-delete={ fmt.Sprintf("/console/app/%s", id) }
 					hx-swap="outerHTML"
+					hx-indicator="#spinner-delete"
 				>
-					<button type="submit" class="btn btn-error">Delete</button>
+					<button type="submit" class="btn btn-error">
+						Delete
+						<span
+							id="spinner-delete"
+							class="ml-1 hidden loading loading-spinner"
+						></span>
+					</button>
 				</form>
 				<form method="dialog">
 					<!-- if there is a button in form, it will close the modal -->

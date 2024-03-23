@@ -19,6 +19,7 @@ templ LoginForm(values LoginParams, err map[string]error) {
 			action={ templ.URL(loginWithReturnTo(values.ReturnTo)) }
 			method="post"
 			hx-boost="true"
+			hx-indicator="#spinner"
 		>
 			<label class="form-control w-full">
 				<div class="label">
@@ -72,7 +73,13 @@ templ LoginForm(values LoginParams, err map[string]error) {
 				}
 			</label>
 			<div class="flex items-center justify-end">
-				<button class="my-4 btn btn-primary w-full md:w-fit">Login</button>
+				<button class="my-4 btn btn-primary w-full md:w-fit">
+					Login
+					<span
+						id="spinner"
+						class="ml-1 hidden loading loading-spinner"
+					></span>
+				</button>
 			</div>
 			<div class="text-sm text-center">
 				Do not have an account?

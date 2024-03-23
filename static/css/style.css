@@ -1,4 +1,15 @@
 tr.htmx-swapping td {
-    opacity: 0;
-    transition: opacity .5s ease-out;
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+
+.htmx-request#spinner,
+.htmx-request #spinner,
+.htmx-request#spinner-delete,
+.htmx-request #spinner-delete,
+.htmx-request#spinner-authorize,
+.htmx-request #spinner-authorize,
+.htmx-request#spinner-cancel,
+.htmx-request #spinner-cancel {
+  display: inline;
 }

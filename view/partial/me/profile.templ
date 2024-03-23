@@ -26,6 +26,7 @@ templ ChangePassword(values ChangePasswordParams, err map[string]error, success 
 		hx-post="/me/change-password"
 		hx-swap="outerHTML"
 		hx-boost="true"
+		hx-indicator="#spinner"
 	>
 		<label class="form-control w-full">
 			<div class="label">
@@ -110,6 +111,10 @@ templ ChangePassword(values ChangePasswordParams, err map[string]error, success 
 		<div class="flex items-center justify-end">
 			<button class="my-4 btn btn-primary w-full md:w-fit">
 				Change Password
+				<span
+					id="spinner"
+					class="ml-1 hidden loading loading-spinner"
+				></span>
 			</button>
 		</div>
 	</form>

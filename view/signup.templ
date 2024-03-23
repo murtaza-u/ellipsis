@@ -20,6 +20,7 @@ templ SignUpForm(values SignUpParams, err map[string]error) {
 			action={ templ.URL(signupWithReturnTo(values.ReturnTo)) }
 			method="post"
 			hx-boost="true"
+			hx-indicator="#spinner"
 		>
 			<label class="form-control w-full">
 				<div class="label">
@@ -102,7 +103,13 @@ templ SignUpForm(values SignUpParams, err map[string]error) {
 				</div>
 			</label>
 			<div class="flex items-center justify-end">
-				<button class="my-4 btn btn-primary w-full md:w-fit">Sign Up</button>
+				<button class="my-4 btn btn-primary w-full md:w-fit">
+					Sign Up
+					<span
+						id="spinner"
+						class="ml-1 hidden loading loading-spinner"
+					></span>
+				</button>
 			</div>
 			<div class="text-sm text-center">
 				Already have an account?
