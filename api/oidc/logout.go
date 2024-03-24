@@ -18,6 +18,7 @@ import (
 
 type LogoutParams struct {
 	IDTkn       string `query:"id_token_hint"`
+	SID         string `query:"logout_hint"`
 	RedirectURI string `query:"post_logout_redirect_uri"`
 	ClientID    string `query:"client_id"`
 	State       string `query:"state"`
@@ -98,6 +99,20 @@ func (a API) Logout(c echo.Context) error {
 				"Logout | Ellipsis",
 				view.Error(
 					"unauthorized client id",
+					http.StatusUnauthorized,
+				),
+			),
+			Status: http.StatusUnauthorized,
+		})
+	}
+
+	if q.SID != "" && q.SID != claims.SID {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"Logout | Ellipsis",
+				view.Error(
+					"invalid logout_hint. Expected SID",
 					http.StatusUnauthorized,
 				),
 			),
