@@ -192,7 +192,7 @@ func (a API) createApp(c echo.Context) error {
 		pictureUrl.String = params.LogoURL
 	}
 
-	err = a.db.CreateClient(c.Request().Context(), sqlc.CreateClientParams{
+	_, err = a.db.CreateClient(c.Request().Context(), sqlc.CreateClientParams{
 		ID:                 id,
 		SecretHash:         hash,
 		Name:               params.Name,

@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS authorization_history (
     client_id CHAR(25) NOT NULL,
     authorized_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-    FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
+    FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, client_id)
 );
 
 CREATE TABLE IF NOT EXISTS session (
@@ -37,3 +38,10 @@ CREATE TABLE IF NOT EXISTS session (
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
 );
+
+-- CREATE EVENT delete_expired_sessions
+-- ON SCHEDULE EVERY 30 MINUTE
+-- STARTS CURRENT_TIMESTAMP
+-- DO
+--     DELETE FROM session
+--     WHERE expires_at <= NOW();

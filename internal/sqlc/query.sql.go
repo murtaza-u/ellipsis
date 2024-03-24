@@ -26,7 +26,7 @@ func (q *Queries) CreateAuthzHistory(ctx context.Context, arg CreateAuthzHistory
 	return q.db.ExecContext(ctx, createAuthzHistory, arg.UserID, arg.ClientID)
 }
 
-const createClient = `-- name: CreateClient :exec
+const createClient = `-- name: CreateClient :execresult
 INSERT INTO client (
     id,
     secret_hash,
@@ -50,8 +50,8 @@ type CreateClientParams struct {
 	TokenExpiration    int64
 }
 
-func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) error {
-	_, err := q.db.ExecContext(ctx, createClient,
+func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createClient,
 		arg.ID,
 		arg.SecretHash,
 		arg.Name,
@@ -60,7 +60,6 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) erro
 		arg.PictureUrl,
 		arg.TokenExpiration,
 	)
-	return err
 }
 
 const createSession = `-- name: CreateSession :execresult
@@ -122,26 +121,6 @@ WHERE id = ? OR expires_at <= NOW()
 
 func (q *Queries) DeleteSession(ctx context.Context, id string) error {
 	_, err := q.db.ExecContext(ctx, deleteSession, id)
-	return err
-}
-
-const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM user
-WHERE id = ?
-`
-
-func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteUser, id)
-	return err
-}
-
-const deleteUserByEmail = `-- name: DeleteUserByEmail :exec
-DELETE FROM user
-WHERE email = ?
-`
-
-func (q *Queries) DeleteUserByEmail(ctx context.Context, email string) error {
-	_, err := q.db.ExecContext(ctx, deleteUserByEmail, email)
 	return err
 }
 
@@ -286,60 +265,6 @@ func (q *Queries) GetSession(ctx context.Context, id string) (Session, error) {
 	return i, err
 }
 
-const getSessionForUserID = `-- name: GetSessionForUserID :many
-SELECT
-    session.id,
-    session.created_at,
-    session.expires_at,
-    session.os,
-    session.browser,
-    client.name as client_name
-FROM
-    session
-LEFT JOIN client
-ON session.client_id = client.id
-WHERE session.user_id = ?
-`
-
-type GetSessionForUserIDRow struct {
-	ID         string
-	CreatedAt  time.Time
-	ExpiresAt  time.Time
-	Os         sql.NullString
-	Browser    sql.NullString
-	ClientName sql.NullString
-}
-
-func (q *Queries) GetSessionForUserID(ctx context.Context, userID int64) ([]GetSessionForUserIDRow, error) {
-	rows, err := q.db.QueryContext(ctx, getSessionForUserID, userID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetSessionForUserIDRow
-	for rows.Next() {
-		var i GetSessionForUserIDRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.CreatedAt,
-			&i.ExpiresAt,
-			&i.Os,
-			&i.Browser,
-			&i.ClientName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getSessionWithClient = `-- name: GetSessionWithClient :one
 SELECT
     session.id,
@@ -363,6 +288,60 @@ func (q *Queries) GetSessionWithClient(ctx context.Context, id string) (GetSessi
 	var i GetSessionWithClientRow
 	err := row.Scan(&i.ID, &i.ClientID, &i.LogoutCallbackUrls)
 	return i, err
+}
+
+const getSessionWithClientForUserID = `-- name: GetSessionWithClientForUserID :many
+SELECT
+    session.id,
+    session.created_at,
+    session.expires_at,
+    session.os,
+    session.browser,
+    client.name as client_name
+FROM
+    session
+LEFT JOIN client
+ON session.client_id = client.id
+WHERE session.user_id = ?
+`
+
+type GetSessionWithClientForUserIDRow struct {
+	ID         string
+	CreatedAt  time.Time
+	ExpiresAt  time.Time
+	Os         sql.NullString
+	Browser    sql.NullString
+	ClientName sql.NullString
+}
+
+func (q *Queries) GetSessionWithClientForUserID(ctx context.Context, userID int64) ([]GetSessionWithClientForUserIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSessionWithClientForUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSessionWithClientForUserIDRow
+	for rows.Next() {
+		var i GetSessionWithClientForUserIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.ExpiresAt,
+			&i.Os,
+			&i.Browser,
+			&i.ClientName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getSessionWithUser = `-- name: GetSessionWithUser :one

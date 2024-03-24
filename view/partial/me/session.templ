@@ -9,7 +9,7 @@ import (
 	"github.com/xeonx/timeago"
 )
 
-templ Sessions(sessions []sqlc.GetSessionForUserIDRow, curr string) {
+templ Sessions(sessions []sqlc.GetSessionWithClientForUserIDRow, curr string) {
 	<div class="overflow-x-auto">
 		<table class="table whitespace-nowrap">
 			<thead>

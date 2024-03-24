@@ -34,7 +34,7 @@ func (a API) SessionPage(c echo.Context) error {
 		return h.Component.Render(c.Request().Context(), r)
 	}
 
-	sessions, err := a.db.GetSessionForUserID(c.Request().Context(), userID)
+	sess, err := a.db.GetSessionWithClientForUserID(c.Request().Context(), userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			r := c.Response()
@@ -67,7 +67,7 @@ func (a API) SessionPage(c echo.Context) error {
 			view.Me(
 				"/me/session",
 				avatarURL,
-				me.Sessions(sessions, sessID),
+				me.Sessions(sess, sessID),
 			),
 		),
 	})
