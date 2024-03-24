@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS client (
     secret_hash CHAR(97) NOT NULL,
     name VARCHAR(50) NOT NULL UNIQUE,
     picture_url VARCHAR(100),
-    callback_urls VARCHAR(1000) NOT NULL,
+    auth_callback_urls VARCHAR(1000) NOT NULL,
+    logout_callback_urls VARCHAR(1000) NOT NULL,
     token_expiration bigint NOT NULL DEFAULT 28800,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

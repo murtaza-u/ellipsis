@@ -193,12 +193,13 @@ func (a API) createApp(c echo.Context) error {
 	}
 
 	err = a.db.CreateClient(c.Request().Context(), sqlc.CreateClientParams{
-		ID:              id,
-		SecretHash:      hash,
-		Name:            params.Name,
-		PictureUrl:      pictureUrl,
-		CallbackUrls:    params.CallbackURLs,
-		TokenExpiration: int64(params.IDTokenExpiration),
+		ID:                 id,
+		SecretHash:         hash,
+		Name:               params.Name,
+		PictureUrl:         pictureUrl,
+		AuthCallbackUrls:   params.AuthCallbackURLs,
+		LogoutCallbackUrls: params.LogoutCallbackURLs,
+		TokenExpiration:    int64(params.IDTokenExpiration),
 	})
 	if err != nil {
 		return render.Do(render.Params{
@@ -302,11 +303,12 @@ func (a API) updateApp(c echo.Context) error {
 	}
 
 	err = a.db.UpdateClient(c.Request().Context(), sqlc.UpdateClientParams{
-		ID:              params.ID,
-		Name:            params.Name,
-		PictureUrl:      pictureUrl,
-		CallbackUrls:    params.CallbackURLs,
-		TokenExpiration: int64(params.IDTokenExpiration),
+		ID:                 params.ID,
+		Name:               params.Name,
+		PictureUrl:         pictureUrl,
+		AuthCallbackUrls:   params.AuthCallbackURLs,
+		LogoutCallbackUrls: params.LogoutCallbackURLs,
+		TokenExpiration:    int64(params.IDTokenExpiration),
 	})
 	if err != nil {
 		return render.Do(render.Params{

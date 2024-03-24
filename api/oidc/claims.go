@@ -10,5 +10,5 @@ type AccessTknClaims struct {
 
 type IDTknClaims struct {
 	jwt.RegisteredClaims
-	AuthSessionID string `json:"auth_session_id"`
+	SID string `json:"sid"`
 }

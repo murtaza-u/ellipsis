@@ -48,11 +48,12 @@ INSERT INTO client (
     id,
     secret_hash,
     name,
-    callback_urls,
+    auth_callback_urls,
+    logout_callback_urls,
     picture_url,
     token_expiration
 ) VALUES (
-	?, ?, ?, ?, ?, ?
+	?, ?, ?, ?, ?, ?, ?
 );
 
 -- name: GetClientByNameForUnmatchingID :one
@@ -62,7 +63,8 @@ WHERE name = ? AND id != ?;
 -- name: UpdateClient :exec
 UPDATE client
 SET name = ?,
-    callback_urls = ?,
+    auth_callback_urls = ?,
+    logout_callback_urls = ?,
     picture_url = ?,
     token_expiration = ?
 WHERE id = ?;
@@ -109,6 +111,17 @@ FROM
     session
 INNER JOIN user
 ON session.user_id = user.id
+WHERE session.id = ?;
+
+-- name: GetSessionWithClient :one
+SELECT
+    session.id,
+    client.id as client_id,
+    client.logout_callback_urls
+FROM
+    session
+INNER JOIN client
+ON session.client_id = client.id
 WHERE session.id = ?;
 
 -- name: GetAuthzHistory :one

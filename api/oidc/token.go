@@ -110,7 +110,7 @@ func (a API) Token(c echo.Context) error {
 
 	idTknExp := time.Now().Add(time.Second * time.Duration(client.TokenExpiration))
 	idTkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, IDTknClaims{
-		AuthSessionID: sessionID,
+		SID: sessionID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "http://localhost:3000/",
 			Subject:   metadata.ClientID,

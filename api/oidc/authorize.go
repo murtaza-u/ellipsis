@@ -184,7 +184,7 @@ func (a API) authorize(c echo.Context) error {
 	p.RedirectURI = strings.TrimSuffix(p.RedirectURI, "/")
 
 	var redirectTo string
-	for _, u := range strings.Split(client.CallbackUrls, ",") {
+	for _, u := range strings.Split(client.AuthCallbackUrls, ",") {
 		if p.RedirectURI == "" || u == p.RedirectURI {
 			redirectTo = u
 			break

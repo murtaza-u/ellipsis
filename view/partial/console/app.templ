@@ -57,11 +57,12 @@ templ Apps(apps []sqlc.Client) {
 }
 
 type AppParams struct {
-	ID                string        `param:"id"`
-	Name              string        `form:"name"`
-	LogoURL           string        `form:"logo_url"`
-	CallbackURLs      string        `form:"callback_urls"`
-	IDTokenExpiration time.Duration `form:"id_token_expiration"`
+	ID                 string        `param:"id"`
+	Name               string        `form:"name"`
+	LogoURL            string        `form:"logo_url"`
+	AuthCallbackURLs   string        `form:"auth_callback_urls"`
+	LogoutCallbackURLs string        `form:"logout_callback_urls"`
+	IDTokenExpiration  time.Duration `form:"id_token_expiration"`
 }
 
 templ AppCreateForm(values AppParams, err map[string]error) {
@@ -134,25 +135,51 @@ templ AppCreateForm(values AppParams, err map[string]error) {
 			</label>
 			<label class="form-control w-full">
 				<div class="label">
-					<span class="label-text">Callback URLs</span>
+					<span class="label-text">Auth Callback URLs</span>
 					<span class="label-text-alt text-error text-xl">*</span>
 				</div>
 				<input
 					required
-					name="callback_urls"
+					name="auth_callback_urls"
 					type="text"
 					maxlength="1000"
-					value={ values.CallbackURLs }
-					placeholder="https://example.com, https://localhost:8000"
+					value={ values.AuthCallbackURLs }
+					placeholder="https://example.com/callback, https://localhost:8000/callback"
 					class={
 						"input input-bordered w-full",
-						templ.KV("input-error", err["callback_urls"] != nil),
+						templ.KV("input-error", err["auth_callback_urls"] != nil),
 					}
 				/>
 				<div class="label">
-					if err["callback_urls"] != nil {
+					if err["auth_callback_urls"] != nil {
 						<span class="label-text-alt text-error first-letter:uppercase">
-							{ err["callback_urls"].Error() }
+							{ err["auth_callback_urls"].Error() }
+						</span>
+					}
+					<span class="label-text-alt">Comma(,) seperated urls</span>
+				</div>
+			</label>
+			<label class="form-control w-full">
+				<div class="label">
+					<span class="label-text">Logout Callback URLs</span>
+					<span class="label-text-alt text-error text-xl">*</span>
+				</div>
+				<input
+					required
+					name="logout_callback_urls"
+					type="text"
+					maxlength="1000"
+					value={ values.LogoutCallbackURLs }
+					placeholder="https://example.com/login, https://localhost:8000/login"
+					class={
+						"input input-bordered w-full",
+						templ.KV("input-error", err["logout_callback_urls"] != nil),
+					}
+				/>
+				<div class="label">
+					if err["logout_callback_urls"] != nil {
+						<span class="label-text-alt text-error first-letter:uppercase">
+							{ err["logout_callback_urls"].Error() }
 						</span>
 					}
 					<span class="label-text-alt">Comma(,) seperated urls</span>
@@ -273,25 +300,51 @@ templ AppUpdateForm(values AppParams, success bool, err map[string]error) {
 		</label>
 		<label class="form-control w-full">
 			<div class="label">
-				<span class="label-text">Callback URLs</span>
+				<span class="label-text">Auth Callback URLs</span>
 				<span class="label-text-alt text-error text-xl">*</span>
 			</div>
 			<input
 				required
-				name="callback_urls"
+				name="auth_callback_urls"
 				type="text"
 				maxlength="1000"
-				value={ values.CallbackURLs }
-				placeholder="https://example.com, https://localhost:8000"
+				value={ values.AuthCallbackURLs }
+				placeholder="https://example.com/callback, https://localhost:8000/callback"
 				class={
 					"input input-bordered w-full",
-					templ.KV("input-error", err["callback_urls"] != nil),
+					templ.KV("input-error", err["auth_callback_urls"] != nil),
 				}
 			/>
 			<div class="label">
-				if err["callback_urls"] != nil {
+				if err["auth_callback_urls"] != nil {
 					<span class="label-text-alt text-error first-letter:uppercase">
-						{ err["callback_urls"].Error() }
+						{ err["auth_callback_urls"].Error() }
+					</span>
+				}
+				<span class="label-text-alt">Comma(,) seperated urls</span>
+			</div>
+		</label>
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">Logout Callback URLs</span>
+				<span class="label-text-alt text-error text-xl">*</span>
+			</div>
+			<input
+				required
+				name="logout_callback_urls"
+				type="text"
+				maxlength="1000"
+				value={ values.LogoutCallbackURLs }
+				placeholder="https://example.com/login, https://localhost:8000/login"
+				class={
+					"input input-bordered w-full",
+					templ.KV("input-error", err["logout_callback_urls"] != nil),
+				}
+			/>
+			<div class="label">
+				if err["logout_callback_urls"] != nil {
+					<span class="label-text-alt text-error first-letter:uppercase">
+						{ err["logout_callback_urls"].Error() }
 					</span>
 				}
 				<span class="label-text-alt">Comma(,) seperated urls</span>
@@ -382,11 +435,12 @@ templ App(app sqlc.Client) {
 		</div>
 		<div class="w-full lg:w-2/3 bg-base-100">
 			@AppUpdateForm(AppParams{
-				ID:                app.ID,
-				Name:              app.Name,
-				LogoURL:           app.PictureUrl.String,
-				CallbackURLs:      app.CallbackUrls,
-				IDTokenExpiration: time.Duration(app.TokenExpiration),
+				ID:                 app.ID,
+				Name:               app.Name,
+				LogoURL:            app.PictureUrl.String,
+				AuthCallbackURLs:   app.AuthCallbackUrls,
+				LogoutCallbackURLs: app.LogoutCallbackUrls,
+				IDTokenExpiration:  time.Duration(app.TokenExpiration),
 			}, false, map[string]error{})
 			<hr class="my-10"/>
 			<div class="flex items-center justify-around mt-5">

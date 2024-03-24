@@ -24,8 +24,11 @@ func (v AppValidator) Validate() (*console.AppParams, map[string]error) {
 	if err := v.validateLogoURL(); err != nil {
 		errMap["logo_url"] = err
 	}
-	if err := v.validateCallbackURLs(); err != nil {
-		errMap["callback_urls"] = err
+	if err := v.validateAuthCallbackURLs(); err != nil {
+		errMap["auth_callback_urls"] = err
+	}
+	if err := v.validateLogoutCallbackURLs(); err != nil {
+		errMap["logout_callback_urls"] = err
 	}
 	if err := v.validateIDTokenExpiration(); err != nil {
 		errMap["id_token_expiration"] = err
@@ -59,27 +62,51 @@ func (v *AppValidator) validateLogoURL() error {
 	return nil
 }
 
-func (v *AppValidator) validateCallbackURLs() error {
-	if v.CallbackURLs == "" {
-		return errors.New("missing callback URL")
-	}
-	if len(v.CallbackURLs) > 1000 {
-		return errors.New("value too long")
+func validateAndTransformCallbackURLs(urls string) (string, error) {
+	if len(urls) > 1000 {
+		return "", errors.New("value too long")
 	}
 
 	var callbacks []string
 
-	for _, callback := range strings.Split(v.CallbackURLs, ",") {
+	for _, callback := range strings.Split(urls, ",") {
 		callback = strings.TrimSpace(callback)
 		callback = strings.TrimSuffix(callback, "/")
 		_, err := url.ParseRequestURI(callback)
 		if err != nil {
-			return errors.New("one or more invalid URL")
+			return "", errors.New("one or more invalid URL")
 		}
 		callbacks = append(callbacks, callback)
 	}
 
-	v.CallbackURLs = strings.Join(callbacks, ",")
+	return strings.Join(callbacks, ","), nil
+}
+
+func (v *AppValidator) validateAuthCallbackURLs() error {
+	if v.AuthCallbackURLs == "" {
+		return errors.New("missing auth callback URL")
+	}
+
+	urls, err := validateAndTransformCallbackURLs(v.AuthCallbackURLs)
+	if err != nil {
+		return err
+	}
+
+	v.AuthCallbackURLs = urls
+	return nil
+}
+
+func (v *AppValidator) validateLogoutCallbackURLs() error {
+	if v.LogoutCallbackURLs == "" {
+		return errors.New("missing logout callback URL")
+	}
+
+	urls, err := validateAndTransformCallbackURLs(v.LogoutCallbackURLs)
+	if err != nil {
+		return err
+	}
+
+	v.LogoutCallbackURLs = urls
 	return nil
 }
 

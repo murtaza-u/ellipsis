@@ -43,7 +43,7 @@ func (API) configuration(c echo.Context) error {
 			"sub",
 			"iat",
 			"exp",
-			"auth_session_id",
+			"sid",
 		},
 		RequestURIParamSupported: false,
 		RequestParamSupported:    false,

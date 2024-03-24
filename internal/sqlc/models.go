@@ -16,13 +16,14 @@ type AuthorizationHistory struct {
 }
 
 type Client struct {
-	ID              string
-	SecretHash      string
-	Name            string
-	PictureUrl      sql.NullString
-	CallbackUrls    string
-	TokenExpiration int64
-	CreatedAt       time.Time
+	ID                 string
+	SecretHash         string
+	Name               string
+	PictureUrl         sql.NullString
+	AuthCallbackUrls   string
+	LogoutCallbackUrls string
+	TokenExpiration    int64
+	CreatedAt          time.Time
 }
 
 type Session struct {

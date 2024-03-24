@@ -76,6 +76,7 @@ func (a API) Register(app *echo.Echo) error {
 	app.POST("/oauth/token", a.Token)
 	app.GET("/.well-known/jwks.json", a.JWKs)
 	app.GET("/userinfo", a.UserInfo)
+	app.GET("/oidc/logout", a.Logout)
 
 	if a.Providers.Google.Enable {
 		google, err := provider.NewGoogleProvider(a.DB, provider.Credentials{
