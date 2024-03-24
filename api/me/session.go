@@ -5,13 +5,14 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/murtaza-u/ellipsis/api/middleware"
+	"github.com/murtaza-u/ellipsis/api/render"
+	"github.com/murtaza-u/ellipsis/view"
+	"github.com/murtaza-u/ellipsis/view/layout"
+	"github.com/murtaza-u/ellipsis/view/partial/me"
+
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
-	"github.com/murtaza-u/account/api/middleware"
-	"github.com/murtaza-u/account/api/render"
-	"github.com/murtaza-u/account/view"
-	"github.com/murtaza-u/account/view/layout"
-	"github.com/murtaza-u/account/view/partial/me"
 )
 
 func (a API) SessionPage(c echo.Context) error {
@@ -45,7 +46,7 @@ func (a API) SessionPage(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"My Account - Sessions | Account",
+				"My Account - Sessions | Ellipsis",
 				view.Me(
 					"/me/session",
 					view.Error(
@@ -60,7 +61,7 @@ func (a API) SessionPage(c echo.Context) error {
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
-			"My Account - Sessions | Account",
+			"My Account - Sessions | Ellipsis",
 			view.Me(
 				"/me/session",
 				me.Sessions(sessions, sessID),

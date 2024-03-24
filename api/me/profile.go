@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/murtaza-u/account/api/middleware"
-	"github.com/murtaza-u/account/api/render"
-	"github.com/murtaza-u/account/api/util"
-	"github.com/murtaza-u/account/internal/sqlc"
-	"github.com/murtaza-u/account/view"
-	"github.com/murtaza-u/account/view/layout"
-	"github.com/murtaza-u/account/view/partial/me"
+	"github.com/murtaza-u/ellipsis/api/middleware"
+	"github.com/murtaza-u/ellipsis/api/render"
+	"github.com/murtaza-u/ellipsis/api/util"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view"
+	"github.com/murtaza-u/ellipsis/view/layout"
+	"github.com/murtaza-u/ellipsis/view/partial/me"
 
 	"github.com/a-h/templ"
 	"github.com/alexedwards/argon2id"
@@ -37,7 +37,7 @@ func (a API) ProfilePage(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"My Account | Account",
+				"My Account | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
@@ -50,7 +50,7 @@ func (a API) ProfilePage(c echo.Context) error {
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
-			"My Account | Account",
+			"My Account | Ellipsis",
 			view.Me(
 				"/me",
 				me.Profile(u.HashedPassword.Valid),

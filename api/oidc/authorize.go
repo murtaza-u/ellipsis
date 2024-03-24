@@ -8,12 +8,12 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/murtaza-u/account/api/middleware"
-	"github.com/murtaza-u/account/api/render"
-	"github.com/murtaza-u/account/api/util"
-	"github.com/murtaza-u/account/internal/sqlc"
-	"github.com/murtaza-u/account/view"
-	"github.com/murtaza-u/account/view/layout"
+	"github.com/murtaza-u/ellipsis/api/middleware"
+	"github.com/murtaza-u/ellipsis/api/render"
+	"github.com/murtaza-u/ellipsis/api/util"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view"
+	"github.com/murtaza-u/ellipsis/view/layout"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
@@ -142,7 +142,7 @@ func (a API) authorize(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Authorization | Account",
+				"Authorization | Ellipsis",
 				view.Error(
 					"Failed to parse query parameters",
 					http.StatusBadRequest,
@@ -158,7 +158,7 @@ func (a API) authorize(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Authorization | Account",
+					"Authorization | Ellipsis",
 					view.Error(
 						"Invalid client id",
 						http.StatusBadRequest,
@@ -170,7 +170,7 @@ func (a API) authorize(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Authorization | Account",
+				"Authorization | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
@@ -195,7 +195,7 @@ func (a API) authorize(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Authorization | Account",
+				"Authorization | Ellipsis",
 				view.Error(
 					"Unauthorized redirect URI",
 					http.StatusBadRequest,
@@ -213,7 +213,7 @@ func (a API) authorize(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Authorization | Account",
+				"Authorization | Ellipsis",
 				view.Error(
 					"An internal error occured",
 					http.StatusInternalServerError,
@@ -227,7 +227,7 @@ func (a API) authorize(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Authorization | Account",
+				"Authorization | Ellipsis",
 				view.Error(
 					"An internal error occured",
 					http.StatusInternalServerError,
@@ -249,7 +249,7 @@ func (a API) authorize(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Authorize | Account",
+					"Authorize | Ellipsis",
 					view.Authorize(redirectTo, c.Request().RequestURI, u, client),
 				),
 			})
@@ -257,7 +257,7 @@ func (a API) authorize(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Authorization | Account",
+				"Authorization | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,

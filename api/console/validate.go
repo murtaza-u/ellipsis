@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/murtaza-u/account/view/partial/console"
+	"github.com/murtaza-u/ellipsis/view/partial/console"
 )
 
 type AppValidator struct {

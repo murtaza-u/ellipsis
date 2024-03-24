@@ -44,7 +44,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- favicon --><link rel=\"icon\" type=\"image/png\" href=\"/static/favicon.png\"><!-- css --><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><link href=\"/static/css/style.css\" rel=\"stylesheet\"></head><body class=\"font-sans\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- favicon --><link rel=\"icon\" type=\"svg+xml\" href=\"/static/favicon.svg\"><!-- css --><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><link href=\"/static/css/style.css\" rel=\"stylesheet\"></head><body class=\"font-sans\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

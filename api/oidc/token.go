@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/murtaza-u/account/api/util"
-	"github.com/murtaza-u/account/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/api/util"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
 
 	"github.com/alexedwards/argon2id"
 	"github.com/golang-jwt/jwt/v5"

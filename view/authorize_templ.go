@@ -13,8 +13,8 @@ import "bytes"
 import (
 	"database/sql"
 
-	"github.com/murtaza-u/account/internal/sqlc"
-	"github.com/murtaza-u/account/view/partial/icon"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view/partial/icon"
 )
 
 func Authorize(callback, returnTo string, user sqlc.User, client sqlc.Client) templ.Component {
@@ -84,7 +84,7 @@ func Authorize(callback, returnTo string, user sqlc.User, client sqlc.Client) te
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</figure><div>Sign you in to their service using your Account's identity</div></li><li class=\"flex items-center space-x-4 p-2\"><figure>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</figure><div>Sign you in to their service using your Ellipsis's identity</div></li><li class=\"flex items-center space-x-4 p-2\"><figure>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

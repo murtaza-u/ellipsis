@@ -6,11 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/murtaza-u/account/api/middleware"
-	"github.com/murtaza-u/account/api/oidc/provider"
-	"github.com/murtaza-u/account/api/util"
-	"github.com/murtaza-u/account/internal/conf"
-	"github.com/murtaza-u/account/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/api/middleware"
+	"github.com/murtaza-u/ellipsis/api/oidc/provider"
+	"github.com/murtaza-u/ellipsis/api/util"
+	"github.com/murtaza-u/ellipsis/internal/conf"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
 
 	"github.com/labstack/echo/v4"
 	"github.com/murtaza-u/dream"

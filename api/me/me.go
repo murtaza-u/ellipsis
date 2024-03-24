@@ -1,8 +1,8 @@
 package me
 
 import (
-	"github.com/murtaza-u/account/api/middleware"
-	"github.com/murtaza-u/account/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/api/middleware"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
 
 	"github.com/labstack/echo/v4"
 )

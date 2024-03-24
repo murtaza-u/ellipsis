@@ -4,14 +4,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/murtaza-u/account/api"
-	"github.com/murtaza-u/account/internal/conf"
+	"github.com/murtaza-u/ellipsis/api"
+	"github.com/murtaza-u/ellipsis/internal/conf"
 )
 
-const defaultConfPath = "/etc/account/config.yaml"
+const defaultConfPath = "/etc/ellipsis/config.yaml"
 
 func main() {
-	path := os.Getenv("ACCOUNT_CONFIG")
+	path := os.Getenv("ELLIPSIS_CONFIG")
 	if path == "" {
 		path = defaultConfPath
 	}

@@ -13,7 +13,7 @@ import "bytes"
 import (
 	"fmt"
 
-	"github.com/murtaza-u/account/view/partial/icon"
+	"github.com/murtaza-u/ellipsis/view/partial/icon"
 )
 
 func Overview(appCount, userCount int) templ.Component {

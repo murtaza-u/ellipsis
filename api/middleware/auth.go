@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/murtaza-u/account/api/render"
-	"github.com/murtaza-u/account/internal/sqlc"
-	"github.com/murtaza-u/account/view"
+	"github.com/murtaza-u/ellipsis/api/render"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view"
 
 	"github.com/labstack/echo/v4"
 )

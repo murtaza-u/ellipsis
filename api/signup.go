@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"net/mail"
 
-	"github.com/murtaza-u/account/api/render"
-	"github.com/murtaza-u/account/api/util"
-	"github.com/murtaza-u/account/internal/sqlc"
-	"github.com/murtaza-u/account/view"
-	"github.com/murtaza-u/account/view/layout"
+	"github.com/murtaza-u/ellipsis/api/render"
+	"github.com/murtaza-u/ellipsis/api/util"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view"
+	"github.com/murtaza-u/ellipsis/view/layout"
 
 	"github.com/a-h/templ"
 	"github.com/alexedwards/argon2id"
@@ -22,7 +22,7 @@ func (Server) SignUpPage(c echo.Context) error {
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
-			"Sign Up | Account",
+			"Sign Up | Ellipsis",
 			view.SignUp(view.SignUpParams{
 				ReturnTo: c.QueryParam("return_to"),
 			}, map[string]error{}),
@@ -36,7 +36,7 @@ func (s Server) SignUp(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Sign Up | Account",
+				"Sign Up | Ellipsis",
 				view.Error("Failed to parse form", http.StatusBadRequest),
 			),
 			Status: http.StatusBadRequest,
@@ -54,7 +54,7 @@ func (s Server) SignUp(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Sign Up | Account",
+				"Sign Up | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
@@ -79,7 +79,7 @@ func (s Server) SignUp(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Sign Up | Account",
+				"Sign Up | Ellipsis",
 				view.SignUp(*params, errMap),
 			),
 			Status: http.StatusBadRequest,
@@ -91,7 +91,7 @@ func (s Server) SignUp(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Sign Up | Account",
+				"Sign Up | Ellipsis",
 				view.Error(
 					"Failed to hash password",
 					http.StatusInternalServerError,
@@ -109,7 +109,7 @@ func (s Server) SignUp(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Sign Up | Account",
+				"Sign Up | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,

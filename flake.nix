@@ -1,5 +1,5 @@
 {
-  description = "Account - authentication & session management service";
+  description = "Ellipsis - authentication & session management service";
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
   outputs = { self, nixpkgs, ... }@inputs:
     let
@@ -25,7 +25,7 @@
           prettierd
         ];
 
-        ACCOUNT_CONFIG = "./config.yaml";
+        ELLIPSIS_CONFIG = "./config.yaml";
       };
     };
 }

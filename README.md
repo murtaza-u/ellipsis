@@ -1,1 +1,3 @@
-# Authentication & Session Management Service
+# Ellipsis
+
+> Authentication & Session Management Service

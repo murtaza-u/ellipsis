@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/murtaza-u/account/api/render"
-	"github.com/murtaza-u/account/api/util"
-	"github.com/murtaza-u/account/internal/sqlc"
-	"github.com/murtaza-u/account/view"
-	"github.com/murtaza-u/account/view/layout"
+	"github.com/murtaza-u/ellipsis/api/render"
+	"github.com/murtaza-u/ellipsis/api/util"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view"
+	"github.com/murtaza-u/ellipsis/view/layout"
 
 	"github.com/a-h/templ"
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -63,7 +63,7 @@ func (p ProviderGoogle) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login - Google | Account",
+				"Login - Google | Ellipsis",
 				view.Error(
 					"failed to get session",
 					http.StatusExpectationFailed,
@@ -78,7 +78,7 @@ func (p ProviderGoogle) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login - Google | Account",
+				"Login - Google | Ellipsis",
 				view.Error(
 					"failed to generate state",
 					http.StatusInternalServerError,
@@ -99,7 +99,7 @@ func (p ProviderGoogle) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login - Google | Account",
+				"Login - Google | Ellipsis",
 				view.Error(
 					"failed to save to session",
 					http.StatusInternalServerError,
@@ -118,7 +118,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"failed to parse query params",
 					http.StatusExpectationFailed,
@@ -136,7 +136,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(msg, http.StatusExpectationFailed),
 			),
 			Status: http.StatusExpectationFailed,
@@ -148,7 +148,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"failed to get session",
 					http.StatusExpectationFailed,
@@ -163,7 +163,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"missing state in session",
 					http.StatusBadRequest,
@@ -178,7 +178,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"invalid state",
 					http.StatusBadRequest,
@@ -193,7 +193,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"failed to exchange code for token",
 					http.StatusExpectationFailed,
@@ -208,7 +208,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"missing id_token field in oauth2 token",
 					http.StatusExpectationFailed,
@@ -224,7 +224,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"failed to verify id token",
 					http.StatusExpectationFailed,
@@ -239,7 +239,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"failed to fetch user's info",
 					http.StatusExpectationFailed,
@@ -254,7 +254,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"failed to unmarshal user info claims",
 					http.StatusExpectationFailed,
@@ -273,7 +273,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Callback - Google | Account",
+					"Callback - Google | Ellipsis",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -303,7 +303,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Callback - Google | Account",
+					"Callback - Google | Ellipsis",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -317,7 +317,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Callback - Google | Account",
+					"Callback - Google | Ellipsis",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -333,7 +333,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"failed to generate session ID",
 					http.StatusInternalServerError,
@@ -372,7 +372,7 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - Google | Account",
+				"Callback - Google | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,

@@ -1,4 +1,4 @@
-module github.com/murtaza-u/account
+module github.com/murtaza-u/ellipsis
 
 go 1.21.5
 

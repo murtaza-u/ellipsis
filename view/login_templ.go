@@ -13,7 +13,7 @@ import "bytes"
 import (
 	"net/url"
 
-	"github.com/murtaza-u/account/view/partial"
+	"github.com/murtaza-u/ellipsis/view/partial"
 )
 
 type LoginParams struct {

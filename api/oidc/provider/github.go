@@ -10,11 +10,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/murtaza-u/account/api/render"
-	"github.com/murtaza-u/account/api/util"
-	"github.com/murtaza-u/account/internal/sqlc"
-	"github.com/murtaza-u/account/view"
-	"github.com/murtaza-u/account/view/layout"
+	"github.com/murtaza-u/ellipsis/api/render"
+	"github.com/murtaza-u/ellipsis/api/util"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view"
+	"github.com/murtaza-u/ellipsis/view/layout"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo-contrib/session"
@@ -56,7 +56,7 @@ func (p ProviderGithub) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login - GitHub | Account",
+				"Login - GitHub | Ellipsis",
 				view.Error(
 					"failed to get session",
 					http.StatusExpectationFailed,
@@ -71,7 +71,7 @@ func (p ProviderGithub) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login - GitHub | Account",
+				"Login - GitHub | Ellipsis",
 				view.Error(
 					"failed to generate state",
 					http.StatusInternalServerError,
@@ -92,7 +92,7 @@ func (p ProviderGithub) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login - GitHub | Account",
+				"Login - GitHub | Ellipsis",
 				view.Error(
 					"failed to save to session",
 					http.StatusInternalServerError,
@@ -111,7 +111,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					"failed to parse query params",
 					http.StatusExpectationFailed,
@@ -129,7 +129,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(msg, http.StatusExpectationFailed),
 			),
 			Status: http.StatusExpectationFailed,
@@ -141,7 +141,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					"failed to get session",
 					http.StatusExpectationFailed,
@@ -156,7 +156,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					"missing state in session",
 					http.StatusBadRequest,
@@ -171,7 +171,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					"invalid state",
 					http.StatusBadRequest,
@@ -186,7 +186,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					"failed to exchange code for token",
 					http.StatusExpectationFailed,
@@ -201,7 +201,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					fmt.Sprintf("failed to retreive user: %s", err.Error()),
 					http.StatusInternalServerError,
@@ -218,7 +218,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					fmt.Sprintf("failed to retreive user: %s", err.Error()),
 					http.StatusInternalServerError,
@@ -232,7 +232,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					fmt.Sprintf("failed to retreive user: status: %s", resp.Status),
 					http.StatusInternalServerError,
@@ -246,7 +246,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					fmt.Sprintf("failed to retreive user: %s", err.Error()),
 					http.StatusInternalServerError,
@@ -262,7 +262,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					fmt.Sprintf("failed to retreive user: %s", err.Error()),
 					http.StatusInternalServerError,
@@ -281,7 +281,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Callback - GitHub | Account",
+					"Callback - GitHub | Ellipsis",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -311,7 +311,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Callback - GitHub | Account",
+					"Callback - GitHub | Ellipsis",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -325,7 +325,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Callback - GitHub | Account",
+					"Callback - GitHub | Ellipsis",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -341,7 +341,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					"failed to generate session ID",
 					http.StatusInternalServerError,
@@ -380,7 +380,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Callback - GitHub | Account",
+				"Callback - GitHub | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,

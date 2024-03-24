@@ -10,7 +10,7 @@ import "context"
 import "io"
 import "bytes"
 
-import "github.com/murtaza-u/account/view/partial/icon"
+import "github.com/murtaza-u/ellipsis/view/partial/icon"
 
 func Profile(hasPswd bool) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {

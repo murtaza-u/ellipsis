@@ -13,7 +13,7 @@ import "bytes"
 import (
 	"net/url"
 
-	"github.com/murtaza-u/account/view/partial/icon"
+	"github.com/murtaza-u/ellipsis/view/partial/icon"
 )
 
 func SocialLogins(returnTo string) templ.Component {

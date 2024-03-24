@@ -3,10 +3,10 @@ package console
 import (
 	"net/http"
 
-	"github.com/murtaza-u/account/api/render"
-	"github.com/murtaza-u/account/view"
-	"github.com/murtaza-u/account/view/layout"
-	"github.com/murtaza-u/account/view/partial/console"
+	"github.com/murtaza-u/ellipsis/api/render"
+	"github.com/murtaza-u/ellipsis/view"
+	"github.com/murtaza-u/ellipsis/view/layout"
+	"github.com/murtaza-u/ellipsis/view/partial/console"
 
 	"github.com/labstack/echo/v4"
 )
@@ -17,7 +17,7 @@ func (a API) overviewPage(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Console | Account",
+				"Console | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
@@ -29,7 +29,7 @@ func (a API) overviewPage(c echo.Context) error {
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
-			"Console | Account",
+			"Console | Ellipsis",
 			view.Console(
 				"/console",
 				console.Overview(

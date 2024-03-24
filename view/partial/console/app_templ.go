@@ -15,8 +15,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/murtaza-u/account/internal/sqlc"
-	"github.com/murtaza-u/account/view/partial/icon"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view/partial/icon"
 
 	"github.com/xeonx/timeago"
 )

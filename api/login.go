@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/murtaza-u/account/api/render"
-	"github.com/murtaza-u/account/api/util"
-	"github.com/murtaza-u/account/internal/sqlc"
-	"github.com/murtaza-u/account/view"
-	"github.com/murtaza-u/account/view/layout"
+	"github.com/murtaza-u/ellipsis/api/render"
+	"github.com/murtaza-u/ellipsis/api/util"
+	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view"
+	"github.com/murtaza-u/ellipsis/view/layout"
 
 	"github.com/a-h/templ"
 	"github.com/alexedwards/argon2id"
@@ -22,7 +22,7 @@ func (Server) LoginPage(c echo.Context) error {
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
-			"Login | Account",
+			"Login | Ellipsis",
 			view.Login(view.LoginParams{
 				ReturnTo: c.QueryParam("return_to"),
 			}, map[string]error{}),
@@ -36,7 +36,7 @@ func (s Server) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login | Account",
+				"Login | Ellipsis",
 				view.Error("Failed to parse form", http.StatusBadRequest),
 			),
 			Status: http.StatusBadRequest,
@@ -57,7 +57,7 @@ func (s Server) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login | Account",
+				"Login | Ellipsis",
 				view.Login(*params, errMap),
 			),
 			Status: http.StatusBadRequest,
@@ -72,7 +72,7 @@ func (s Server) Login(c echo.Context) error {
 			return render.Do(render.Params{
 				Ctx: c,
 				Component: layout.Base(
-					"Login | Account",
+					"Login | Ellipsis",
 					view.Login(*params, errMap),
 				),
 				Status: http.StatusBadRequest,
@@ -81,7 +81,7 @@ func (s Server) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login | Account",
+				"Login | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
@@ -96,7 +96,7 @@ func (s Server) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login | Account",
+				"Login | Ellipsis",
 				view.Login(*params, errMap),
 			),
 			Status: http.StatusBadRequest,
@@ -109,7 +109,7 @@ func (s Server) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login | Account",
+				"Login | Ellipsis",
 				view.Error(
 					"Failed to validate credentials",
 					http.StatusInternalServerError,
@@ -124,7 +124,7 @@ func (s Server) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login | Account",
+				"Login | Ellipsis",
 				view.Login(*params, errMap),
 			),
 			Status: http.StatusBadRequest,
@@ -136,7 +136,7 @@ func (s Server) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login | Account",
+				"Login | Ellipsis",
 				view.Error(
 					"Failed to generate session id",
 					http.StatusInternalServerError,
@@ -173,7 +173,7 @@ func (s Server) Login(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"Login | Account",
+				"Login | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
