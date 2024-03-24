@@ -55,9 +55,10 @@ func New(c conf.C) (*Server, error) {
 
 func (s Server) Start() error {
 	s.app.Static("/static", "static")
-	s.app.GET("/", s.indexPage)
 
 	auth := middleware.NewAuthMiddleware(s.queries)
+
+	s.app.GET("/", s.indexPage, auth.AuthInfo)
 
 	s.app.GET("/signup", s.SignUpPage, auth.AlreadyAuthenticated)
 	s.app.POST("/signup", s.SignUp, auth.AlreadyAuthenticated)

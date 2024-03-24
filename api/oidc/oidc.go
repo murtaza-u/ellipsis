@@ -70,8 +70,8 @@ func (a API) Register(app *echo.Echo) error {
 	app.GET("/.well-known/openid-configuration", a.configuration)
 
 	auth := middleware.NewAuthMiddleware(a.DB)
-	app.GET("/authorize", a.authorize, auth.Required)
-	app.POST("/authorize", a.consent, auth.Required)
+	app.GET("/authorize", a.authorize, auth.Required, auth.AuthInfo)
+	app.POST("/authorize", a.consent, auth.Required, auth.AuthInfo)
 
 	app.POST("/oauth/token", a.Token)
 	app.GET("/.well-known/jwks.json", a.JWKs)

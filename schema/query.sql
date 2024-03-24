@@ -98,6 +98,19 @@ LEFT JOIN client
 ON session.client_id = client.id
 WHERE session.user_id = ?;
 
+-- name: GetSessionWithUser :one
+SELECT
+    session.id,
+    session.expires_at,
+    user.id as user_id,
+    user.email,
+    user.avatar_url
+FROM
+    session
+INNER JOIN user
+ON session.user_id = user.id
+WHERE session.id = ?;
+
 -- name: GetAuthzHistory :one
 SELECT * FROM authorization_history
 WHERE user_id = ? AND client_id = ?;

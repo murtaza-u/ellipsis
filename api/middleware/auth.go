@@ -24,10 +24,32 @@ func NewAuthMiddleware(db *sqlc.Queries) AuthMiddleware {
 	}
 }
 
-type CtxWithIDs struct {
+type CtxWithAuthInfo struct {
 	echo.Context
-	UserID    int64
 	SessionID string
+	UserID    int64
+	AvatarURL string
+	Email     string
+}
+
+func (m AuthMiddleware) AuthInfo(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		cookie, err := c.Cookie("auth_session")
+		if err != nil {
+			return next(c)
+		}
+		sess, err := m.db.GetSessionWithUser(c.Request().Context(), cookie.Value)
+		if err != nil {
+			return next(c)
+		}
+		return next(CtxWithAuthInfo{
+			Context:   c,
+			SessionID: sess.ID,
+			UserID:    sess.UserID,
+			Email:     sess.Email,
+			AvatarURL: sess.AvatarUrl.String,
+		})
+	}
 }
 
 func (m AuthMiddleware) Required(next echo.HandlerFunc) echo.HandlerFunc {
@@ -55,11 +77,7 @@ func (m AuthMiddleware) Required(next echo.HandlerFunc) echo.HandlerFunc {
 		if time.Until(sess.ExpiresAt) <= 0 {
 			return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
 		}
-		return next(CtxWithIDs{
-			Context:   c,
-			UserID:    sess.UserID,
-			SessionID: sess.ID,
-		})
+		return next(c)
 	}
 }
 

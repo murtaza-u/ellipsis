@@ -5,10 +5,12 @@ import (
 
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
 	"github.com/murtaza-u/ellipsis/view/partial/icon"
+	"github.com/murtaza-u/ellipsis/view/partial"
 )
 
 templ Authorize(callback, returnTo string, user sqlc.User, client sqlc.Client) {
 	<div class="bg-temple">
+		@partial.Navbar("/authorize", user.AvatarUrl.String)
 		<main class="min-h-screen w-full lg:w-1/2 lg:mx-auto flex flex-col justify-center items-center space-y-8 bg-base-100">
 			<div class="w-full flex justify-evenly items-center">
 				<div class="tooltip" data-tip={ user.Email }>
@@ -20,7 +22,7 @@ templ Authorize(callback, returnTo string, user sqlc.User, client sqlc.Client) {
 			<h1 class="text-xl text-center">
 				<em>{ client.Name }</em> wants to
 			</h1>
-			<ul class="w-full bg-base-200 rounded-lg">
+			<ul class="w-full bg-base-200">
 				<li class="flex items-center space-x-4 p-2">
 					<figure>
 						@icon.Fingerprint(32)
@@ -116,8 +118,12 @@ templ Authorize(callback, returnTo string, user sqlc.User, client sqlc.Client) {
 					</button>
 				</form>
 			</div>
+			<p class="text-sm">
+				You are signed in as <strong>{ user.Email }</strong>
+			</p>
 		</main>
 	</div>
+	@partial.Footer()
 }
 
 templ userAvatar(url sql.NullString) {

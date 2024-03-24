@@ -1,0 +1,23 @@
+package partial
+
+import "github.com/murtaza-u/ellipsis/view/partial/icon"
+
+templ Footer() {
+	<footer class="footer p-10 bg-base-200">
+		<aside>
+			<img
+				class="w-52"
+				src="/static/ellipsis-logo-transparent.svg"
+				alt="Ellipsis logo"
+			/>
+		</aside>
+		<nav>
+			<h6 class="footer-title normal-case">Powered by Ellipsis</h6>
+			<div class="grid grid-flow-col gap-4">
+				<a href="https://github.com/murtaza-u/ellipsis" target="_blank">
+					@icon.Github()
+				</a>
+			</div>
+		</nav>
+	</footer>
+}

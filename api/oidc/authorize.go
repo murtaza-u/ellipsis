@@ -95,7 +95,7 @@ func (a API) consent(c echo.Context) error {
 	}
 
 	var userID int64
-	if ctx, ok := c.(middleware.CtxWithIDs); ok {
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 	}
 
@@ -206,7 +206,7 @@ func (a API) authorize(c echo.Context) error {
 	}
 
 	var userID int64
-	if ctx, ok := c.(middleware.CtxWithIDs); ok {
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 	}
 	if userID == 0 {

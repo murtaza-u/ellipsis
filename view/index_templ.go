@@ -10,9 +10,12 @@ import "context"
 import "io"
 import "bytes"
 
-import "github.com/murtaza-u/ellipsis/view/partial/icon"
+import (
+	"github.com/murtaza-u/ellipsis/view/partial"
+	"github.com/murtaza-u/ellipsis/view/partial/icon"
+)
 
-func Index() templ.Component {
+func Index(avatarURL string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -25,15 +28,27 @@ func Index() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- hero --><section class=\"h-screen overflow-hidden flex flex-col justify-center items-center space-y-6\" hx-boost=\"true\"><h1 class=\"bg-gradient-to-r from-blue-500 via-pink-500 to-purple-700 bg-clip-text py-1 text-center text-5xl font-bold text-transparent\">Authentication & Session Management Service</h1><a href=\"/me\" class=\"btn btn-primary\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icon.Goto().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = partial.Navbar("/", avatarURL).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("My Account</a></section>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</header><section class=\"mx-3 min-h-screen flex flex-col justify-center items-center space-y-8\"><h1 class=\"font-bold text-center text-4xl lg:text-7xl bg-gradient-to-r from-blue-500 via-pink-500 to-purple-700 bg-clip-text text-transparent\">Identity in Motion, Sessions in Control</h1><p class=\"text-md lg:text-xl text-center\">Ellipsis is an open-source authentication-as-a-service (AaaS) built with simplicity in mind.</p><a href=\"https://github.com/murtaza-u/ellipsis\" target=\"_blank\" class=\"btn btn-primary w-full lg:w-fit\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = icon.Github().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("Get Started</a></section>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = partial.Footer().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

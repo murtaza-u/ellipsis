@@ -1,0 +1,22 @@
+package partial
+
+import "strings"
+
+templ Navbar(path, avatarURL string) {
+	<div
+		class="navbar bg-base-100 flex justify-end items-center px-3 lg:px-5"
+		hx-boost="true"
+	>
+		if strings.HasPrefix(path, "/me") {
+			<a href="/logout" class="link-hover" hx-boost="false">Logout</a>
+		} else {
+			<a class="block w-10 rounded-full" href="/me">
+				if avatarURL != "" {
+					<img alt="Avatar" src={ avatarURL }/>
+				} else {
+					<img alt="Avatar" src="/static/default-user.svg"/>
+				}
+			</a>
+		}
+	</div>
+}

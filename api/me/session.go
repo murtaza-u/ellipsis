@@ -17,12 +17,13 @@ import (
 
 func (a API) SessionPage(c echo.Context) error {
 	var (
-		userID int64
-		sessID string
+		userID            int64
+		sessID, avatarURL string
 	)
-	if ctx, ok := c.(middleware.CtxWithIDs); ok {
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 		sessID = ctx.SessionID
+		avatarURL = ctx.AvatarURL
 	}
 	if userID == 0 || sessID == "" {
 		r := c.Response()
@@ -49,6 +50,7 @@ func (a API) SessionPage(c echo.Context) error {
 				"My Account - Sessions | Ellipsis",
 				view.Me(
 					"/me/session",
+					avatarURL,
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
@@ -64,6 +66,7 @@ func (a API) SessionPage(c echo.Context) error {
 			"My Account - Sessions | Ellipsis",
 			view.Me(
 				"/me/session",
+				avatarURL,
 				me.Sessions(sessions, sessID),
 			),
 		),

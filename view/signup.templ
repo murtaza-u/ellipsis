@@ -125,6 +125,7 @@ templ SignUp(values SignUpParams, err map[string]error) {
 		<div class="divider my-8 lg:my-0 lg:divider-horizontal">OR</div>
 		@partial.SocialLogins(values.ReturnTo)
 	</main>
+	@partial.Footer()
 }
 
 func signupWithReturnTo(returnTo string) string {

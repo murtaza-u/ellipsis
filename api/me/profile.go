@@ -21,7 +21,7 @@ import (
 
 func (a API) ProfilePage(c echo.Context) error {
 	var userID int64
-	if ctx, ok := c.(middleware.CtxWithIDs); ok {
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 	}
 	u, err := a.db.GetUser(c.Request().Context(), userID)
@@ -53,6 +53,7 @@ func (a API) ProfilePage(c echo.Context) error {
 			"My Account | Ellipsis",
 			view.Me(
 				"/me",
+				u.AvatarUrl.String,
 				me.Profile(u.HashedPassword.Valid),
 			),
 		),
@@ -73,7 +74,7 @@ func (a API) ChangePassword(c echo.Context) error {
 	}
 
 	var userID int64
-	if ctx, ok := c.(middleware.CtxWithIDs); ok {
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 	}
 	if userID == 0 {

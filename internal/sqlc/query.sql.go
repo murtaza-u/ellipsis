@@ -333,6 +333,41 @@ func (q *Queries) GetSessionForUserID(ctx context.Context, userID int64) ([]GetS
 	return items, nil
 }
 
+const getSessionWithUser = `-- name: GetSessionWithUser :one
+SELECT
+    session.id,
+    session.expires_at,
+    user.id as user_id,
+    user.email,
+    user.avatar_url
+FROM
+    session
+INNER JOIN user
+ON session.user_id = user.id
+WHERE session.id = ?
+`
+
+type GetSessionWithUserRow struct {
+	ID        string
+	ExpiresAt time.Time
+	UserID    int64
+	Email     string
+	AvatarUrl sql.NullString
+}
+
+func (q *Queries) GetSessionWithUser(ctx context.Context, id string) (GetSessionWithUserRow, error) {
+	row := q.db.QueryRowContext(ctx, getSessionWithUser, id)
+	var i GetSessionWithUserRow
+	err := row.Scan(
+		&i.ID,
+		&i.ExpiresAt,
+		&i.UserID,
+		&i.Email,
+		&i.AvatarUrl,
+	)
+	return i, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, email, avatar_url, hashed_password, is_admin, created_at FROM user
 WHERE id = ? LIMIT 1

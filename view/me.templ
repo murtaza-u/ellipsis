@@ -1,9 +1,11 @@
 package view
 
 import "strings"
+import "github.com/murtaza-u/ellipsis/view/partial"
 
-templ Me(route string, child templ.Component) {
+templ Me(route string, avatarURL string, child templ.Component) {
 	<header>
+		@partial.Navbar(route, avatarURL)
 		<div class="mx-3 my-5 lg:mx-5">
 			<h1 class="mb-8 text-4xl font-bold">My Account</h1>
 			<nav>

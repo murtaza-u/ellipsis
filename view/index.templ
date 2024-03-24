@@ -1,19 +1,30 @@
 package view
 
-import "github.com/murtaza-u/ellipsis/view/partial/icon"
+import (
+	"github.com/murtaza-u/ellipsis/view/partial"
+	"github.com/murtaza-u/ellipsis/view/partial/icon"
+)
 
-templ Index() {
-	<!-- hero -->
-	<section
-		class="h-screen overflow-hidden flex flex-col justify-center items-center space-y-6"
-		hx-boost="true"
-	>
-		<h1 class="bg-gradient-to-r from-blue-500 via-pink-500 to-purple-700 bg-clip-text py-1 text-center text-5xl font-bold text-transparent">
-			Authentication & Session Management Service
+templ Index(avatarURL string) {
+	<header>
+		@partial.Navbar("/", avatarURL)
+	</header>
+	<section class="mx-3 min-h-screen flex flex-col justify-center items-center space-y-8">
+		<h1 class="font-bold text-center text-4xl lg:text-7xl bg-gradient-to-r from-blue-500 via-pink-500 to-purple-700 bg-clip-text text-transparent">
+			Identity in Motion, Sessions in Control
 		</h1>
-		<a href="/me" class="btn btn-primary">
-			@icon.Goto()
-			My Account
+		<p class="text-md lg:text-xl text-center">
+			Ellipsis is an open-source authentication-as-a-service (AaaS) built with
+			simplicity in mind.
+		</p>
+		<a
+			href="https://github.com/murtaza-u/ellipsis"
+			target="_blank"
+			class="btn btn-primary w-full lg:w-fit"
+		>
+			@icon.Github()
+			Get Started
 		</a>
 	</section>
+	@partial.Footer()
 }
