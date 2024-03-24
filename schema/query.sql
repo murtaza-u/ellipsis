@@ -89,9 +89,10 @@ INSERT INTO client (
     auth_callback_urls,
     logout_callback_urls,
     picture_url,
+    backchannel_logout_url,
     token_expiration
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?
+	?, ?, ?, ?, ?, ?, ?, ?
 );
 
 -- name: CreateSession :execresult
@@ -116,6 +117,7 @@ SET name = ?,
     auth_callback_urls = ?,
     logout_callback_urls = ?,
     picture_url = ?,
+    backchannel_logout_url = ?,
     token_expiration = ?
 WHERE id = ?;
 

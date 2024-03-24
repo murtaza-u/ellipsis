@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS client (
     picture_url VARCHAR(100),
     auth_callback_urls VARCHAR(1000) NOT NULL,
     logout_callback_urls VARCHAR(1000) NOT NULL,
+    backchannel_logout_url VARCHAR(100),
     token_expiration bigint NOT NULL DEFAULT 28800,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

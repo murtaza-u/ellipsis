@@ -192,14 +192,21 @@ func (a API) createApp(c echo.Context) error {
 		pictureUrl.String = params.LogoURL
 	}
 
+	var backchannelLogoutURL sql.NullString
+	if params.BackchannelLogoutURL != "" {
+		backchannelLogoutURL.Valid = true
+		backchannelLogoutURL.String = params.BackchannelLogoutURL
+	}
+
 	_, err = a.db.CreateClient(c.Request().Context(), sqlc.CreateClientParams{
-		ID:                 id,
-		SecretHash:         hash,
-		Name:               params.Name,
-		PictureUrl:         pictureUrl,
-		AuthCallbackUrls:   params.AuthCallbackURLs,
-		LogoutCallbackUrls: params.LogoutCallbackURLs,
-		TokenExpiration:    int64(params.IDTokenExpiration),
+		ID:                   id,
+		SecretHash:           hash,
+		Name:                 params.Name,
+		PictureUrl:           pictureUrl,
+		AuthCallbackUrls:     params.AuthCallbackURLs,
+		LogoutCallbackUrls:   params.LogoutCallbackURLs,
+		BackchannelLogoutUrl: backchannelLogoutURL,
+		TokenExpiration:      int64(params.IDTokenExpiration),
 	})
 	if err != nil {
 		return render.Do(render.Params{
@@ -302,13 +309,20 @@ func (a API) updateApp(c echo.Context) error {
 		pictureUrl.String = params.LogoURL
 	}
 
+	var backchannelLogoutURL sql.NullString
+	if params.BackchannelLogoutURL != "" {
+		backchannelLogoutURL.Valid = true
+		backchannelLogoutURL.String = params.BackchannelLogoutURL
+	}
+
 	err = a.db.UpdateClient(c.Request().Context(), sqlc.UpdateClientParams{
-		ID:                 params.ID,
-		Name:               params.Name,
-		PictureUrl:         pictureUrl,
-		AuthCallbackUrls:   params.AuthCallbackURLs,
-		LogoutCallbackUrls: params.LogoutCallbackURLs,
-		TokenExpiration:    int64(params.IDTokenExpiration),
+		ID:                   params.ID,
+		Name:                 params.Name,
+		PictureUrl:           pictureUrl,
+		AuthCallbackUrls:     params.AuthCallbackURLs,
+		LogoutCallbackUrls:   params.LogoutCallbackURLs,
+		BackchannelLogoutUrl: backchannelLogoutURL,
+		TokenExpiration:      int64(params.IDTokenExpiration),
 	})
 	if err != nil {
 		return render.Do(render.Params{

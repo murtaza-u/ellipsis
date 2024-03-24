@@ -57,12 +57,13 @@ templ Apps(apps []sqlc.Client) {
 }
 
 type AppParams struct {
-	ID                 string        `param:"id"`
-	Name               string        `form:"name"`
-	LogoURL            string        `form:"logo_url"`
-	AuthCallbackURLs   string        `form:"auth_callback_urls"`
-	LogoutCallbackURLs string        `form:"logout_callback_urls"`
-	IDTokenExpiration  time.Duration `form:"id_token_expiration"`
+	ID                   string        `param:"id"`
+	Name                 string        `form:"name"`
+	LogoURL              string        `form:"logo_url"`
+	AuthCallbackURLs     string        `form:"auth_callback_urls"`
+	LogoutCallbackURLs   string        `form:"logout_callback_urls"`
+	BackchannelLogoutURL string        `form:"backchannel_logout_url"`
+	IDTokenExpiration    time.Duration `form:"id_token_expiration"`
 }
 
 templ AppCreateForm(values AppParams, err map[string]error) {
@@ -183,6 +184,32 @@ templ AppCreateForm(values AppParams, err map[string]error) {
 						</span>
 					}
 					<span class="label-text-alt">Comma(,) seperated urls</span>
+				</div>
+			</label>
+			<label class="form-control w-full">
+				<div class="label">
+					<span class="label-text">Back-channel logout URL</span>
+				</div>
+				<input
+					name="backchannel_logout_url"
+					type="url"
+					maxlength="100"
+					value={ values.BackchannelLogoutURL }
+					placeholder="https://example.com/backchannel-logout"
+					class={
+						"input input-bordered w-full",
+						templ.KV("input-error", err["backchannel_logout_url"] != nil),
+					}
+				/>
+				<div class="label">
+					if err["backchannel_logout_url"] != nil {
+						<span class="label-text-alt text-error first-letter:uppercase">
+							{ err["backchannel_logout_url"].Error() }
+						</span>
+					}
+					<span class="label-text-alt">
+						Must be exposed over the internet
+					</span>
 				</div>
 			</label>
 			<label class="form-control w-full">
@@ -352,6 +379,32 @@ templ AppUpdateForm(values AppParams, success bool, err map[string]error) {
 		</label>
 		<label class="form-control w-full">
 			<div class="label">
+				<span class="label-text">Back-channel logout URL</span>
+			</div>
+			<input
+				name="backchannel_logout_url"
+				type="url"
+				maxlength="100"
+				value={ values.BackchannelLogoutURL }
+				placeholder="https://example.com/backchannel-logout"
+				class={
+					"input input-bordered w-full",
+					templ.KV("input-error", err["backchannel_logout_url"] != nil),
+				}
+			/>
+			<div class="label">
+				if err["backchannel_logout_url"] != nil {
+					<span class="label-text-alt text-error first-letter:uppercase">
+						{ err["backchannel_logout_url"].Error() }
+					</span>
+				}
+				<span class="label-text-alt">
+					Must be exposed over the internet
+				</span>
+			</div>
+		</label>
+		<label class="form-control w-full">
+			<div class="label">
 				<span class="label-text">ID token expiration</span>
 				<span class="label-text-alt text-error text-xl">*</span>
 			</div>
@@ -435,12 +488,13 @@ templ App(app sqlc.Client) {
 		</div>
 		<div class="w-full lg:w-2/3 bg-base-100">
 			@AppUpdateForm(AppParams{
-				ID:                 app.ID,
-				Name:               app.Name,
-				LogoURL:            app.PictureUrl.String,
-				AuthCallbackURLs:   app.AuthCallbackUrls,
-				LogoutCallbackURLs: app.LogoutCallbackUrls,
-				IDTokenExpiration:  time.Duration(app.TokenExpiration),
+				ID:                   app.ID,
+				Name:                 app.Name,
+				LogoURL:              app.PictureUrl.String,
+				AuthCallbackURLs:     app.AuthCallbackUrls,
+				LogoutCallbackURLs:   app.LogoutCallbackUrls,
+				BackchannelLogoutURL: app.BackchannelLogoutUrl.String,
+				IDTokenExpiration:    time.Duration(app.TokenExpiration),
 			}, false, map[string]error{})
 			<hr class="my-10"/>
 			<div class="flex items-center justify-around mt-5">

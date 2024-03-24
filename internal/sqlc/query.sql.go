@@ -34,20 +34,22 @@ INSERT INTO client (
     auth_callback_urls,
     logout_callback_urls,
     picture_url,
+    backchannel_logout_url,
     token_expiration
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?
+	?, ?, ?, ?, ?, ?, ?, ?
 )
 `
 
 type CreateClientParams struct {
-	ID                 string
-	SecretHash         string
-	Name               string
-	AuthCallbackUrls   string
-	LogoutCallbackUrls string
-	PictureUrl         sql.NullString
-	TokenExpiration    int64
+	ID                   string
+	SecretHash           string
+	Name                 string
+	AuthCallbackUrls     string
+	LogoutCallbackUrls   string
+	PictureUrl           sql.NullString
+	BackchannelLogoutUrl sql.NullString
+	TokenExpiration      int64
 }
 
 func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (sql.Result, error) {
@@ -58,6 +60,7 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (sql
 		arg.AuthCallbackUrls,
 		arg.LogoutCallbackUrls,
 		arg.PictureUrl,
+		arg.BackchannelLogoutUrl,
 		arg.TokenExpiration,
 	)
 }
@@ -142,7 +145,7 @@ func (q *Queries) GetAuthzHistory(ctx context.Context, arg GetAuthzHistoryParams
 }
 
 const getClient = `-- name: GetClient :one
-SELECT id, secret_hash, name, picture_url, auth_callback_urls, logout_callback_urls, token_expiration, created_at FROM client
+SELECT id, secret_hash, name, picture_url, auth_callback_urls, logout_callback_urls, backchannel_logout_url, token_expiration, created_at FROM client
 WHERE id = ?
 `
 
@@ -156,6 +159,7 @@ func (q *Queries) GetClient(ctx context.Context, id string) (Client, error) {
 		&i.PictureUrl,
 		&i.AuthCallbackUrls,
 		&i.LogoutCallbackUrls,
+		&i.BackchannelLogoutUrl,
 		&i.TokenExpiration,
 		&i.CreatedAt,
 	)
@@ -163,7 +167,7 @@ func (q *Queries) GetClient(ctx context.Context, id string) (Client, error) {
 }
 
 const getClientByName = `-- name: GetClientByName :one
-SELECT id, secret_hash, name, picture_url, auth_callback_urls, logout_callback_urls, token_expiration, created_at FROM client
+SELECT id, secret_hash, name, picture_url, auth_callback_urls, logout_callback_urls, backchannel_logout_url, token_expiration, created_at FROM client
 WHERE name = ?
 `
 
@@ -177,6 +181,7 @@ func (q *Queries) GetClientByName(ctx context.Context, name string) (Client, err
 		&i.PictureUrl,
 		&i.AuthCallbackUrls,
 		&i.LogoutCallbackUrls,
+		&i.BackchannelLogoutUrl,
 		&i.TokenExpiration,
 		&i.CreatedAt,
 	)
@@ -184,7 +189,7 @@ func (q *Queries) GetClientByName(ctx context.Context, name string) (Client, err
 }
 
 const getClientByNameForUnmatchingID = `-- name: GetClientByNameForUnmatchingID :one
-SELECT id, secret_hash, name, picture_url, auth_callback_urls, logout_callback_urls, token_expiration, created_at FROM client
+SELECT id, secret_hash, name, picture_url, auth_callback_urls, logout_callback_urls, backchannel_logout_url, token_expiration, created_at FROM client
 WHERE name = ? AND id != ?
 `
 
@@ -203,6 +208,7 @@ func (q *Queries) GetClientByNameForUnmatchingID(ctx context.Context, arg GetCli
 		&i.PictureUrl,
 		&i.AuthCallbackUrls,
 		&i.LogoutCallbackUrls,
+		&i.BackchannelLogoutUrl,
 		&i.TokenExpiration,
 		&i.CreatedAt,
 	)
@@ -210,7 +216,7 @@ func (q *Queries) GetClientByNameForUnmatchingID(ctx context.Context, arg GetCli
 }
 
 const getClients = `-- name: GetClients :many
-SELECT id, secret_hash, name, picture_url, auth_callback_urls, logout_callback_urls, token_expiration, created_at FROM client
+SELECT id, secret_hash, name, picture_url, auth_callback_urls, logout_callback_urls, backchannel_logout_url, token_expiration, created_at FROM client
 `
 
 func (q *Queries) GetClients(ctx context.Context) ([]Client, error) {
@@ -229,6 +235,7 @@ func (q *Queries) GetClients(ctx context.Context) ([]Client, error) {
 			&i.PictureUrl,
 			&i.AuthCallbackUrls,
 			&i.LogoutCallbackUrls,
+			&i.BackchannelLogoutUrl,
 			&i.TokenExpiration,
 			&i.CreatedAt,
 		); err != nil {
@@ -475,17 +482,19 @@ SET name = ?,
     auth_callback_urls = ?,
     logout_callback_urls = ?,
     picture_url = ?,
+    backchannel_logout_url = ?,
     token_expiration = ?
 WHERE id = ?
 `
 
 type UpdateClientParams struct {
-	Name               string
-	AuthCallbackUrls   string
-	LogoutCallbackUrls string
-	PictureUrl         sql.NullString
-	TokenExpiration    int64
-	ID                 string
+	Name                 string
+	AuthCallbackUrls     string
+	LogoutCallbackUrls   string
+	PictureUrl           sql.NullString
+	BackchannelLogoutUrl sql.NullString
+	TokenExpiration      int64
+	ID                   string
 }
 
 func (q *Queries) UpdateClient(ctx context.Context, arg UpdateClientParams) error {
@@ -494,6 +503,7 @@ func (q *Queries) UpdateClient(ctx context.Context, arg UpdateClientParams) erro
 		arg.AuthCallbackUrls,
 		arg.LogoutCallbackUrls,
 		arg.PictureUrl,
+		arg.BackchannelLogoutUrl,
 		arg.TokenExpiration,
 		arg.ID,
 	)

@@ -24,6 +24,9 @@ func (v AppValidator) Validate() (*console.AppParams, map[string]error) {
 	if err := v.validateLogoURL(); err != nil {
 		errMap["logo_url"] = err
 	}
+	if err := v.validateBackchannelLogoutURL(); err != nil {
+		errMap["backchannel_logout_url"] = err
+	}
 	if err := v.validateAuthCallbackURLs(); err != nil {
 		errMap["auth_callback_urls"] = err
 	}
@@ -44,22 +47,33 @@ func (v *AppValidator) validateName() error {
 	return nil
 }
 
-func (v *AppValidator) validateLogoURL() error {
-	if v.LogoURL == "" {
-		return nil
-	}
-
-	v.LogoURL = strings.TrimSpace(v.LogoURL)
-	v.LogoURL = strings.TrimSuffix(v.LogoURL, "/")
-
-	if len(v.LogoURL) > 100 {
+func validateURL(s string) error {
+	if len(s) > 100 {
 		return errors.New("url too long")
 	}
-	_, err := url.ParseRequestURI(v.LogoURL)
+	_, err := url.ParseRequestURI(s)
 	if err != nil {
 		return errors.New("invalid URL")
 	}
 	return nil
+}
+
+func (v *AppValidator) validateLogoURL() error {
+	if v.LogoURL == "" {
+		return nil
+	}
+	v.LogoURL = strings.TrimSpace(v.LogoURL)
+	v.LogoURL = strings.TrimSuffix(v.LogoURL, "/")
+	return validateURL(v.LogoURL)
+}
+
+func (v *AppValidator) validateBackchannelLogoutURL() error {
+	if v.BackchannelLogoutURL == "" {
+		return nil
+	}
+	v.BackchannelLogoutURL = strings.TrimSpace(v.BackchannelLogoutURL)
+	v.BackchannelLogoutURL = strings.TrimSuffix(v.BackchannelLogoutURL, "/")
+	return validateURL(v.BackchannelLogoutURL)
 }
 
 func validateAndTransformCallbackURLs(urls string) (string, error) {
