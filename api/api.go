@@ -73,7 +73,7 @@ func (s Server) Start() error {
 	oidcAPI, err := oidc.New(oidc.Config{
 		DB:        s.queries,
 		Cache:     s.cache,
-		KeyStore:  s.KeyStore,
+		Key:       s.Key,
 		Providers: s.Providers,
 	})
 	if err != nil {

@@ -34,11 +34,12 @@ func (a API) UserInfo(c echo.Context) error {
 			ErrDesc: err.Error(),
 		})
 	}
-	tkn, err := jwt.ParseWithClaims(
-		tknStr,
-		&AccessTknClaims{},
+
+	claims := new(AccessTknClaims)
+	_, err = jwt.ParseWithClaims(
+		tknStr, claims,
 		func(t *jwt.Token) (interface{}, error) {
-			return *a.key.pub, nil
+			return a.Key.Pub, nil
 		},
 	)
 	if err != nil {
@@ -48,7 +49,7 @@ func (a API) UserInfo(c echo.Context) error {
 		})
 	}
 
-	exp, err := tkn.Claims.GetExpirationTime()
+	exp, err := claims.GetExpirationTime()
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, UserInfo{
 			Err:     "bad_request",
@@ -56,14 +57,6 @@ func (a API) UserInfo(c echo.Context) error {
 		})
 	}
 	if time.Until(exp.Time) <= 0 {
-		return c.JSON(http.StatusBadRequest, UserInfo{
-			Err:     "bad_request",
-			ErrDesc: "invalid or expired access token",
-		})
-	}
-
-	claims, ok := tkn.Claims.(*AccessTknClaims)
-	if !ok {
 		return c.JSON(http.StatusBadRequest, UserInfo{
 			Err:     "bad_request",
 			ErrDesc: "invalid or expired access token",

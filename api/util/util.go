@@ -27,7 +27,7 @@ func GenerateRandom(n int) (string, error) {
 	return string(ret), nil
 }
 
-func PEMToEd25519PrivKey(data []byte) (*ed25519.PrivateKey, error) {
+func PEMToEd25519PrivKey(data []byte) (ed25519.PrivateKey, error) {
 	block, _ := pem.Decode(data)
 	if block == nil || block.Type != "PRIVATE KEY" {
 		return nil, fmt.Errorf("invalid PEM block")
@@ -40,10 +40,10 @@ func PEMToEd25519PrivKey(data []byte) (*ed25519.PrivateKey, error) {
 	if !ok {
 		return nil, fmt.Errorf("failed to parse private key")
 	}
-	return &ed25519Priv, nil
+	return ed25519Priv, nil
 }
 
-func PEMToEd25519PubKey(data []byte) (*ed25519.PublicKey, error) {
+func PEMToEd25519PubKey(data []byte) (ed25519.PublicKey, error) {
 	block, _ := pem.Decode(data)
 	if block == nil || block.Type != "PUBLIC KEY" {
 		return nil, fmt.Errorf("invalid PEM block")
@@ -56,7 +56,7 @@ func PEMToEd25519PubKey(data []byte) (*ed25519.PublicKey, error) {
 	if !ok {
 		return nil, fmt.Errorf("failed to parse public key")
 	}
-	return &ed25519Pub, nil
+	return ed25519Pub, nil
 }
 
 func BrowserFromUA(ua useragent.UserAgent) string {

@@ -55,10 +55,9 @@ func (a API) Logout(c echo.Context) error {
 
 	claims := new(IDTknClaims)
 	_, err := jwt.ParseWithClaims(
-		q.IDTkn,
-		claims,
+		q.IDTkn, claims,
 		func(t *jwt.Token) (interface{}, error) {
-			return *a.key.pub, nil
+			return a.Key.Pub, nil
 		},
 	)
 	if err != nil {

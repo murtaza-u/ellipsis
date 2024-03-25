@@ -92,7 +92,7 @@ func (a API) Token(c echo.Context) error {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 1800)),
 		},
 	})
-	accessTknStr, err := accessTkn.SignedString(a.key.priv)
+	accessTknStr, err := accessTkn.SignedString(a.Key.Priv)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, tknResp{
 			Err:     "internal_error",
@@ -120,7 +120,7 @@ func (a API) Token(c echo.Context) error {
 			ExpiresAt: jwt.NewNumericDate(idTknExp),
 		},
 	})
-	idTknStr, err := idTkn.SignedString(a.key.priv)
+	idTknStr, err := idTkn.SignedString(a.Key.Priv)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, tknResp{
 			Err:     "internal_error",

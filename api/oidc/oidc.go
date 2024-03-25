@@ -1,14 +1,10 @@
 package oidc
 
 import (
-	"crypto/ed25519"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/oidc/provider"
-	"github.com/murtaza-u/ellipsis/api/util"
 	"github.com/murtaza-u/ellipsis/internal/conf"
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
 
@@ -23,47 +19,17 @@ const (
 
 type API struct {
 	Config
-	key key
 }
 
 type Config struct {
 	DB        *sqlc.Queries
 	Cache     *dream.Store
-	KeyStore  string
+	Key       conf.Key
 	Providers conf.Providers
 }
 
-type key struct {
-	priv *ed25519.PrivateKey
-	pub  *ed25519.PublicKey
-}
-
 func New(c Config) (*API, error) {
-	data, err := os.ReadFile(filepath.Join(c.KeyStore, "ed25519"))
-	if err != nil {
-		return nil, fmt.Errorf("failed to read ed25519 priv key: %w", err)
-	}
-	priv, err := util.PEMToEd25519PrivKey(data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read ed25519 priv key: %w", err)
-	}
-
-	data, err = os.ReadFile(filepath.Join(c.KeyStore, "ed25519.pub"))
-	if err != nil {
-		return nil, fmt.Errorf("failed to read ed25519 pub key: %w", err)
-	}
-	pub, err := util.PEMToEd25519PubKey(data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read ed25519 pub key: %w", err)
-	}
-
-	return &API{
-		Config: c,
-		key: key{
-			priv: priv,
-			pub:  pub,
-		},
-	}, nil
+	return &API{Config: c}, nil
 }
 
 func (a API) Register(app *echo.Echo) error {
