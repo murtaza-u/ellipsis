@@ -18,13 +18,14 @@ import (
 	"github.com/mileusna/useragent"
 )
 
-func (Server) LoginPage(c echo.Context) error {
+func (s Server) LoginPage(c echo.Context) error {
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"Login | Ellipsis",
 			view.Login(view.LoginParams{
-				ReturnTo: c.QueryParam("return_to"),
+				ReturnTo:  c.QueryParam("return_to"),
+				Providers: s.Providers,
 			}, map[string]error{}),
 		),
 	})
@@ -43,6 +44,7 @@ func (s Server) Login(c echo.Context) error {
 		})
 	}
 	params.ReturnTo = c.QueryParam("return_to")
+	params.Providers = s.Providers
 
 	errMap := make(map[string]error)
 

@@ -4,28 +4,36 @@ import (
 	"net/url"
 
 	"github.com/murtaza-u/ellipsis/view/partial/icon"
+	"github.com/murtaza-u/ellipsis/internal/conf"
 )
 
-templ SocialLogins(returnTo string) {
+templ SocialLogins(returnTo string, providers conf.Providers) {
 	<div class="w-full flex flex-col items-center justify-center space-y-2 space-x-0 lg:space-x-2 lg:space-y-0 lg:flex-row lg:w-1/2">
-		<a
-			href={ templ.URL(githubLoginWithReturnTo(returnTo)) }
-			class="w-full md:w-fit btn bg-[#323232] hover:bg-black text-white tracking-wide"
-		>
-			<span class="mr-0.5">
-				@icon.Github()
-			</span>
-			Sign in with GitHub
-		</a>
-		<a
-			href={ templ.URL(googleLoginWithReturnTo(returnTo)) }
-			class="w-full md:w-fit  btn bg-[#db4a39] hover:bg-[#b80f08] text-white tracking-wide"
-		>
-			<span class="mr-0.5">
-				@icon.Google()
-			</span>
-			Sign in with Google
-		</a>
+		if providers.Github.Enable {
+			<a
+				href={ templ.URL(githubLoginWithReturnTo(returnTo)) }
+				class="w-full md:w-fit btn bg-[#323232] hover:bg-black text-white tracking-wide"
+			>
+				<span class="mr-0.5">
+					@icon.Github()
+				</span>
+				Sign in with GitHub
+			</a>
+		}
+		if providers.Google.Enable {
+			<a
+				href={ templ.URL(googleLoginWithReturnTo(returnTo)) }
+				class="w-full md:w-fit  btn bg-[#db4a39] hover:bg-[#b80f08] text-white tracking-wide"
+			>
+				<span class="mr-0.5">
+					@icon.Google()
+				</span>
+				Sign in with Google
+			</a>
+		}
+		if !providers.Google.Enable && !providers.Github.Enable {
+			<p class="text-center text-lg">Ask your admin to enable social login</p>
+		}
 	</div>
 }
 

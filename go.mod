@@ -3,7 +3,7 @@ module github.com/murtaza-u/ellipsis
 go 1.21.5
 
 require (
-	github.com/a-h/templ v0.2.646
+	github.com/a-h/templ v0.2.648
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/coreos/go-oidc/v3 v3.9.0
 	github.com/go-sql-driver/mysql v1.8.0

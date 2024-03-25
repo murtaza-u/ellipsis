@@ -4,12 +4,14 @@ import (
 	"net/url"
 
 	"github.com/murtaza-u/ellipsis/view/partial"
+	"github.com/murtaza-u/ellipsis/internal/conf"
 )
 
 type LoginParams struct {
-	Email    string `form:"email"`
-	Password string `form:"password"`
-	ReturnTo string
+	Email     string `form:"email"`
+	Password  string `form:"password"`
+	ReturnTo  string
+	Providers conf.Providers
 }
 
 templ LoginForm(values LoginParams, err map[string]error) {
@@ -96,7 +98,7 @@ templ Login(values LoginParams, err map[string]error) {
 	<main class="min-h-screen flex flex-col justify-center items-center mx-3 lg:mx-3 lg:flex-row lg:justify-evenly">
 		@LoginForm(values, err)
 		<div class="divider my-8 lg:my-0 lg:divider-horizontal">OR</div>
-		@partial.SocialLogins(values.ReturnTo)
+		@partial.SocialLogins(values.ReturnTo, values.Providers)
 	</main>
 	@partial.Footer()
 }

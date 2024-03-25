@@ -4,6 +4,7 @@ import (
 	"net/url"
 
 	"github.com/murtaza-u/ellipsis/view/partial"
+	"github.com/murtaza-u/ellipsis/internal/conf"
 )
 
 type SignUpParams struct {
@@ -11,6 +12,7 @@ type SignUpParams struct {
 	Password        string `form:"password"`
 	ConfirmPassword string `form:"confirm_password"`
 	ReturnTo        string
+	Providers       conf.Providers
 }
 
 templ SignUpForm(values SignUpParams, err map[string]error) {
@@ -123,7 +125,7 @@ templ SignUp(values SignUpParams, err map[string]error) {
 	<main class="min-h-screen flex flex-col justify-center items-center mx-3 lg:mx-3 lg:flex-row lg:justify-evenly">
 		@SignUpForm(values, err)
 		<div class="divider my-8 lg:my-0 lg:divider-horizontal">OR</div>
-		@partial.SocialLogins(values.ReturnTo)
+		@partial.SocialLogins(values.ReturnTo, values.Providers)
 	</main>
 	@partial.Footer()
 }
