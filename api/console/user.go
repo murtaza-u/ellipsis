@@ -3,6 +3,7 @@ package console
 import (
 	"net/http"
 
+	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/view"
 	"github.com/murtaza-u/ellipsis/view/layout"
@@ -26,14 +27,17 @@ func (a API) userPage(c echo.Context) error {
 			Status: http.StatusInternalServerError,
 		})
 	}
+
+	var avatarURL string
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
+		avatarURL = ctx.AvatarURL
+	}
+
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"Console - Users | Ellipsis",
-			view.Console(
-				"/console/user",
-				console.Users(users),
-			),
+			view.Console("/console/user", avatarURL, console.Users(users)),
 		),
 	})
 }

@@ -10,9 +10,13 @@ import "context"
 import "io"
 import "bytes"
 
-import "strings"
+import (
+	"strings"
 
-func Console(route string, child templ.Component) templ.Component {
+	"github.com/murtaza-u/ellipsis/view/partial"
+)
+
+func Console(route, avatarURL string, child templ.Component) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -25,7 +29,15 @@ func Console(route string, child templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><div class=\"mx-3 my-5 lg:mx-5\"><h1 class=\"mb-8 text-4xl font-bold\">Console</h1><nav><ul class=\"flex w-full items-center rounded-lg bg-base-200 px-2 py-3 lg:w-fit\" hx-boost=\"true\"><li>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = partial.Navbar(route, avatarURL).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"mx-3 my-5 lg:mx-5\"><h1 class=\"mb-8 text-4xl font-bold\">Console</h1><nav><ul class=\"flex w-full items-center rounded-lg bg-base-200 px-2 py-3 lg:w-fit\" hx-boost=\"true\"><li>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

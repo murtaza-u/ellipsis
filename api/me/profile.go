@@ -52,7 +52,7 @@ func (a API) ProfilePage(c echo.Context) error {
 		Component: layout.Base(
 			"My Account | Ellipsis",
 			view.Me(
-				"/me",
+				"/",
 				u.AvatarUrl.String,
 				me.Profile(u.HashedPassword.Valid),
 			),

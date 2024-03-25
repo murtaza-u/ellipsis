@@ -58,8 +58,6 @@ func (s Server) Start() error {
 
 	auth := middleware.NewAuthMiddleware(s.queries)
 
-	s.app.GET("/", s.indexPage, auth.AuthInfo)
-
 	s.app.GET("/signup", s.SignUpPage, auth.AlreadyAuthenticated)
 	s.app.POST("/signup", s.SignUp, auth.AlreadyAuthenticated)
 	s.app.GET("/login", s.LoginPage, auth.AlreadyAuthenticated)
@@ -68,6 +66,9 @@ func (s Server) Start() error {
 
 	// console
 	console.New(s.queries).Register(s.app)
+
+	// my account
+	me.New(s.queries, s.Key, s.BaseURL).Register(s.app)
 
 	// oidc
 	oidcAPI, err := oidc.New(oidc.Config{
@@ -84,9 +85,6 @@ func (s Server) Start() error {
 	if err != nil {
 		return fmt.Errorf("failed to register OIDC APIs: %w", err)
 	}
-
-	// my account
-	me.New(s.queries, s.Key, s.BaseURL).Register(s.app)
 
 	return s.app.Start(fmt.Sprintf(":%d", s.Port))
 }

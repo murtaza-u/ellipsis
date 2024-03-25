@@ -15,12 +15,12 @@ templ Me(route string, avatarURL string, child templ.Component) {
 				>
 					<li>
 						<a
-							href="/me"
+							href="/"
 							class={
 								"rounded-lg p-2",
 								templ.KV(
 									"bg-base-100 shadow-md",
-									strings.EqualFold(route, "/me"),
+									strings.EqualFold(route, "/"),
 								),
 							}
 						>
@@ -29,12 +29,12 @@ templ Me(route string, avatarURL string, child templ.Component) {
 					</li>
 					<li>
 						<a
-							href="/me/session"
+							href="/session"
 							class={
 								"rounded-lg p-2",
 								templ.KV(
 									"bg-base-100 shadow-md",
-									strings.EqualFold(route, "/me/session"),
+									strings.EqualFold(route, "/session"),
 								),
 							}
 						>

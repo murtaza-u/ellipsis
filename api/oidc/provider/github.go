@@ -83,7 +83,7 @@ func (p ProviderGithub) Login(c echo.Context) error {
 
 	returnTo := c.QueryParam("return_to")
 	if returnTo == "" {
-		returnTo = "/me"
+		returnTo = "/"
 	}
 
 	sess.Values["state"] = state
@@ -402,7 +402,7 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 
 	returnTo, ok := sess.Values["return_to"].(string)
 	if !ok {
-		returnTo = "/me"
+		returnTo = "/"
 	}
 
 	isBoosted := c.Request().Header.Get("HX-Boosted") != ""

@@ -72,7 +72,7 @@ func ChangePassword(values ChangePasswordParams, err map[string]error, success b
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"w-full lg:w-1/2 space-y-2\" hx-post=\"/me/change-password\" hx-swap=\"outerHTML\" hx-boost=\"true\" hx-indicator=\"#spinner\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"w-full lg:w-1/2 space-y-2\" hx-post=\"/change-password\" hx-swap=\"outerHTML\" hx-boost=\"true\" hx-indicator=\"#spinner\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

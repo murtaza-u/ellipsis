@@ -42,14 +42,14 @@ func Me(route string, avatarURL string, child templ.Component) templ.Component {
 			"rounded-lg p-2",
 			templ.KV(
 				"bg-base-100 shadow-md",
-				strings.EqualFold(route, "/me"),
+				strings.EqualFold(route, "/"),
 			),
 		}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"/me\" class=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"/\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -70,14 +70,14 @@ func Me(route string, avatarURL string, child templ.Component) templ.Component {
 			"rounded-lg p-2",
 			templ.KV(
 				"bg-base-100 shadow-md",
-				strings.EqualFold(route, "/me/session"),
+				strings.EqualFold(route, "/session"),
 			),
 		}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"/me/session\" class=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"/session\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

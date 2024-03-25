@@ -56,7 +56,7 @@ func (a API) SessionPage(c echo.Context) error {
 			Component: layout.Base(
 				"My Account - Sessions | Ellipsis",
 				view.Me(
-					"/me/session",
+					"/session",
 					avatarURL,
 					view.Error(
 						"database operation failed",
@@ -72,7 +72,7 @@ func (a API) SessionPage(c echo.Context) error {
 		Component: layout.Base(
 			"My Account - Sessions | Ellipsis",
 			view.Me(
-				"/me/session",
+				"/session",
 				avatarURL,
 				me.Sessions(sess, sessID),
 			),
@@ -212,11 +212,11 @@ func (a API) DeleteSession(c echo.Context) error {
 
 		isBoosted := c.Request().Header.Get("HX-Boosted") != ""
 		if !isBoosted {
-			return c.Redirect(http.StatusFound, "/me/session")
+			return c.Redirect(http.StatusFound, "/session")
 		}
 
 		r := c.Response()
-		r.Header().Set("HX-Redirect", "/me/session")
+		r.Header().Set("HX-Redirect", "/session")
 
 		// render empty template
 		h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
@@ -287,11 +287,11 @@ func (a API) DeleteSession(c echo.Context) error {
 
 	isBoosted := c.Request().Header.Get("HX-Boosted") != ""
 	if !isBoosted {
-		return c.Redirect(http.StatusFound, "/me/session")
+		return c.Redirect(http.StatusFound, "/session")
 	}
 
 	r := c.Response()
-	r.Header().Set("HX-Redirect", "/me/session")
+	r.Header().Set("HX-Redirect", "/session")
 
 	// render empty template
 	h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))

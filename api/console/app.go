@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/api/util"
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
@@ -32,14 +33,17 @@ func (a API) appsPage(c echo.Context) error {
 			Status: http.StatusInternalServerError,
 		})
 	}
+
+	var avatarURL string
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
+		avatarURL = ctx.AvatarURL
+	}
+
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"Console - Apps | Ellipsis",
-			view.Console(
-				"/console/app",
-				console.Apps(clients),
-			),
+			view.Console("/console/app", avatarURL, console.Apps(clients)),
 		),
 	})
 }
@@ -59,6 +63,7 @@ func (a API) appPage(c echo.Context) error {
 			Status: http.StatusBadRequest,
 		})
 	}
+
 	client, err := a.db.GetClient(c.Request().Context(), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -86,27 +91,32 @@ func (a API) appPage(c echo.Context) error {
 			Status: http.StatusInternalServerError,
 		})
 	}
+
+	var avatarURL string
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
+		avatarURL = ctx.AvatarURL
+	}
+
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"Console - Apps | Ellipsis",
-			view.Console(
-				"/console/app",
-				console.App(client),
-			),
+			view.Console("/console/app", avatarURL, console.App(client)),
 		),
 	})
 }
 
 func (API) createAppPage(c echo.Context) error {
+	var avatarURL string
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
+		avatarURL = ctx.AvatarURL
+	}
+
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"Console - Create App | Ellipsis",
-			view.Console(
-				"/console/app",
-				console.AppCreate(),
-			),
+			view.Console("/console/app", avatarURL, console.AppCreate()),
 		),
 	})
 }

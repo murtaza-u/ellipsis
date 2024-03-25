@@ -104,6 +104,6 @@ func (m AuthMiddleware) AlreadyAuthenticated(next echo.HandlerFunc) echo.Handler
 		if time.Until(sess.ExpiresAt) <= 0 {
 			return next(c)
 		}
-		return c.Redirect(http.StatusTemporaryRedirect, "/me")
+		return c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
 }

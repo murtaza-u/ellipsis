@@ -129,7 +129,7 @@ func Sessions(sessions []sqlc.GetSessionWithClientForUserIDRow, curr string) tem
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var7 templ.SafeURL = templ.URL(fmt.Sprintf("/me/session/delete/%s", s.ID))
+				var templ_7745c5c3_Var7 templ.SafeURL = templ.URL(fmt.Sprintf("/session/delete/%s", s.ID))
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var7)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -176,7 +176,7 @@ func DeleteSession(clientName sql.NullString, sid string) templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex h-screen overflow-hidden\"><aside class=\"hidden h-screen w-full bg-temple lg:block\"></aside><main class=\"mx-3 flex w-full flex-col items-center justify-center\"><h1 class=\"mb-5 text-center text-4xl font-bold\">Are you absolutely sure?</h1><p class=\"text-center mb-10\">This will revoke your session and sign you out of  <strong>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex h-screen overflow-hidden\"><aside class=\"hidden h-screen w-full bg-temple lg:block\"></aside><main class=\"mx-3 flex w-full flex-col items-center justify-center\"><h1 class=\"mb-5 text-center text-4xl font-bold\">Are you absolutely sure?</h1><p class=\"text-center mb-10\">This will revoke your session and sign you out of <strong>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -196,7 +196,7 @@ func DeleteSession(clientName sql.NullString, sid string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</strong></p><form class=\"w-full flex flex-col-reverse justify-center space-y-2 lg:flex-row lg:space-y-2 lg:space-x-4\" hx-boost=\"true\" hx-indicator=\"#spinner\" method=\"post\" action=\"/me/session/delete\"><input type=\"text\" name=\"id\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</strong></p><form class=\"w-full flex flex-col-reverse justify-center space-y-2 lg:flex-row lg:space-y-2 lg:space-x-4\" hx-boost=\"true\" hx-indicator=\"#spinner\" method=\"post\" action=\"/session/delete\"><input type=\"text\" name=\"id\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -209,7 +209,7 @@ func DeleteSession(clientName sql.NullString, sid string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"hidden\"> <a class=\"btn w-full lg:w-fit\" href=\"/me/session\">Cancel</a> <button class=\"btn btn-error w-full lg:w-fit\" type=\"submit\">Revoke <span id=\"spinner\" class=\"ml-1 hidden loading loading-spinner\"></span></button></form></main></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"hidden\"> <a class=\"btn w-full lg:w-fit\" href=\"/session\">Cancel</a> <button class=\"btn btn-error w-full lg:w-fit\" type=\"submit\">Revoke <span id=\"spinner\" class=\"ml-1 hidden loading loading-spinner\"></span></button></form></main></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -259,7 +259,7 @@ func DeleteSessionUnsupportedBackchannelLogout(clientName, sid string) templ.Com
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><form class=\"w-full flex flex-col-reverse justify-center space-y-2 lg:flex-row lg:space-y-2 lg:space-x-4\" hx-boost=\"true\" hx-indicator=\"#spinner\" method=\"post\" action=\"/me/session/delete\"><input type=\"text\" name=\"id\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><form class=\"w-full flex flex-col-reverse justify-center space-y-2 lg:flex-row lg:space-y-2 lg:space-x-4\" hx-boost=\"true\" hx-indicator=\"#spinner\" method=\"post\" action=\"/session/delete\"><input type=\"text\" name=\"id\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -272,7 +272,7 @@ func DeleteSessionUnsupportedBackchannelLogout(clientName, sid string) templ.Com
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"hidden\"> <input type=\"checkbox\" name=\"force\" checked value=\"1\" class=\"hidden\"> <a class=\"btn w-full lg:w-fit\" href=\"/me/session\">Cancel</a> <button class=\"btn btn-error w-full lg:w-fit\" type=\"submit\">Revoke Anyway <span id=\"spinner\" class=\"ml-1 hidden loading loading-spinner\"></span></button></form></main></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"hidden\"> <input type=\"checkbox\" name=\"force\" checked value=\"1\" class=\"hidden\"> <a class=\"btn w-full lg:w-fit\" href=\"/session\">Cancel</a> <button class=\"btn btn-error w-full lg:w-fit\" type=\"submit\">Revoke Anyway <span id=\"spinner\" class=\"ml-1 hidden loading loading-spinner\"></span></button></form></main></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -309,7 +309,7 @@ func DeleteSessionBackchannelLogoutFailure(clientName, sid string) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><form class=\"w-full flex flex-col-reverse justify-center space-y-2 lg:flex-row lg:space-y-2 lg:space-x-4\" hx-boost=\"true\" hx-indicator=\"#spinner\" method=\"post\" action=\"/me/session/delete\"><input type=\"text\" name=\"id\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><form class=\"w-full flex flex-col-reverse justify-center space-y-2 lg:flex-row lg:space-y-2 lg:space-x-4\" hx-boost=\"true\" hx-indicator=\"#spinner\" method=\"post\" action=\"/session/delete\"><input type=\"text\" name=\"id\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -322,7 +322,7 @@ func DeleteSessionBackchannelLogoutFailure(clientName, sid string) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"hidden\"> <input type=\"checkbox\" name=\"force\" checked value=\"1\" class=\"hidden\"> <a class=\"btn w-full lg:w-fit\" href=\"/me/session\">Cancel</a> <button class=\"btn btn-error w-full lg:w-fit\" type=\"submit\">Revoke Anyway <span id=\"spinner\" class=\"ml-1 hidden loading loading-spinner\"></span></button></form></main></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"hidden\"> <input type=\"checkbox\" name=\"force\" checked value=\"1\" class=\"hidden\"> <a class=\"btn w-full lg:w-fit\" href=\"/session\">Cancel</a> <button class=\"btn btn-error w-full lg:w-fit\" type=\"submit\">Revoke Anyway <span id=\"spinner\" class=\"ml-1 hidden loading loading-spinner\"></span></button></form></main></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

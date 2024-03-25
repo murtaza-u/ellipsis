@@ -46,7 +46,7 @@ templ Sessions(sessions []sqlc.GetSessionWithClientForUserIDRow, curr string) {
 						<td>
 							if s.ID != curr {
 								<a
-									href={ templ.URL(fmt.Sprintf("/me/session/delete/%s", s.ID)) }
+									href={ templ.URL(fmt.Sprintf("/session/delete/%s", s.ID)) }
 									class="text-error"
 								>
 									@icon.Trash()
@@ -66,7 +66,7 @@ templ DeleteSession(clientName sql.NullString, sid string) {
 		<main class="mx-3 flex w-full flex-col items-center justify-center">
 			<h1 class="mb-5 text-center text-4xl font-bold">Are you absolutely sure?</h1>
 			<p class="text-center mb-10">
-				This will revoke your session and sign you out of 
+				This will revoke your session and sign you out of
 				<strong>
 					if clientName.Valid {
 						{ clientName.String }
@@ -80,10 +80,10 @@ templ DeleteSession(clientName sql.NullString, sid string) {
 				hx-boost="true"
 				hx-indicator="#spinner"
 				method="post"
-				action="/me/session/delete"
+				action="/session/delete"
 			>
 				<input type="text" name="id" value={ sid } class="hidden"/>
-				<a class="btn w-full lg:w-fit" href="/me/session">Cancel</a>
+				<a class="btn w-full lg:w-fit" href="/session">Cancel</a>
 				<button class="btn btn-error w-full lg:w-fit" type="submit">
 					Revoke
 					<span
@@ -111,11 +111,11 @@ templ DeleteSessionUnsupportedBackchannelLogout(clientName, sid string) {
 				hx-boost="true"
 				hx-indicator="#spinner"
 				method="post"
-				action="/me/session/delete"
+				action="/session/delete"
 			>
 				<input type="text" name="id" value={ sid } class="hidden"/>
 				<input type="checkbox" name="force" checked value="1" class="hidden"/>
-				<a class="btn w-full lg:w-fit" href="/me/session">Cancel</a>
+				<a class="btn w-full lg:w-fit" href="/session">Cancel</a>
 				<button class="btn btn-error w-full lg:w-fit" type="submit">
 					Revoke Anyway
 					<span
@@ -143,11 +143,11 @@ templ DeleteSessionBackchannelLogoutFailure(clientName, sid string) {
 				hx-boost="true"
 				hx-indicator="#spinner"
 				method="post"
-				action="/me/session/delete"
+				action="/session/delete"
 			>
 				<input type="text" name="id" value={ sid } class="hidden"/>
 				<input type="checkbox" name="force" checked value="1" class="hidden"/>
-				<a class="btn w-full lg:w-fit" href="/me/session">Cancel</a>
+				<a class="btn w-full lg:w-fit" href="/session">Cancel</a>
 				<button class="btn btn-error w-full lg:w-fit" type="submit">
 					Revoke Anyway
 					<span
