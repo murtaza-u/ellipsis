@@ -14,13 +14,15 @@ templ Base(title string, children ...templ.Component) {
 			<!-- css -->
 			<link href="/static/css/tailwind.css" rel="stylesheet"/>
 			<link href="/static/css/style.css" rel="stylesheet"/>
+			<link href="https://unpkg.com/nprogress@0.2.0/nprogress.css" rel="stylesheet"/>
 		</head>
 		<body class="font-sans">
 			for _, child := range children {
 				@child
 			}
-			<!-- htmx -->
 			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+			<script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
+			<script src="/static/js/navigation.js"></script>
 		</body>
 	</html>
 }
