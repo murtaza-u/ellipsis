@@ -301,7 +301,7 @@ func (a API) DeleteSession(c echo.Context) error {
 func (a API) createLogoutTkn(sid, clientID string) (string, error) {
 	tkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, oidc.LogoutTknClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "http://localhost:3000/",
+			Issuer:    a.baseURL,
 			Subject:   clientID,
 			Audience:  jwt.ClaimStrings{clientID},
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

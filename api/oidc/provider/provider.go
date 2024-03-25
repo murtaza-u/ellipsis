@@ -13,6 +13,7 @@ type Provider interface {
 type Credentials struct {
 	ClientID     string
 	ClientSecret string
+	BaseURL      string
 }
 
 type CallbackParams struct {

@@ -41,7 +41,7 @@ func NewGithubProvider(db *sqlc.Queries, c Credentials) Provider {
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
 		Endpoint:     github.Endpoint,
-		RedirectURL:  "http://localhost:3000/github/callback",
+		RedirectURL:  c.BaseURL + "/github/callback",
 		Scopes:       []string{"read:user"},
 	}
 	return ProviderGithub{

@@ -75,6 +75,7 @@ func (s Server) Start() error {
 		Cache:     s.cache,
 		Key:       s.Key,
 		Providers: s.Providers,
+		BaseURL:   s.BaseURL,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to setup OIDC APIs: %w", err)
@@ -85,7 +86,7 @@ func (s Server) Start() error {
 	}
 
 	// my account
-	me.New(s.queries, s.Key).Register(s.app)
+	me.New(s.queries, s.Key, s.BaseURL).Register(s.app)
 
 	return s.app.Start(fmt.Sprintf(":%d", s.Port))
 }

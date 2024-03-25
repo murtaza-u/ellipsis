@@ -46,7 +46,7 @@ func NewGoogleProvider(db *sqlc.Queries, c Credentials) (Provider, error) {
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
 		Endpoint:     p.Endpoint(),
-		RedirectURL:  "http://localhost:3000/google/callback",
+		RedirectURL:  c.BaseURL + "/google/callback",
 		Scopes:       []string{oidc.ScopeOpenID, "profile", "email"},
 	}
 

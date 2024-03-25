@@ -3,8 +3,10 @@ package conf
 import (
 	"crypto/ed25519"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/murtaza-u/ellipsis/api/util"
 
@@ -12,6 +14,7 @@ import (
 )
 
 type C struct {
+	BaseURL              string    `yaml:"baseURL"`
 	Port                 uint16    `yaml:"port"`
 	KeyStore             string    `yaml:"keyStore"`
 	SessionEncryptionKey string    `yaml:"sessionEncryptionKey"`
@@ -59,6 +62,14 @@ func New(path string) (*C, error) {
 }
 
 func (c *C) Validate() error {
+	if c.BaseURL == "" {
+		return fmt.Errorf("missing base url")
+	}
+	if _, err := url.ParseRequestURI(c.BaseURL); err != nil {
+		return fmt.Errorf("invalid base url %q", c.BaseURL)
+	}
+	c.BaseURL = strings.TrimSuffix(c.BaseURL, "/")
+
 	if c.Port == 0 {
 		c.Port = 3000
 	}

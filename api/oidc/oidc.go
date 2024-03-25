@@ -26,6 +26,7 @@ type Config struct {
 	Cache     *dream.Store
 	Key       conf.Key
 	Providers conf.Providers
+	BaseURL   string
 }
 
 func New(c Config) (*API, error) {
@@ -48,6 +49,7 @@ func (a API) Register(app *echo.Echo) error {
 		google, err := provider.NewGoogleProvider(a.DB, provider.Credentials{
 			ClientID:     a.Providers.Google.ClientID,
 			ClientSecret: a.Providers.Google.ClientSecret,
+			BaseURL:      a.BaseURL,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to setup google identity provider")
@@ -60,6 +62,7 @@ func (a API) Register(app *echo.Echo) error {
 		github := provider.NewGithubProvider(a.DB, provider.Credentials{
 			ClientID:     a.Providers.Github.ClientID,
 			ClientSecret: a.Providers.Github.ClientSecret,
+			BaseURL:      a.BaseURL,
 		})
 		app.GET("/github/login", github.Login)
 		app.GET("/github/callback", github.Callback)

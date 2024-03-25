@@ -9,14 +9,16 @@ import (
 )
 
 type API struct {
-	db  *sqlc.Queries
-	key conf.Key
+	db      *sqlc.Queries
+	key     conf.Key
+	baseURL string
 }
 
-func New(db *sqlc.Queries, key conf.Key) API {
+func New(db *sqlc.Queries, key conf.Key, baseURL string) API {
 	return API{
-		db:  db,
-		key: key,
+		db:      db,
+		key:     key,
+		baseURL: baseURL,
 	}
 }
 

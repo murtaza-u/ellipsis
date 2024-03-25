@@ -84,8 +84,8 @@ func (a API) Token(c echo.Context) error {
 		UserID: metadata.UserID,
 		Scopes: metadata.Scopes,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "http://localhost:3000/",
-			Subject:   "http://localhost:3000/userinfo",
+			Issuer:    a.BaseURL,
+			Subject:   a.BaseURL + "/userinfo",
 			Audience:  jwt.ClaimStrings{metadata.ClientID},
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
@@ -112,7 +112,7 @@ func (a API) Token(c echo.Context) error {
 	idTkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, IDTknClaims{
 		SID: sessionID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "http://localhost:3000/",
+			Issuer:    a.BaseURL,
 			Subject:   metadata.ClientID,
 			Audience:  jwt.ClaimStrings{metadata.ClientID},
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

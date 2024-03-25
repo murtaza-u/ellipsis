@@ -26,13 +26,13 @@ type config struct {
 	BackchannelLogoutSessionSupported bool     `json:"backchannel_logout_session_supported"`
 }
 
-func (API) configuration(c echo.Context) error {
+func (a API) configuration(c echo.Context) error {
 	return c.JSON(http.StatusOK, config{
-		Issuer:                         "http://localhost:3000/",
-		AuthzEndp:                      "http://localhost:3000/authorize",
-		TknEndp:                        "http://localhost:3000/oauth/token",
-		UserinfoEndp:                   "http://localhost:3000/userinfo",
-		JWKsURI:                        "http://localhost:3000/.well-known/jwks.json",
+		Issuer:                         a.BaseURL,
+		AuthzEndp:                      a.BaseURL + "/authorize",
+		TknEndp:                        a.BaseURL + "/oauth/token",
+		UserinfoEndp:                   a.BaseURL + "/userinfo",
+		JWKsURI:                        a.BaseURL + "/.well-known/jwks.json",
 		ScopesSupported:                []string{"openid", "profile"},
 		ResponseTypesSupported:         []string{"code"},
 		ResponseModesSupported:         []string{"query"},
@@ -49,7 +49,7 @@ func (API) configuration(c echo.Context) error {
 		},
 		RequestURIParamSupported:          false,
 		RequestParamSupported:             false,
-		EndSessionEndpoint:                "http://localhost:3000/oidc/logout",
+		EndSessionEndpoint:                a.BaseURL + "/oidc/logout",
 		BackchannelLogoutSupported:        false,
 		BackchannelLogoutSessionSupported: false,
 	})
