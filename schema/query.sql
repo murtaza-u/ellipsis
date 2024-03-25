@@ -50,10 +50,25 @@ WHERE session.id = ?;
 SELECT
     session.id,
     client.id as client_id,
-    client.logout_callback_urls
+    client.name as client_name,
+    client.logout_callback_urls,
+    client.backchannel_logout_url
 FROM
     session
 INNER JOIN client
+ON session.client_id = client.id
+WHERE session.id = ?;
+
+-- name: GetSessionWithOptionalClient :one
+SELECT
+    session.id,
+    client.id as client_id,
+    client.name as client_name,
+    client.logout_callback_urls,
+    client.backchannel_logout_url
+FROM
+    session
+LEFT JOIN client
 ON session.client_id = client.id
 WHERE session.id = ?;
 

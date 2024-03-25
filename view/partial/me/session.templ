@@ -7,6 +7,7 @@ import (
 	"github.com/murtaza-u/ellipsis/view/partial/icon"
 
 	"github.com/xeonx/timeago"
+	"database/sql"
 )
 
 templ Sessions(sessions []sqlc.GetSessionWithClientForUserIDRow, curr string) {
@@ -23,7 +24,7 @@ templ Sessions(sessions []sqlc.GetSessionWithClientForUserIDRow, curr string) {
 					<th></th>
 				</tr>
 			</thead>
-			<tbody hx-target="closest tr" hx-swap="outerHTML swap:0.5s">
+			<tbody hx-boost="true">
 				for _, s := range sessions {
 					<tr>
 						<td>
@@ -44,16 +45,117 @@ templ Sessions(sessions []sqlc.GetSessionWithClientForUserIDRow, curr string) {
 						<td>{ s.Browser.String }</td>
 						<td>
 							if s.ID != curr {
-								<form hx-delete={ fmt.Sprintf("/me/session/%s", s.ID) }>
-									<button type="submit" class="text-error">
-										@icon.Trash()
-									</button>
-								</form>
+								<a
+									href={ templ.URL(fmt.Sprintf("/me/session/delete/%s", s.ID)) }
+									class="text-error"
+								>
+									@icon.Trash()
+								</a>
 							}
 						</td>
 					</tr>
 				}
 			</tbody>
 		</table>
+	</div>
+}
+
+templ DeleteSession(clientName sql.NullString, sid string) {
+	<div class="flex h-screen overflow-hidden">
+		<aside class="hidden h-screen w-full bg-temple lg:block"></aside>
+		<main class="mx-3 flex w-full flex-col items-center justify-center">
+			<h1 class="mb-5 text-center text-4xl font-bold">Are you absolutely sure?</h1>
+			<p class="text-center mb-10">
+				This will revoke your session and sign you out of 
+				<strong>
+					if clientName.Valid {
+						{ clientName.String }
+					} else {
+						Ellipsis
+					}
+				</strong>
+			</p>
+			<form
+				class="w-full flex flex-col-reverse justify-center space-y-2 lg:flex-row lg:space-y-2 lg:space-x-4"
+				hx-boost="true"
+				hx-indicator="#spinner"
+				method="post"
+				action="/me/session/delete"
+			>
+				<input type="text" name="id" value={ sid } class="hidden"/>
+				<a class="btn w-full lg:w-fit" href="/me/session">Cancel</a>
+				<button class="btn btn-error w-full lg:w-fit" type="submit">
+					Revoke
+					<span
+						id="spinner"
+						class="ml-1 hidden loading loading-spinner"
+					></span>
+				</button>
+			</form>
+		</main>
+	</div>
+}
+
+templ DeleteSessionUnsupportedBackchannelLogout(clientName, sid string) {
+	<div class="flex h-screen overflow-hidden">
+		<aside class="hidden h-screen w-full bg-temple lg:block"></aside>
+		<main class="mx-3 flex w-full flex-col items-center justify-center">
+			<h1 class="mb-5 text-center text-4xl font-bold">
+				<em>{ clientName }</em> does not supported back-channel logout
+			</h1>
+			<p class="text-center mb-10">
+				Revoking session may <strong>not</strong> sign you out of { clientName }
+			</p>
+			<form
+				class="w-full flex flex-col-reverse justify-center space-y-2 lg:flex-row lg:space-y-2 lg:space-x-4"
+				hx-boost="true"
+				hx-indicator="#spinner"
+				method="post"
+				action="/me/session/delete"
+			>
+				<input type="text" name="id" value={ sid } class="hidden"/>
+				<input type="checkbox" name="force" checked value="1" class="hidden"/>
+				<a class="btn w-full lg:w-fit" href="/me/session">Cancel</a>
+				<button class="btn btn-error w-full lg:w-fit" type="submit">
+					Revoke Anyway
+					<span
+						id="spinner"
+						class="ml-1 hidden loading loading-spinner"
+					></span>
+				</button>
+			</form>
+		</main>
+	</div>
+}
+
+templ DeleteSessionBackchannelLogoutFailure(clientName, sid string) {
+	<div class="flex h-screen overflow-hidden">
+		<aside class="hidden h-screen w-full bg-temple lg:block"></aside>
+		<main class="mx-3 flex w-full flex-col items-center justify-center">
+			<h1 class="mb-5 text-center text-4xl font-bold">
+				Back-Channel Logout Failed
+			</h1>
+			<p class="text-center mb-10">
+				Revoking session may <strong>not</strong> sign you out of { clientName }
+			</p>
+			<form
+				class="w-full flex flex-col-reverse justify-center space-y-2 lg:flex-row lg:space-y-2 lg:space-x-4"
+				hx-boost="true"
+				hx-indicator="#spinner"
+				method="post"
+				action="/me/session/delete"
+			>
+				<input type="text" name="id" value={ sid } class="hidden"/>
+				<input type="checkbox" name="force" checked value="1" class="hidden"/>
+				<a class="btn w-full lg:w-fit" href="/me/session">Cancel</a>
+				<button class="btn btn-error w-full lg:w-fit" type="submit">
+					Revoke Anyway
+					<span
+						id="spinner"
+						class="ml-1 hidden loading loading-spinner"
+					></span>
+				</button>
+			</form>
+		</main>
 	</div>
 }

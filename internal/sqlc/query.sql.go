@@ -276,7 +276,9 @@ const getSessionWithClient = `-- name: GetSessionWithClient :one
 SELECT
     session.id,
     client.id as client_id,
-    client.logout_callback_urls
+    client.name as client_name,
+    client.logout_callback_urls,
+    client.backchannel_logout_url
 FROM
     session
 INNER JOIN client
@@ -285,15 +287,23 @@ WHERE session.id = ?
 `
 
 type GetSessionWithClientRow struct {
-	ID                 string
-	ClientID           string
-	LogoutCallbackUrls string
+	ID                   string
+	ClientID             string
+	ClientName           string
+	LogoutCallbackUrls   string
+	BackchannelLogoutUrl sql.NullString
 }
 
 func (q *Queries) GetSessionWithClient(ctx context.Context, id string) (GetSessionWithClientRow, error) {
 	row := q.db.QueryRowContext(ctx, getSessionWithClient, id)
 	var i GetSessionWithClientRow
-	err := row.Scan(&i.ID, &i.ClientID, &i.LogoutCallbackUrls)
+	err := row.Scan(
+		&i.ID,
+		&i.ClientID,
+		&i.ClientName,
+		&i.LogoutCallbackUrls,
+		&i.BackchannelLogoutUrl,
+	)
 	return i, err
 }
 
@@ -349,6 +359,41 @@ func (q *Queries) GetSessionWithClientForUserID(ctx context.Context, userID int6
 		return nil, err
 	}
 	return items, nil
+}
+
+const getSessionWithOptionalClient = `-- name: GetSessionWithOptionalClient :one
+SELECT
+    session.id,
+    client.id as client_id,
+    client.name as client_name,
+    client.logout_callback_urls,
+    client.backchannel_logout_url
+FROM
+    session
+LEFT JOIN client
+ON session.client_id = client.id
+WHERE session.id = ?
+`
+
+type GetSessionWithOptionalClientRow struct {
+	ID                   string
+	ClientID             sql.NullString
+	ClientName           sql.NullString
+	LogoutCallbackUrls   sql.NullString
+	BackchannelLogoutUrl sql.NullString
+}
+
+func (q *Queries) GetSessionWithOptionalClient(ctx context.Context, id string) (GetSessionWithOptionalClientRow, error) {
+	row := q.db.QueryRowContext(ctx, getSessionWithOptionalClient, id)
+	var i GetSessionWithOptionalClientRow
+	err := row.Scan(
+		&i.ID,
+		&i.ClientID,
+		&i.ClientName,
+		&i.LogoutCallbackUrls,
+		&i.BackchannelLogoutUrl,
+	)
+	return i, err
 }
 
 const getSessionWithUser = `-- name: GetSessionWithUser :one

@@ -85,7 +85,7 @@ func (s Server) Start() error {
 	}
 
 	// my account
-	me.New(s.queries).Register(s.app)
+	me.New(s.queries, s.Key).Register(s.app)
 
 	return s.app.Start(fmt.Sprintf(":%d", s.Port))
 }
