@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/murtaza-u/ellipsis/api/console"
 	"github.com/murtaza-u/ellipsis/api/me"
@@ -16,14 +15,12 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
-	"github.com/murtaza-u/dream"
 )
 
 type Server struct {
 	conf.C
 	app     *echo.Echo
 	queries *sqlc.Queries
-	cache   *dream.Store
 }
 
 func New(c conf.C) (*Server, error) {
@@ -49,7 +46,6 @@ func New(c conf.C) (*Server, error) {
 		C:       c,
 		app:     app,
 		queries: sqlc.New(db),
-		cache:   dream.New(dream.WithCleanUp(time.Minute)),
 	}, nil
 }
 
@@ -73,7 +69,6 @@ func (s Server) Start() error {
 	// oidc
 	oidcAPI, err := oidc.New(oidc.Config{
 		DB:        s.queries,
-		Cache:     s.cache,
 		Key:       s.Key,
 		Providers: s.Providers,
 		BaseURL:   s.BaseURL,

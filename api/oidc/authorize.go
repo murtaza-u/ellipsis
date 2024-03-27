@@ -323,18 +323,32 @@ func (a API) authorize(c echo.Context) error {
 	if uaRaw != "" {
 		ua = useragent.Parse(uaRaw)
 	}
-	var browser string
+	var browser, os sql.NullString
 	if b := util.BrowserFromUA(ua); b != "" {
-		browser = b
+		browser.String = b
+		browser.Valid = true
+	}
+	if ua.OS == "" {
+		os.String = ua.OS
+		os.Valid = true
 	}
 
-	a.Cache.Put(code, authorizeMetadata{
-		ClientID: client.ID,
-		UserID:   userID,
-		Scopes:   scopes,
-		OS:       ua.OS,
-		Browser:  browser,
-	})
+	_, err = a.DB.CreateAuthzCode(
+		c.Request().Context(),
+		sqlc.CreateAuthzCodeParams{
+			ID:       code,
+			UserID:   userID,
+			ClientID: client.ID,
+			Scopes:   p.Scope,
+			Os:       os,
+			Browser:  browser,
+		},
+	)
+	if err != nil {
+		err := newAuthorizeErr("internal_server_error",
+			"database operation failed")
+		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
+	}
 
 	return c.Redirect(http.StatusFound, fmt.Sprintf(
 		"%s?code=%s&state=%s",
@@ -381,12 +395,4 @@ func (a authorizeErr) AttachTo(baseURL string) string {
 	return fmt.Sprintf(
 		"%s?error=%s&error_description=%s",
 		baseURL, a.Name(), a.Desc())
-}
-
-type authorizeMetadata struct {
-	ClientID string   `json:"client_id"`
-	UserID   int64    `json:"user_id"`
-	Scopes   []string `json:"scopes"`
-	Browser  string   `json:"browser"`
-	OS       string   `json:"os"`
 }

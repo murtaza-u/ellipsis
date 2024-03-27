@@ -31,11 +31,23 @@ CREATE TABLE IF NOT EXISTS authorization_history (
 CREATE TABLE IF NOT EXISTS session (
     id CHAR(25) PRIMARY KEY,
     user_id BIGINT NOT NULL,
+    client_id CHAR(25),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     expires_at TIMESTAMP NOT NULL,
-    client_id CHAR(25),
     os VARCHAR(15),
     browser VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS authorization_code (
+    id CHAR(13) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    client_id CHAR(25) NOT NULL,
+    scopes VARCHAR(50) NOT NULL,
+    os VARCHAR(15),
+    browser VARCHAR(50),
+    expires_at TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
 );
@@ -45,4 +57,19 @@ CREATE TABLE IF NOT EXISTS session (
 -- STARTS CURRENT_TIMESTAMP
 -- DO
 --     DELETE FROM session
+--     WHERE expires_at <= NOW();
+--
+-- CREATE TRIGGER set_authorization_code_expiry
+-- BEFORE INSERT on authorization_code
+-- FOR EACH ROW BEGIN
+--     IF new.expires_at IS null THEN
+--         SET new.expires_at = DATE_ADD(NOW(), INTERVAL 5 MINUTE);
+--     END IF;
+-- END;
+--
+-- CREATE EVENT delete_expired_authorization_code
+-- ON SCHEDULE EVERY 1 MINUTE
+-- STARTS CURRENT_TIMESTAMP
+-- DO
+--     DELETE FROM authorization_code
 --     WHERE expires_at <= NOW();

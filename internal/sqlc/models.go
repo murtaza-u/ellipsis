@@ -9,6 +9,16 @@ import (
 	"time"
 )
 
+type AuthorizationCode struct {
+	ID        string
+	UserID    int64
+	ClientID  string
+	Scopes    string
+	Os        sql.NullString
+	Browser   sql.NullString
+	ExpiresAt sql.NullTime
+}
+
 type AuthorizationHistory struct {
 	UserID       int64
 	ClientID     string
@@ -30,9 +40,9 @@ type Client struct {
 type Session struct {
 	ID        string
 	UserID    int64
+	ClientID  sql.NullString
 	CreatedAt time.Time
 	ExpiresAt time.Time
-	ClientID  sql.NullString
 	Os        sql.NullString
 	Browser   sql.NullString
 }

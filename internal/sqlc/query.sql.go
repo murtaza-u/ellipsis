@@ -11,6 +11,39 @@ import (
 	"time"
 )
 
+const createAuthzCode = `-- name: CreateAuthzCode :execresult
+INSERT INTO authorization_code (
+	id,
+	user_id,
+	client_id,
+	scopes,
+	os,
+	browser
+) VALUES (
+    ?, ?, ?, ?, ?, ?
+)
+`
+
+type CreateAuthzCodeParams struct {
+	ID       string
+	UserID   int64
+	ClientID string
+	Scopes   string
+	Os       sql.NullString
+	Browser  sql.NullString
+}
+
+func (q *Queries) CreateAuthzCode(ctx context.Context, arg CreateAuthzCodeParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createAuthzCode,
+		arg.ID,
+		arg.UserID,
+		arg.ClientID,
+		arg.Scopes,
+		arg.Os,
+		arg.Browser,
+	)
+}
+
 const createAuthzHistory = `-- name: CreateAuthzHistory :execresult
 INSERT INTO authorization_history (user_id, client_id) VALUES (
     ?, ?
@@ -107,6 +140,16 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Res
 	return q.db.ExecContext(ctx, createUser, arg.Email, arg.HashedPassword, arg.AvatarUrl)
 }
 
+const deleteAuthzCode = `-- name: DeleteAuthzCode :exec
+DELETE FROM authorization_code
+WHERE id = ?
+`
+
+func (q *Queries) DeleteAuthzCode(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, deleteAuthzCode, id)
+	return err
+}
+
 const deleteClient = `-- name: DeleteClient :exec
 DELETE FROM client
 WHERE id = ?
@@ -125,6 +168,26 @@ WHERE id = ? OR expires_at <= NOW()
 func (q *Queries) DeleteSession(ctx context.Context, id string) error {
 	_, err := q.db.ExecContext(ctx, deleteSession, id)
 	return err
+}
+
+const getAuthzCode = `-- name: GetAuthzCode :one
+SELECT id, user_id, client_id, scopes, os, browser, expires_at FROM authorization_code
+WHERE id = ?
+`
+
+func (q *Queries) GetAuthzCode(ctx context.Context, id string) (AuthorizationCode, error) {
+	row := q.db.QueryRowContext(ctx, getAuthzCode, id)
+	var i AuthorizationCode
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ClientID,
+		&i.Scopes,
+		&i.Os,
+		&i.Browser,
+		&i.ExpiresAt,
+	)
+	return i, err
 }
 
 const getAuthzHistory = `-- name: GetAuthzHistory :one
@@ -253,7 +316,7 @@ func (q *Queries) GetClients(ctx context.Context) ([]Client, error) {
 }
 
 const getSession = `-- name: GetSession :one
-SELECT id, user_id, created_at, expires_at, client_id, os, browser FROM session
+SELECT id, user_id, client_id, created_at, expires_at, os, browser FROM session
 WHERE id = ? LIMIT 1
 `
 
@@ -263,9 +326,9 @@ func (q *Queries) GetSession(ctx context.Context, id string) (Session, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
+		&i.ClientID,
 		&i.CreatedAt,
 		&i.ExpiresAt,
-		&i.ClientID,
 		&i.Os,
 		&i.Browser,
 	)

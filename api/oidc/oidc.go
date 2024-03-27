@@ -9,7 +9,6 @@ import (
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
 
 	"github.com/labstack/echo/v4"
-	"github.com/murtaza-u/dream"
 )
 
 const (
@@ -23,7 +22,6 @@ type API struct {
 
 type Config struct {
 	DB        *sqlc.Queries
-	Cache     *dream.Store
 	Key       conf.Key
 	Providers conf.Providers
 	BaseURL   string

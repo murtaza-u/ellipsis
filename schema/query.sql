@@ -90,6 +90,10 @@ WHERE session.user_id = ?;
 SELECT * FROM authorization_history
 WHERE user_id = ? AND client_id = ?;
 
+-- name: GetAuthzCode :one
+SELECT * FROM authorization_code
+WHERE id = ?;
+
 
 -- name: CreateUser :execresult
 INSERT INTO user (email, hashed_password, avatar_url) VALUES (
@@ -120,6 +124,18 @@ INSERT INTO authorization_history (user_id, client_id) VALUES (
     ?, ?
 );
 
+-- name: CreateAuthzCode :execresult
+INSERT INTO authorization_code (
+	id,
+	user_id,
+	client_id,
+	scopes,
+	os,
+	browser
+) VALUES (
+    ?, ?, ?, ?, ?, ?
+);
+
 
 -- name: UpdateUserPasswordHash :exec
 UPDATE user
@@ -144,3 +160,7 @@ WHERE id = ?;
 -- name: DeleteSession :exec
 DELETE FROM session
 WHERE id = ? OR expires_at <= NOW();
+
+-- name: DeleteAuthzCode :exec
+DELETE FROM authorization_code
+WHERE id = ?;

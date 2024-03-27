@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -45,20 +46,21 @@ func (a API) Token(c echo.Context) error {
 			ErrDesc: "invalid or unsupported grant_type",
 		})
 	}
-	v := a.Cache.Get(params.Code)
-	if v == nil {
+
+	metadata, err := a.DB.GetAuthzCode(c.Request().Context(), params.Code)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return c.JSON(http.StatusBadRequest, tknResp{
+				Err:     "bad_request",
+				ErrDesc: "invalid or malformed authorization code",
+			})
+		}
 		return c.JSON(http.StatusBadRequest, tknResp{
-			Err:     "bad_request",
-			ErrDesc: "invalid or malformed authorization code",
+			Err:     "internal_server_error",
+			ErrDesc: "database operation failed",
 		})
 	}
-	metadata, ok := v.(authorizeMetadata)
-	if !ok {
-		return c.JSON(http.StatusBadRequest, tknResp{
-			Err:     "bad_request",
-			ErrDesc: "invalid or malformed authorization code",
-		})
-	}
+
 	if metadata.ClientID != params.ClientID {
 		return c.JSON(http.StatusBadRequest, tknResp{
 			Err:     "unauthorized",
@@ -82,7 +84,7 @@ func (a API) Token(c echo.Context) error {
 
 	accessTkn := jwt.NewWithClaims(jwt.SigningMethodEdDSA, AccessTknClaims{
 		UserID: metadata.UserID,
-		Scopes: metadata.Scopes,
+		Scopes: strings.Split(metadata.Scopes, " "),
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    a.BaseURL,
 			Subject:   a.BaseURL + "/userinfo",
@@ -128,23 +130,13 @@ func (a API) Token(c echo.Context) error {
 		})
 	}
 
-	var os, browser sql.NullString
-	if metadata.OS != "" {
-		os.String = metadata.OS
-		os.Valid = true
-	}
-	if metadata.Browser != "" {
-		browser.String = metadata.Browser
-		browser.Valid = true
-	}
-
 	_, err = a.DB.CreateSession(c.Request().Context(), sqlc.CreateSessionParams{
 		ID:        sessionID,
 		UserID:    metadata.UserID,
 		ClientID:  sql.NullString{String: metadata.ClientID, Valid: true},
 		ExpiresAt: idTknExp,
-		Os:        os,
-		Browser:   browser,
+		Os:        metadata.Os,
+		Browser:   metadata.Browser,
 	})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, tknResp{
@@ -154,13 +146,13 @@ func (a API) Token(c echo.Context) error {
 	}
 
 	// invalidate auth code
-	a.Cache.Delete(params.Code)
+	a.DB.DeleteAuthzCode(c.Request().Context(), params.Code)
 
 	return c.JSON(http.StatusOK, tknResp{
 		AccessTkn: accessTknStr,
 		TknType:   "Bearer",
 		ExpiresIn: 1800,
-		Scope:     strings.Join(metadata.Scopes, " "),
+		Scope:     metadata.Scopes,
 		IDTkn:     idTknStr,
 	})
 }
