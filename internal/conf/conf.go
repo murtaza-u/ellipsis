@@ -20,6 +20,7 @@ type C struct {
 	SessionEncryptionKey string    `yaml:"sessionEncryptionKey"`
 	Mysql                Mysql     `yaml:"mysql"`
 	Providers            Providers `yaml:"providers"`
+	S3                   S3        `yaml:"s3"`
 
 	Key Key
 }
@@ -39,6 +40,11 @@ type Provider struct {
 	Enable       bool   `yaml:"enable"`
 	ClientID     string `yaml:"clientID"`
 	ClientSecret string `yaml:"clientSecret"`
+}
+
+type S3 struct {
+	Bucket string `yaml:"bucket"`
+	Region string `yaml:"region"`
 }
 
 type Key struct {
@@ -106,6 +112,13 @@ func (c *C) Validate() error {
 		if p.ClientSecret == "" {
 			return fmt.Errorf("missing client secret for one of the enabled IdP")
 		}
+	}
+
+	if c.S3.Bucket == "" {
+		return fmt.Errorf("missing s3 bucket")
+	}
+	if c.S3.Region == "" {
+		return fmt.Errorf("missing s3 region")
 	}
 
 	return nil

@@ -44,7 +44,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- favicon --><link rel=\"icon\" type=\"svg+xml\" href=\"/static/favicon.svg\"><!-- css --><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><link href=\"/static/css/style.css\" rel=\"stylesheet\"><link href=\"https://unpkg.com/nprogress@0.2.0/nprogress.css\" rel=\"stylesheet\"></head><body class=\"font-sans\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- favicon --><link rel=\"icon\" type=\"svg+xml\" href=\"/static/favicon.svg\"><!-- css --><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><link href=\"/static/css/style.css\" rel=\"stylesheet\"><link href=\"https://unpkg.com/nprogress@0.2.0/nprogress.css\" rel=\"stylesheet\"><link href=\"https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css\" rel=\"stylesheet\"></head><body class=\"font-sans\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -54,7 +54,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script src=\"https://unpkg.com/htmx.org@1.9.10\"></script><script src=\"https://unpkg.com/nprogress@0.2.0/nprogress.js\"></script><script src=\"/static/js/navigation.js\"></script></body></html>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script src=\"https://unpkg.com/htmx.org@1.9.10\"></script><script src=\"https://unpkg.com/nprogress@0.2.0/nprogress.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js\"></script><script src=\"/static/js/navigation.js\"></script><script src=\"/static/js/util.js\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

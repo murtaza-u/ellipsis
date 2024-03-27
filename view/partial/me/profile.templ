@@ -2,10 +2,168 @@ package me
 
 import "github.com/murtaza-u/ellipsis/view/partial/icon"
 
-templ Profile(hasPswd bool) {
-	@ChangePassword(ChangePasswordParams{
-		HasPswd: hasPswd,
-	}, map[string]error{}, false)
+templ Profile(avatarURL string) {
+	@ChangeAvatar(avatarURL, map[string]error{})
+}
+
+templ ChangeAvatar(avatarURL string, err map[string]error) {
+	@crop()
+	<form
+		action="/"
+		method="post"
+		class="w-full lg:w-1/2 space-y-2"
+		enctype="multipart/form-data"
+		hx-indicator="#spinner"
+	>
+		<div class="avatar">
+			<div class="w-24 mask mask-circle">
+				if avatarURL != "" {
+					<img alt="Avatar" src={ avatarURL }/>
+				} else {
+					<img alt="Avatar" src="/static/default-user.svg"/>
+				}
+			</div>
+		</div>
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">Pick a file</span>
+				<span class="label-text-alt text-error text-xl">*</span>
+			</div>
+			<input
+				id="avatar-input"
+				type="file"
+				name="avatar"
+				class={
+					"file-input file-input-bordered w-full",
+					templ.KV("file-input-error", err["avatar"] != nil),
+				}
+				accept="image/*"
+			/>
+			<div class="label">
+				if err["avatar"] != nil {
+					<span class="label-text-alt text-error first-letter:uppercase">
+						{ err["avatar"].Error() }
+					</span>
+				}
+				<span class="label-text-alt">File size must be less than 512KB</span>
+			</div>
+		</label>
+		<div class="flex items-center justify-end">
+			<button class="my-4 btn btn-primary w-full md:w-fit">
+				Change Avatar
+				<span
+					id="spinner"
+					class="ml-1 hidden loading loading-spinner"
+				></span>
+			</button>
+		</div>
+		@initCropper()
+	</form>
+}
+
+templ crop() {
+	<dialog id="crop" class="modal modal-bottom sm:modal-middle">
+		<div class="modal-box">
+			<div class="w-full">
+				<div>
+					<img
+						id="crop-image"
+						class="block w-full max-w-full"
+						src="/static/default-user.svg"
+						alt="User avatar"
+					/>
+				</div>
+			</div>
+			<div class="modal-action">
+				<form method="dialog">
+					<!-- if there is a button in form, it will close the modal -->
+					<button class="btn">Cancel</button>
+				</form>
+				<button id="crop-button" class="btn btn-success">Crop</button>
+			</div>
+		</div>
+	</dialog>
+}
+
+script initCropper() {
+	function setupCropper(fileInput, cropButton, croppedImage, cropModal) {
+		let cropper = null
+		let croppable = false
+		let fname = null
+
+		fileInput.addEventListener("change", (e) => {
+			if (cropper) {
+				cropper.destroy();
+				cropper = null;
+			}
+
+			if (fname) {
+				fname = null
+			}
+
+			const files = e.target.files;
+			if (!files || files.length === 0) {
+				return;
+			}
+
+			cropModal.classList.add("modal-open")
+
+			function done(url) {
+				e.target.value = null;
+				croppedImage.src = url;
+				cropper = new Cropper(croppedImage, {
+					aspectRatio: 1,
+					dragMode: "move",
+					cropBoxMovable: true,
+					cropBoxResizable: false,
+					toggleDragModeOnDblclick: false,
+					responsive: true,
+					zoomable: false,
+					center: true,
+					data: {
+						width: 360,
+						height: 360,
+					},
+					ready: () => {
+						croppable = true;
+					},
+				});
+			}
+
+			const file = files[0];
+			fname = file.name
+
+			if (URL) {
+				done(URL.createObjectURL(file));
+				return;
+			}
+
+			if (FileReader) {
+				const reader = new FileReader();
+				reader.onload = () => done(reader.result);
+				reader.readAsDataURL(file);
+				return;
+			}
+		})
+
+		cropButton.addEventListener("click", () => {
+			if (!croppable) return;
+			const croppedCanvas = cropper.getCroppedCanvas();
+			const roundedCanvas = getRoundedCanvas(croppedCanvas);
+			roundedImage = document.createElement("img");
+			roundedImage.src = roundedCanvas.toDataURL();
+			roundedImage.style = "width: 360px;";
+			createFile(roundedImage.src, fileInput, fname).then(
+				() => cropModal.classList.remove("modal-open")
+			);
+		})
+	}
+
+	const input = document.getElementById("avatar-input")
+	const btn = document.getElementById("crop-button")
+	const image = document.getElementById("crop-image")
+	const modal = document.getElementById("crop")
+	setupCropper(input, btn, image, modal)
 }
 
 type ChangePasswordParams struct {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path/filepath"
 
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/render"
@@ -19,7 +20,155 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (a API) ProfilePage(c echo.Context) error {
+const maxUploadSize = 1024 * 512
+
+func (a API) Profile(c echo.Context) error {
+	var avatarURL string
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
+		avatarURL = ctx.AvatarURL
+	}
+	return render.Do(render.Params{
+		Ctx: c,
+		Component: layout.Base(
+			"My Account | Ellipsis",
+			view.Me("/", avatarURL, me.Profile(avatarURL)),
+		),
+	})
+}
+
+func (a API) ChangeAvatar(c echo.Context) error {
+	var avatarURL string
+	var userID int64
+	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
+		avatarURL = ctx.AvatarURL
+		userID = ctx.UserID
+	}
+
+	avatar, err := c.FormFile("avatar")
+	if err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"My Account | Ellipsis",
+				view.Me(
+					"/", avatarURL,
+					view.Error(
+						"failed to parse form file",
+						http.StatusBadRequest,
+					),
+				),
+			),
+			Status: http.StatusBadRequest,
+		})
+	}
+	if avatar.Size > maxUploadSize {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"My Account | Ellipsis",
+				view.Me(
+					"/", avatarURL,
+					me.ChangeAvatar(avatarURL, map[string]error{
+						"avatar": errors.New("file too large"),
+					}),
+				),
+			),
+			Status: http.StatusBadRequest,
+		})
+	}
+
+	file, err := avatar.Open()
+	if err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"My Account | Ellipsis",
+				view.Me(
+					"/", avatarURL,
+					view.Error(
+						"failed to open form file",
+						http.StatusInternalServerError,
+					),
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+	defer file.Close()
+
+	key := fmt.Sprintf("%d%s", userID, filepath.Ext(avatar.Filename))
+	if err := a.fs.Put(key, file); err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"My Account | Ellipsis",
+				view.Me(
+					"/", avatarURL,
+					view.Error(
+						"failed to upload avatar to file storage",
+						http.StatusInternalServerError,
+					),
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+
+	url, err := a.fs.GetURL(key)
+	if err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"My Account | Ellipsis",
+				view.Me(
+					"/", avatarURL,
+					view.Error(
+						"failed to fetch avatar url from file storage",
+						http.StatusInternalServerError,
+					),
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+
+	err = a.db.UpdateUserAvatar(
+		c.Request().Context(),
+		sqlc.UpdateUserAvatarParams{
+			ID:        userID,
+			AvatarUrl: sql.NullString{String: url, Valid: true},
+		},
+	)
+	if err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"My Account | Ellipsis",
+				view.Me(
+					"/", avatarURL,
+					view.Error(
+						"database operation failed",
+						http.StatusInternalServerError,
+					),
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+
+	return render.Do(render.Params{
+		Ctx: c,
+		Component: layout.Base(
+			"My Account | Ellipsis",
+			view.Me(
+				"/", url,
+				me.ChangeAvatar(url, map[string]error{}),
+			),
+		),
+	})
+}
+
+func (a API) ChangePasswordPage(c echo.Context) error {
 	var userID int64
 	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
@@ -37,7 +186,7 @@ func (a API) ProfilePage(c echo.Context) error {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
-				"My Account | Ellipsis",
+				"My Account - Change Password | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
@@ -50,11 +199,15 @@ func (a API) ProfilePage(c echo.Context) error {
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
-			"My Account | Ellipsis",
+			"My Account - Change Password | Ellipsis",
 			view.Me(
-				"/",
+				"/change-password",
 				u.AvatarUrl.String,
-				me.Profile(u.HashedPassword.Valid),
+				me.ChangePassword(
+					me.ChangePasswordParams{HasPswd: u.HashedPassword.Valid},
+					map[string]error{},
+					false,
+				),
 			),
 		),
 	})

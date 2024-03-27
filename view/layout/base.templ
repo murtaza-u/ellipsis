@@ -15,6 +15,7 @@ templ Base(title string, children ...templ.Component) {
 			<link href="/static/css/tailwind.css" rel="stylesheet"/>
 			<link href="/static/css/style.css" rel="stylesheet"/>
 			<link href="https://unpkg.com/nprogress@0.2.0/nprogress.css" rel="stylesheet"/>
+			<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet"/>
 		</head>
 		<body class="font-sans">
 			for _, child := range children {
@@ -22,7 +23,9 @@ templ Base(title string, children ...templ.Component) {
 			}
 			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 			<script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 			<script src="/static/js/navigation.js"></script>
+			<script src="/static/js/util.js"></script>
 		</body>
 	</html>
 }

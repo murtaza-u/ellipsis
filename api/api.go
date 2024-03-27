@@ -8,6 +8,7 @@ import (
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/oidc"
 	"github.com/murtaza-u/ellipsis/db"
+	"github.com/murtaza-u/ellipsis/fs"
 	"github.com/murtaza-u/ellipsis/internal/conf"
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
 
@@ -21,6 +22,7 @@ type Server struct {
 	conf.C
 	app     *echo.Echo
 	queries *sqlc.Queries
+	fs      fs.Storage
 }
 
 func New(c conf.C) (*Server, error) {
@@ -42,10 +44,16 @@ func New(c conf.C) (*Server, error) {
 	app.Pre(echoMiddleware.RemoveTrailingSlash())
 	app.Use(session.Middleware(sessions.NewCookieStore([]byte(c.SessionEncryptionKey))))
 
+	s3, err := fs.NewS3Store(c.S3.Region, c.S3.Bucket)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize s3: %w", err)
+	}
+
 	return &Server{
 		C:       c,
 		app:     app,
 		queries: sqlc.New(db),
+		fs:      s3,
 	}, nil
 }
 
@@ -64,7 +72,7 @@ func (s Server) Start() error {
 	console.New(s.queries).Register(s.app)
 
 	// my account
-	me.New(s.queries, s.Key, s.BaseURL).Register(s.app)
+	me.New(s.queries, s.Key, s.BaseURL, s.fs).Register(s.app)
 
 	// oidc
 	oidcAPI, err := oidc.New(oidc.Config{

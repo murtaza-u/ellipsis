@@ -142,6 +142,11 @@ UPDATE user
 SET hashed_password = ?
 WHERE id = ?;
 
+-- name: UpdateUserAvatar :exec
+UPDATE user
+SET avatar_url = ?
+WHERE id = ?;
+
 -- name: UpdateClient :exec
 UPDATE client
 SET name = ?,

@@ -618,6 +618,22 @@ func (q *Queries) UpdateClient(ctx context.Context, arg UpdateClientParams) erro
 	return err
 }
 
+const updateUserAvatar = `-- name: UpdateUserAvatar :exec
+UPDATE user
+SET avatar_url = ?
+WHERE id = ?
+`
+
+type UpdateUserAvatarParams struct {
+	AvatarUrl sql.NullString
+	ID        int64
+}
+
+func (q *Queries) UpdateUserAvatar(ctx context.Context, arg UpdateUserAvatarParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserAvatar, arg.AvatarUrl, arg.ID)
+	return err
+}
+
 const updateUserPasswordHash = `-- name: UpdateUserPasswordHash :exec
 UPDATE user
 SET hashed_password = ?
