@@ -26,7 +26,7 @@ INSERT INTO authorization_code (
 
 type CreateAuthzCodeParams struct {
 	ID       string
-	UserID   int64
+	UserID   string
 	ClientID string
 	Scopes   string
 	Os       sql.NullString
@@ -51,7 +51,7 @@ INSERT INTO authorization_history (user_id, client_id) VALUES (
 `
 
 type CreateAuthzHistoryParams struct {
-	UserID   int64
+	UserID   string
 	ClientID string
 }
 
@@ -106,7 +106,7 @@ INSERT INTO session (id, user_id, client_id, expires_at, os, browser) VALUES (
 
 type CreateSessionParams struct {
 	ID        string
-	UserID    int64
+	UserID    string
 	ClientID  sql.NullString
 	ExpiresAt time.Time
 	Os        sql.NullString
@@ -125,19 +125,25 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (s
 }
 
 const createUser = `-- name: CreateUser :execresult
-INSERT INTO user (email, hashed_password, avatar_url) VALUES (
-    ?, ?, ?
+INSERT INTO user (id, email, hashed_password, avatar_url) VALUES (
+    ?, ?, ?, ?
 )
 `
 
 type CreateUserParams struct {
+	ID             string
 	Email          string
 	HashedPassword sql.NullString
 	AvatarUrl      sql.NullString
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createUser, arg.Email, arg.HashedPassword, arg.AvatarUrl)
+	return q.db.ExecContext(ctx, createUser,
+		arg.ID,
+		arg.Email,
+		arg.HashedPassword,
+		arg.AvatarUrl,
+	)
 }
 
 const deleteAuthzCode = `-- name: DeleteAuthzCode :exec
@@ -196,7 +202,7 @@ WHERE user_id = ? AND client_id = ?
 `
 
 type GetAuthzHistoryParams struct {
-	UserID   int64
+	UserID   string
 	ClientID string
 }
 
@@ -394,7 +400,7 @@ type GetSessionWithClientForUserIDRow struct {
 	ClientName sql.NullString
 }
 
-func (q *Queries) GetSessionWithClientForUserID(ctx context.Context, userID int64) ([]GetSessionWithClientForUserIDRow, error) {
+func (q *Queries) GetSessionWithClientForUserID(ctx context.Context, userID string) ([]GetSessionWithClientForUserIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getSessionWithClientForUserID, userID)
 	if err != nil {
 		return nil, err
@@ -476,7 +482,7 @@ WHERE session.id = ?
 type GetSessionWithUserRow struct {
 	ID        string
 	ExpiresAt time.Time
-	UserID    int64
+	UserID    string
 	Email     string
 	AvatarUrl sql.NullString
 }
@@ -499,7 +505,7 @@ SELECT id, email, avatar_url, hashed_password, is_admin, created_at FROM user
 WHERE id = ? LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
+func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
 	var i User
 	err := row.Scan(
@@ -626,7 +632,7 @@ WHERE id = ?
 
 type UpdateUserAvatarParams struct {
 	AvatarUrl sql.NullString
-	ID        int64
+	ID        string
 }
 
 func (q *Queries) UpdateUserAvatar(ctx context.Context, arg UpdateUserAvatarParams) error {
@@ -642,7 +648,7 @@ WHERE id = ?
 
 type UpdateUserPasswordHashParams struct {
 	HashedPassword sql.NullString
-	ID             int64
+	ID             string
 }
 
 func (q *Queries) UpdateUserPasswordHash(ctx context.Context, arg UpdateUserPasswordHashParams) error {

@@ -94,7 +94,7 @@ func (a API) consent(c echo.Context) error {
 		})
 	}
 
-	var userID int64
+	var userID string
 	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 	}
@@ -205,11 +205,11 @@ func (a API) authorize(c echo.Context) error {
 		})
 	}
 
-	var userID int64
+	var userID string
 	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 	}
-	if userID == 0 {
+	if userID == "" {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(

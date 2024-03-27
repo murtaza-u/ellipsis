@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"crypto/subtle"
 	"database/sql"
 	"encoding/json"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/api/util"
+	"github.com/murtaza-u/ellipsis/fs"
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
 	"github.com/murtaza-u/ellipsis/view"
 	"github.com/murtaza-u/ellipsis/view/layout"
@@ -27,6 +29,7 @@ import (
 type ProviderGithub struct {
 	*oauth2.Config
 	db *sqlc.Queries
+	fs fs.Storage
 }
 
 const githubUserInfoURL = "https://api.github.com/user"
@@ -36,7 +39,7 @@ type githubUser struct {
 	AvatarURL string `json:"avatar_url"`
 }
 
-func NewGithubProvider(db *sqlc.Queries, c Credentials) Provider {
+func NewGithubProvider(db *sqlc.Queries, fs fs.Storage, c Credentials) Provider {
 	conf := &oauth2.Config{
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
@@ -47,6 +50,7 @@ func NewGithubProvider(db *sqlc.Queries, c Credentials) Provider {
 	return ProviderGithub{
 		Config: conf,
 		db:     db,
+		fs:     fs,
 	}
 }
 
@@ -272,68 +276,19 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 		})
 	}
 
-	var userID int64
-
-	exists := true
-	dbUser, err := p.db.GetUserByEmail(c.Request().Context(), user.Email)
+	userID, err := p.InsertUser(c.Request().Context(), user)
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			return render.Do(render.Params{
-				Ctx: c,
-				Component: layout.Base(
-					"Callback - GitHub | Ellipsis",
-					view.Error(
-						"database operation failed",
-						http.StatusInternalServerError,
-					),
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"Callback - GitHub | Ellipsis",
+				view.Error(
+					"database operation failed",
+					http.StatusInternalServerError,
 				),
-				Status: http.StatusInternalServerError,
-			})
-		}
-		exists = false
-	}
-
-	if exists {
-		userID = dbUser.ID
-	}
-
-	if !exists {
-		var avatar sql.NullString
-		if user.AvatarURL != "" {
-			avatar.String = user.AvatarURL
-			avatar.Valid = true
-		}
-		res, err := p.db.CreateUser(c.Request().Context(), sqlc.CreateUserParams{
-			Email:     user.Email,
-			AvatarUrl: avatar,
+			),
+			Status: http.StatusInternalServerError,
 		})
-		if err != nil {
-			return render.Do(render.Params{
-				Ctx: c,
-				Component: layout.Base(
-					"Callback - GitHub | Ellipsis",
-					view.Error(
-						"database operation failed",
-						http.StatusInternalServerError,
-					),
-				),
-				Status: http.StatusInternalServerError,
-			})
-		}
-		userID, err = res.LastInsertId()
-		if err != nil {
-			return render.Do(render.Params{
-				Ctx: c,
-				Component: layout.Base(
-					"Callback - GitHub | Ellipsis",
-					view.Error(
-						"database operation failed",
-						http.StatusInternalServerError,
-					),
-				),
-				Status: http.StatusInternalServerError,
-			})
-		}
 	}
 
 	sessID, err := util.GenerateRandom(25)
@@ -416,4 +371,46 @@ func (p ProviderGithub) Callback(c echo.Context) error {
 	// render empty template
 	h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
 	return h.Component.Render(c.Request().Context(), r)
+}
+
+func (p ProviderGithub) InsertUser(ctx context.Context, u *githubUser) (string, error) {
+	dbUser, err := p.db.GetUserByEmail(ctx, u.Email)
+
+	// user exists
+	if err == nil {
+		return dbUser.ID, nil
+	}
+
+	// database error
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return "", fmt.Errorf("failed to read user: %w", err)
+	}
+
+	// user does not exists
+	userID, err := util.GenerateRandom(25)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate user id: %w", err)
+	}
+
+	f, err := util.ReadURL(ctx, u.AvatarURL)
+	err = p.fs.Put(userID, f)
+	if err != nil {
+		return "", fmt.Errorf("failed to upload file to file storage: %w", err)
+	}
+
+	url, err := p.fs.GetURL(userID)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch file url from storage: %w", err)
+	}
+
+	_, err = p.db.CreateUser(ctx, sqlc.CreateUserParams{
+		ID:        userID,
+		Email:     u.Email,
+		AvatarUrl: sql.NullString{String: url, Valid: true},
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to insert new user: %w", err)
+	}
+
+	return userID, nil
 }

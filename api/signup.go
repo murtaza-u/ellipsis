@@ -101,7 +101,23 @@ func (s Server) SignUp(c echo.Context) error {
 		})
 	}
 
+	userID, err := util.GenerateRandom(25)
+	if err != nil {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"Sign Up | Ellipsis",
+				view.Error(
+					"failed to generate user id",
+					http.StatusInternalServerError,
+				),
+			),
+			Status: http.StatusInternalServerError,
+		})
+	}
+
 	_, err = s.queries.CreateUser(c.Request().Context(), sqlc.CreateUserParams{
+		ID:             userID,
 		Email:          params.Email,
 		HashedPassword: sql.NullString{String: hash, Valid: true},
 	})

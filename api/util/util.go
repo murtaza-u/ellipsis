@@ -1,13 +1,17 @@
 package util
 
 import (
+	"bytes"
+	"context"
 	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
 	"math/big"
+	"net/http"
 
 	"github.com/mileusna/useragent"
 	pswdValidator "github.com/wagslane/go-password-validator"
@@ -90,4 +94,24 @@ func ValidatePassword(pswd string) error {
 		return err
 	}
 	return nil
+}
+
+func ReadURL(ctx context.Context, url string) (io.ReadSeeker, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new request: %w", err)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make request: %w", err)
+	}
+	defer res.Body.Close()
+
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	return bytes.NewReader(data), nil
 }

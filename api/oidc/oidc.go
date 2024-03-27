@@ -5,6 +5,7 @@ import (
 
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/oidc/provider"
+	"github.com/murtaza-u/ellipsis/fs"
 	"github.com/murtaza-u/ellipsis/internal/conf"
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
 
@@ -25,6 +26,7 @@ type Config struct {
 	Key       conf.Key
 	Providers conf.Providers
 	BaseURL   string
+	FS        fs.Storage
 }
 
 func New(c Config) (*API, error) {
@@ -44,11 +46,14 @@ func (a API) Register(app *echo.Echo) error {
 	app.GET("/oidc/logout", a.Logout)
 
 	if a.Providers.Google.Enable {
-		google, err := provider.NewGoogleProvider(a.DB, provider.Credentials{
-			ClientID:     a.Providers.Google.ClientID,
-			ClientSecret: a.Providers.Google.ClientSecret,
-			BaseURL:      a.BaseURL,
-		})
+		google, err := provider.NewGoogleProvider(
+			a.DB, a.FS,
+			provider.Credentials{
+				ClientID:     a.Providers.Google.ClientID,
+				ClientSecret: a.Providers.Google.ClientSecret,
+				BaseURL:      a.BaseURL,
+			},
+		)
 		if err != nil {
 			return fmt.Errorf("failed to setup google identity provider")
 		}
@@ -57,11 +62,14 @@ func (a API) Register(app *echo.Echo) error {
 	}
 
 	if a.Providers.Github.Enable {
-		github := provider.NewGithubProvider(a.DB, provider.Credentials{
-			ClientID:     a.Providers.Github.ClientID,
-			ClientSecret: a.Providers.Github.ClientSecret,
-			BaseURL:      a.BaseURL,
-		})
+		github := provider.NewGithubProvider(
+			a.DB, a.FS,
+			provider.Credentials{
+				ClientID:     a.Providers.Github.ClientID,
+				ClientSecret: a.Providers.Github.ClientSecret,
+				BaseURL:      a.BaseURL,
+			},
+		)
 		app.GET("/github/login", github.Login)
 		app.GET("/github/callback", github.Callback)
 	}

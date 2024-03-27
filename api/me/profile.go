@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"path/filepath"
 
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/render"
@@ -37,8 +36,7 @@ func (a API) Profile(c echo.Context) error {
 }
 
 func (a API) ChangeAvatar(c echo.Context) error {
-	var avatarURL string
-	var userID int64
+	var userID, avatarURL string
 	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		avatarURL = ctx.AvatarURL
 		userID = ctx.UserID
@@ -96,8 +94,7 @@ func (a API) ChangeAvatar(c echo.Context) error {
 	}
 	defer file.Close()
 
-	key := fmt.Sprintf("%d%s", userID, filepath.Ext(avatar.Filename))
-	if err := a.fs.Put(key, file); err != nil {
+	if err := a.fs.Put(userID, file); err != nil {
 		return render.Do(render.Params{
 			Ctx: c,
 			Component: layout.Base(
@@ -114,7 +111,7 @@ func (a API) ChangeAvatar(c echo.Context) error {
 		})
 	}
 
-	url, err := a.fs.GetURL(key)
+	url, err := a.fs.GetURL(userID)
 	if err != nil {
 		return render.Do(render.Params{
 			Ctx: c,
@@ -169,7 +166,7 @@ func (a API) ChangeAvatar(c echo.Context) error {
 }
 
 func (a API) ChangePasswordPage(c echo.Context) error {
-	var userID int64
+	var userID string
 	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 	}
@@ -226,11 +223,11 @@ func (a API) ChangePassword(c echo.Context) error {
 		})
 	}
 
-	var userID int64
+	var userID string
 	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 	}
-	if userID == 0 {
+	if userID == "" {
 		r := c.Response()
 		r.Header().Set("HX-Redirect", "/logout")
 

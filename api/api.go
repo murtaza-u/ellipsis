@@ -80,6 +80,7 @@ func (s Server) Start() error {
 		Key:       s.Key,
 		Providers: s.Providers,
 		BaseURL:   s.BaseURL,
+		FS:        s.fs,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to setup OIDC APIs: %w", err)

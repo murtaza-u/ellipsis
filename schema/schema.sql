@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS user (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id CHAR(25) PRIMARY KEY,
     email VARCHAR(50) NOT NULL UNIQUE,
     avatar_url VARCHAR(100),
     hashed_password VARCHAR(255),
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS client (
 );
 
 CREATE TABLE IF NOT EXISTS authorization_history (
-    user_id BIGINT NOT NULL,
+    user_id CHAR(25) NOT NULL,
     client_id CHAR(25) NOT NULL,
     authorized_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS authorization_history (
 
 CREATE TABLE IF NOT EXISTS session (
     id CHAR(25) PRIMARY KEY,
-    user_id BIGINT NOT NULL,
+    user_id CHAR(25) NOT NULL,
     client_id CHAR(25),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     expires_at TIMESTAMP NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS session (
 
 CREATE TABLE IF NOT EXISTS authorization_code (
     id CHAR(13) PRIMARY KEY,
-    user_id BIGINT NOT NULL,
+    user_id CHAR(25) NOT NULL,
     client_id CHAR(25) NOT NULL,
     scopes VARCHAR(50) NOT NULL,
     os VARCHAR(15),

@@ -96,8 +96,8 @@ WHERE id = ?;
 
 
 -- name: CreateUser :execresult
-INSERT INTO user (email, hashed_password, avatar_url) VALUES (
-    ?, ?, ?
+INSERT INTO user (id, email, hashed_password, avatar_url) VALUES (
+    ?, ?, ?, ?
 );
 
 -- name: CreateClient :execresult

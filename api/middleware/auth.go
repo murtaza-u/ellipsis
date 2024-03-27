@@ -27,7 +27,7 @@ func NewAuthMiddleware(db *sqlc.Queries) AuthMiddleware {
 type CtxWithAuthInfo struct {
 	echo.Context
 	SessionID string
-	UserID    int64
+	UserID    string
 	AvatarURL string
 	Email     string
 }

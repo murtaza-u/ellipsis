@@ -23,16 +23,13 @@ import (
 )
 
 func (a API) SessionPage(c echo.Context) error {
-	var (
-		userID            int64
-		sessID, avatarURL string
-	)
+	var userID, sessID, avatarURL string
 	if ctx, ok := c.(middleware.CtxWithAuthInfo); ok {
 		userID = ctx.UserID
 		sessID = ctx.SessionID
 		avatarURL = ctx.AvatarURL
 	}
-	if userID == 0 || sessID == "" {
+	if userID == "" || sessID == "" {
 		r := c.Response()
 		r.Header().Set("HX-Redirect", "/logout")
 

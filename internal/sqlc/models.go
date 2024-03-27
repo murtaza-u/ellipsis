@@ -11,7 +11,7 @@ import (
 
 type AuthorizationCode struct {
 	ID        string
-	UserID    int64
+	UserID    string
 	ClientID  string
 	Scopes    string
 	Os        sql.NullString
@@ -20,7 +20,7 @@ type AuthorizationCode struct {
 }
 
 type AuthorizationHistory struct {
-	UserID       int64
+	UserID       string
 	ClientID     string
 	AuthorizedAt time.Time
 }
@@ -39,7 +39,7 @@ type Client struct {
 
 type Session struct {
 	ID        string
-	UserID    int64
+	UserID    string
 	ClientID  sql.NullString
 	CreatedAt time.Time
 	ExpiresAt time.Time
@@ -48,7 +48,7 @@ type Session struct {
 }
 
 type User struct {
-	ID             int64
+	ID             string
 	Email          string
 	AvatarUrl      sql.NullString
 	HashedPassword sql.NullString
