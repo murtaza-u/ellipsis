@@ -5,9 +5,29 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      version = "24.03";
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
+      packages.${system} = rec {
+        ellipsis = pkgs.buildGoModule {
+          pname = "ellipsis";
+          version = version;
+          src = ./.;
+          vendorHash = "sha256-+D3//4UNiwUZFJ/GG0QveQGOeeQBhSc97d1TRo7LzEo=";
+          CGO_ENABLED = 0;
+          subPackages = [ "cmd/ellipsis" ];
+        };
+        dockerImage = pkgs.dockerTools.buildImage {
+          name = "murtazau/ellipsis";
+          tag = version;
+          config = {
+            Cmd = [ "${ellipsis}/bin/ellipsis" ];
+            WorkingDir = "/data";
+          };
+        };
+        default = ellipsis;
+      };
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
           go
