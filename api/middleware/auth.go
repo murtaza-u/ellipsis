@@ -52,6 +52,35 @@ func (m AuthMiddleware) AuthInfo(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+func (m AuthMiddleware) AdminOnly(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		returnTo := url.QueryEscape(c.Request().URL.RequestURI())
+		redirectTo := "/login?return_to=" + returnTo
+		cookie, err := c.Cookie("auth_session")
+		if err != nil {
+			return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
+		}
+		sess, err := m.db.GetSessionWithUser(c.Request().Context(), cookie.Value)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
+			}
+			return render.Do(render.Params{
+				Ctx: c,
+				Component: view.Error(
+					"Database operation failed",
+					http.StatusInternalServerError,
+				),
+				Status: http.StatusInternalServerError,
+			})
+		}
+		if !sess.IsAdmin {
+			return c.Redirect(http.StatusSeeOther, "/")
+		}
+		return next(c)
+	}
+}
+
 func (m AuthMiddleware) Required(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		returnTo := url.QueryEscape(c.Request().URL.RequestURI())

@@ -20,7 +20,7 @@ func New(db *sqlc.Queries) API {
 func (a API) Register(app *echo.Echo) {
 	auth := middleware.NewAuthMiddleware(a.db)
 
-	grp := app.Group("/console", auth.Required, auth.AuthInfo)
+	grp := app.Group("/console", auth.Required, auth.AdminOnly, auth.AuthInfo)
 
 	// overview
 	grp.GET("", a.overviewPage)

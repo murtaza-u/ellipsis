@@ -11,7 +11,7 @@ import (
 
 templ Users(users []sqlc.User) {
 	<div class="overflow-x-auto">
-		<table class="table">
+		<table class="table whitespace-nowrap">
 			<thead>
 				<tr>
 					<th>Avatar</th>
@@ -30,9 +30,7 @@ templ Users(users []sqlc.User) {
 						<td>{ timeago.English.Format(u.CreatedAt) }</td>
 						<td>
 							if u.IsAdmin {
-								<span class="text-success">
-									@icon.Dot(32)
-								</span>
+								@icon.Check(32)
 							}
 						</td>
 					</tr>

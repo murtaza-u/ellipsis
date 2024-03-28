@@ -39,12 +39,16 @@ SELECT
     session.expires_at,
     user.id as user_id,
     user.email,
-    user.avatar_url
+    user.avatar_url,
+    user.is_admin
 FROM
     session
-INNER JOIN user
-ON session.user_id = user.id
-WHERE session.id = ?;
+INNER JOIN
+    user
+ON
+    session.user_id = user.id
+WHERE
+    session.id = ?;
 
 -- name: GetSessionWithClient :one
 SELECT
@@ -55,9 +59,12 @@ SELECT
     client.backchannel_logout_url
 FROM
     session
-INNER JOIN client
-ON session.client_id = client.id
-WHERE session.id = ?;
+INNER JOIN
+    client
+ON
+    session.client_id = client.id
+WHERE
+    session.id = ?;
 
 -- name: GetSessionWithOptionalClient :one
 SELECT
@@ -68,9 +75,12 @@ SELECT
     client.backchannel_logout_url
 FROM
     session
-LEFT JOIN client
-ON session.client_id = client.id
-WHERE session.id = ?;
+LEFT JOIN
+    client
+ON
+    session.client_id = client.id
+WHERE
+    session.id = ?;
 
 -- name: GetSessionWithClientForUserID :many
 SELECT
@@ -82,9 +92,12 @@ SELECT
     client.name as client_name
 FROM
     session
-LEFT JOIN client
-ON session.client_id = client.id
-WHERE session.user_id = ?;
+LEFT JOIN
+    client
+ON
+    session.client_id = client.id
+WHERE
+    session.user_id = ?;
 
 -- name: GetAuthzHistory :one
 SELECT * FROM authorization_history
@@ -111,27 +124,32 @@ INSERT INTO client (
     backchannel_logout_url,
     token_expiration
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?, ?
 );
 
 -- name: CreateSession :execresult
-INSERT INTO session (id, user_id, client_id, expires_at, os, browser) VALUES (
+INSERT INTO session (
+    id,
+    user_id,
+    client_id,
+    expires_at,
+    os,
+    browser
+) VALUES (
     ?, ?, ?, ?, ?, ?
 );
 
 -- name: CreateAuthzHistory :execresult
-INSERT INTO authorization_history (user_id, client_id) VALUES (
-    ?, ?
-);
+INSERT INTO authorization_history (user_id, client_id) VALUES (?, ?);
 
 -- name: CreateAuthzCode :execresult
 INSERT INTO authorization_code (
-	id,
-	user_id,
-	client_id,
-	scopes,
-	os,
-	browser
+    id,
+    user_id,
+    client_id,
+    scopes,
+    os,
+    browser
 ) VALUES (
     ?, ?, ?, ?, ?, ?
 );

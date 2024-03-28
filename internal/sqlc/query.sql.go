@@ -13,12 +13,12 @@ import (
 
 const createAuthzCode = `-- name: CreateAuthzCode :execresult
 INSERT INTO authorization_code (
-	id,
-	user_id,
-	client_id,
-	scopes,
-	os,
-	browser
+    id,
+    user_id,
+    client_id,
+    scopes,
+    os,
+    browser
 ) VALUES (
     ?, ?, ?, ?, ?, ?
 )
@@ -45,9 +45,7 @@ func (q *Queries) CreateAuthzCode(ctx context.Context, arg CreateAuthzCodeParams
 }
 
 const createAuthzHistory = `-- name: CreateAuthzHistory :execresult
-INSERT INTO authorization_history (user_id, client_id) VALUES (
-    ?, ?
-)
+INSERT INTO authorization_history (user_id, client_id) VALUES (?, ?)
 `
 
 type CreateAuthzHistoryParams struct {
@@ -70,7 +68,7 @@ INSERT INTO client (
     backchannel_logout_url,
     token_expiration
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?, ?
 )
 `
 
@@ -99,7 +97,14 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (sql
 }
 
 const createSession = `-- name: CreateSession :execresult
-INSERT INTO session (id, user_id, client_id, expires_at, os, browser) VALUES (
+INSERT INTO session (
+    id,
+    user_id,
+    client_id,
+    expires_at,
+    os,
+    browser
+) VALUES (
     ?, ?, ?, ?, ?, ?
 )
 `
@@ -350,9 +355,12 @@ SELECT
     client.backchannel_logout_url
 FROM
     session
-INNER JOIN client
-ON session.client_id = client.id
-WHERE session.id = ?
+INNER JOIN
+    client
+ON
+    session.client_id = client.id
+WHERE
+    session.id = ?
 `
 
 type GetSessionWithClientRow struct {
@@ -386,9 +394,12 @@ SELECT
     client.name as client_name
 FROM
     session
-LEFT JOIN client
-ON session.client_id = client.id
-WHERE session.user_id = ?
+LEFT JOIN
+    client
+ON
+    session.client_id = client.id
+WHERE
+    session.user_id = ?
 `
 
 type GetSessionWithClientForUserIDRow struct {
@@ -439,9 +450,12 @@ SELECT
     client.backchannel_logout_url
 FROM
     session
-LEFT JOIN client
-ON session.client_id = client.id
-WHERE session.id = ?
+LEFT JOIN
+    client
+ON
+    session.client_id = client.id
+WHERE
+    session.id = ?
 `
 
 type GetSessionWithOptionalClientRow struct {
@@ -471,12 +485,16 @@ SELECT
     session.expires_at,
     user.id as user_id,
     user.email,
-    user.avatar_url
+    user.avatar_url,
+    user.is_admin
 FROM
     session
-INNER JOIN user
-ON session.user_id = user.id
-WHERE session.id = ?
+INNER JOIN
+    user
+ON
+    session.user_id = user.id
+WHERE
+    session.id = ?
 `
 
 type GetSessionWithUserRow struct {
@@ -485,6 +503,7 @@ type GetSessionWithUserRow struct {
 	UserID    string
 	Email     string
 	AvatarUrl sql.NullString
+	IsAdmin   bool
 }
 
 func (q *Queries) GetSessionWithUser(ctx context.Context, id string) (GetSessionWithUserRow, error) {
@@ -496,6 +515,7 @@ func (q *Queries) GetSessionWithUser(ctx context.Context, id string) (GetSession
 		&i.UserID,
 		&i.Email,
 		&i.AvatarUrl,
+		&i.IsAdmin,
 	)
 	return i, err
 }
