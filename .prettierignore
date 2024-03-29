@@ -2,6 +2,6 @@
 pnpm-lock.yaml
 package-lock.json
 yarn.lock
-/static/css/tailwind.css
+/api/static/css/tailwind.css
 /.direnv
 /flake.lock
