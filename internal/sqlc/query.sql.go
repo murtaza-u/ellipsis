@@ -173,7 +173,7 @@ func (q *Queries) DeleteClient(ctx context.Context, id string) error {
 
 const deleteSession = `-- name: DeleteSession :exec
 DELETE FROM session
-WHERE id = ? OR expires_at <= NOW()
+WHERE id = ? OR expires_at <= CURRENT_TIMESTAMP
 `
 
 func (q *Queries) DeleteSession(ctx context.Context, id string) error {

@@ -14,8 +14,8 @@
           pname = "ellipsis";
           version = version;
           src = ./.;
-          vendorHash = "sha256-+D3//4UNiwUZFJ/GG0QveQGOeeQBhSc97d1TRo7LzEo=";
-          CGO_ENABLED = 0;
+          vendorHash = "sha256-HieSQxFYcfzp+WCv4JxgpTRf+A/HbGK6qAy7hDgnAZs=";
+          CGO_ENABLED = 1;
           subPackages = [ "cmd/ellipsis" ];
         };
         dockerImage = pkgs.dockerTools.buildImage {

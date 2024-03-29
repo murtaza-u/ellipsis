@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/murtaza-u/ellipsis/api/console"
@@ -31,13 +32,28 @@ func New(c conf.C) (*Server, error) {
 		return nil, fmt.Errorf("failed to validate config: %w", err)
 	}
 
-	db, err := db.New(db.Config{
-		User:     c.Mysql.User,
-		Pass:     c.Mysql.Password,
-		Database: c.Mysql.Database,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize database: %w", err)
+	var conn *sql.DB
+
+	if c.DB.Mysql.Enable {
+		conn, err = db.NewMySQL(db.MySQLConfig{
+			User:     c.DB.Mysql.User,
+			Pass:     c.DB.Mysql.Password,
+			Database: c.DB.Mysql.Database,
+		})
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to instantiate to mysql database: %w", err)
+		}
+	}
+
+	if c.DB.Sqlite.Enable {
+		conn, err = db.NewSqlite(db.SqliteConfig{
+			Path: c.DB.Sqlite.Path,
+		})
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to instantiate to sqlite database: %w", err)
+		}
 	}
 
 	app := echo.New()
@@ -52,7 +68,7 @@ func New(c conf.C) (*Server, error) {
 	return &Server{
 		C:       c,
 		app:     app,
-		queries: sqlc.New(db),
+		queries: sqlc.New(conn),
 		fs:      s3,
 	}, nil
 }

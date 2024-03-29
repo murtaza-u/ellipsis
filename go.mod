@@ -12,6 +12,7 @@ require (
 	github.com/gorilla/sessions v1.2.2
 	github.com/labstack/echo-contrib v0.16.0
 	github.com/labstack/echo/v4 v4.11.4
+	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/mileusna/useragent v1.3.4
 	github.com/wagslane/go-password-validator v0.3.0
 	github.com/xeonx/timeago v1.0.0-rc5

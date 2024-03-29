@@ -182,7 +182,7 @@ WHERE id = ?;
 
 -- name: DeleteSession :exec
 DELETE FROM session
-WHERE id = ? OR expires_at <= NOW();
+WHERE id = ? OR expires_at <= CURRENT_TIMESTAMP;
 
 -- name: DeleteAuthzCode :exec
 DELETE FROM authorization_code

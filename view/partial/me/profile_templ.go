@@ -53,7 +53,7 @@ func ChangeAvatar(avatarURL string, err map[string]error) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/\" method=\"post\" class=\"w-full lg:w-1/2 space-y-2\" enctype=\"multipart/form-data\" hx-indicator=\"#spinner\"><div class=\"avatar\"><div class=\"w-24 mask mask-circle\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/\" method=\"post\" class=\"w-full lg:w-1/2 space-y-2\" enctype=\"multipart/form-data\"><div class=\"avatar\"><div class=\"w-24 mask mask-circle\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -65,7 +65,7 @@ func ChangeAvatar(avatarURL string, err map[string]error) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(avatarURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 21, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 20, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -118,7 +118,7 @@ func ChangeAvatar(avatarURL string, err map[string]error) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(err["avatar"].Error())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 45, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 44, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -129,7 +129,7 @@ func ChangeAvatar(avatarURL string, err map[string]error) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span class=\"label-text-alt\">File size must be less than 512KB</span></div></label><div class=\"flex items-center justify-end\"><button class=\"my-4 btn btn-primary w-full md:w-fit\">Change Avatar <span id=\"spinner\" class=\"ml-1 hidden loading loading-spinner\"></span></button></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span class=\"label-text-alt\">File size must be less than 512KB</span></div></label><div class=\"flex items-center justify-end\"><button class=\"my-4 btn btn-primary w-full md:w-fit\">Change Avatar</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -317,7 +317,7 @@ func ChangePassword(values ChangePasswordParams, err map[string]error, success b
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(values.OldPassword)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 204, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 199, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -348,7 +348,7 @@ func ChangePassword(values ChangePasswordParams, err map[string]error, success b
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(err["old_password"].Error())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 214, Col: 36}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 209, Col: 36}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -383,7 +383,7 @@ func ChangePassword(values ChangePasswordParams, err map[string]error, success b
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(values.NewPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 231, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 226, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -414,7 +414,7 @@ func ChangePassword(values ChangePasswordParams, err map[string]error, success b
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(err["new_password"].Error())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 241, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 236, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -444,7 +444,7 @@ func ChangePassword(values ChangePasswordParams, err map[string]error, success b
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(values.NewConfirmPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 258, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 253, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -475,7 +475,7 @@ func ChangePassword(values ChangePasswordParams, err map[string]error, success b
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(err["new_confirm_password"].Error())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 268, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `view/partial/me/profile.templ`, Line: 263, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {

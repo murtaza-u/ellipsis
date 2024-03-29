@@ -18,17 +18,28 @@ type C struct {
 	Port                 uint16    `yaml:"port"`
 	KeyStore             string    `yaml:"keyStore"`
 	SessionEncryptionKey string    `yaml:"sessionEncryptionKey"`
-	Mysql                Mysql     `yaml:"mysql"`
+	DB                   DB        `yaml:"db"`
 	Providers            Providers `yaml:"providers"`
 	S3                   S3        `yaml:"s3"`
 
 	Key Key
 }
 
+type DB struct {
+	Mysql  Mysql  `yaml:"mysql"`
+	Sqlite Sqlite `yaml:"sqlite"`
+}
+
 type Mysql struct {
+	Enable   bool   `yaml:"enable"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
 	Database string `yaml:"database"`
+}
+
+type Sqlite struct {
+	Enable bool   `yaml:"enable"`
+	Path   string `yaml:"path"`
 }
 
 type Providers struct {
@@ -88,14 +99,30 @@ func (c *C) Validate() error {
 		return err
 	}
 
-	if c.Mysql.User == "" {
-		return fmt.Errorf("missing database user")
+	if c.DB.Mysql.Enable && c.DB.Sqlite.Enable {
+		return fmt.Errorf("multiple databases enabled")
 	}
-	if c.Mysql.Password == "" {
-		return fmt.Errorf("missing database password")
+
+	if !c.DB.Mysql.Enable && !c.DB.Sqlite.Enable {
+		return fmt.Errorf("no databases enabled")
 	}
-	if c.Mysql.Database == "" {
-		return fmt.Errorf("missing database")
+
+	if c.DB.Mysql.Enable {
+		if c.DB.Mysql.User == "" {
+			return fmt.Errorf("missing mysql user")
+		}
+		if c.DB.Mysql.Password == "" {
+			return fmt.Errorf("missing mysql password")
+		}
+		if c.DB.Mysql.Database == "" {
+			return fmt.Errorf("missing mysql database")
+		}
+	}
+
+	if c.DB.Sqlite.Enable {
+		if c.DB.Sqlite.Path == "" {
+			return fmt.Errorf("missing sqlite file path")
+		}
 	}
 
 	var providers = []Provider{

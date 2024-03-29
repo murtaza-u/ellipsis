@@ -13,7 +13,6 @@ templ ChangeAvatar(avatarURL string, err map[string]error) {
 		method="post"
 		class="w-full lg:w-1/2 space-y-2"
 		enctype="multipart/form-data"
-		hx-indicator="#spinner"
 	>
 		<div class="avatar">
 			<div class="w-24 mask mask-circle">
@@ -51,10 +50,6 @@ templ ChangeAvatar(avatarURL string, err map[string]error) {
 		<div class="flex items-center justify-end">
 			<button class="my-4 btn btn-primary w-full md:w-fit">
 				Change Avatar
-				<span
-					id="spinner"
-					class="ml-1 hidden loading loading-spinner"
-				></span>
 			</button>
 		</div>
 		@initCropper()

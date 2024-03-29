@@ -3,7 +3,7 @@ tmp_dir = "bin"
 
 [build]
   bin = "./bin/main"
-  cmd = "go build -o ./bin/main ./cmd/account"
+  cmd = "CGO_ENABLED=1 go build -o ./bin/main ./cmd/account"
   delay = 1000
   exclude_dir = ["bin", "static", "node_modules"]
   exclude_unchanged = false

@@ -18,13 +18,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (Server) SignUpPage(c echo.Context) error {
+func (s Server) SignUpPage(c echo.Context) error {
 	return render.Do(render.Params{
 		Ctx: c,
 		Component: layout.Base(
 			"Sign Up | Ellipsis",
 			view.SignUp(view.SignUpParams{
-				ReturnTo: c.QueryParam("return_to"),
+				ReturnTo:  c.QueryParam("return_to"),
+				Providers: s.Providers,
 			}, map[string]error{}),
 		),
 	})
@@ -43,6 +44,7 @@ func (s Server) SignUp(c echo.Context) error {
 		})
 	}
 	params.ReturnTo = c.QueryParam("return_to")
+	params.Providers = s.Providers
 
 	errMap := make(map[string]error)
 

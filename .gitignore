@@ -34,3 +34,4 @@ go.work.sum
 /example
 /keys
 /config.yaml
+/data.db

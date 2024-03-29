@@ -2,7 +2,14 @@ version: '2'
 sql:
   - engine: 'mysql'
     queries: 'schema/query.sql'
-    schema: 'schema/schema.sql'
+    schema: 'schema/mysql-schema.sql'
+    gen:
+      go:
+        package: 'sqlc'
+        out: 'internal/sqlc'
+  - engine: 'sqlite'
+    queries: 'schema/query.sql'
+    schema: 'schema/sqlite-schema.sql'
     gen:
       go:
         package: 'sqlc'
