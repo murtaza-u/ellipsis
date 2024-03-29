@@ -1,0 +1,10 @@
+services:
+  ellipsis:
+    restart: always
+    image: murtazau/ellipsis:24.03
+    ports:
+      - 3000:3000
+    volumes:
+      - /etc/ellipsis:/etc/ellipsis
+    environment:
+      - ELLIPSIS_CONFIG=/etc/ellipsis/config.yaml
