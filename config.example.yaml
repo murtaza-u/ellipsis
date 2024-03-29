@@ -1,0 +1,29 @@
+baseURL: https://example.com # used as the issuer
+port: 3000
+keyStore: /etc/ellipsis/keys
+sessionEncryptionKey: CHANGE_ME # used to encrypt session cookie
+db:
+  sqlite:
+    enable: false
+    path: /var/lib/ellipsis/sqlite/data.db
+  mysql:
+    enable: false
+    user: notroot
+    password: not123
+    database: ellipsis
+  turso:
+    enable: false
+    database: turso db list
+    authToken: turso db tokens create database_name
+providers:
+  google:
+    enable: false
+    clientID: CHANGE_ME
+    clientSecret: CHANGE_ME
+  github:
+    enable: false
+    clientID: CHANGE_ME
+    clientSecret: CHANGE_ME
+s3:
+  region: AWS_REGION # change me
+  bucket: S3_BUCKET_NAME # change me
