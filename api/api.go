@@ -56,6 +56,17 @@ func New(c conf.C) (*Server, error) {
 		}
 	}
 
+	if c.DB.Turso.Enable {
+		conn, err = db.NewTurso(db.TursoConfig{
+			Database: c.DB.Turso.Database,
+			AuthToken: c.DB.Turso.AuthToken,
+		})
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to instantiate to turso connection: %w", err)
+		}
+	}
+
 	app := echo.New()
 	app.Pre(echoMiddleware.RemoveTrailingSlash())
 	app.Use(session.Middleware(sessions.NewCookieStore([]byte(c.SessionEncryptionKey))))

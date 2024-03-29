@@ -41,3 +41,18 @@ func (c SqliteConfig) validate() error {
 	}
 	return nil
 }
+
+type TursoConfig struct {
+	Database  string
+	AuthToken string
+}
+
+func (c TursoConfig) validate() error {
+	if c.Database == "" {
+		return fmt.Errorf("missing turso database")
+	}
+	if c.AuthToken == "" {
+		return fmt.Errorf("missing turso auth token")
+	}
+	return nil
+}

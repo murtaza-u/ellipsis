@@ -28,6 +28,7 @@ type C struct {
 type DB struct {
 	Mysql  Mysql  `yaml:"mysql"`
 	Sqlite Sqlite `yaml:"sqlite"`
+	Turso  Turso  `yaml:"turso"`
 }
 
 type Mysql struct {
@@ -40,6 +41,12 @@ type Mysql struct {
 type Sqlite struct {
 	Enable bool   `yaml:"enable"`
 	Path   string `yaml:"path"`
+}
+
+type Turso struct {
+	Enable    bool   `yaml:"enable"`
+	Database  string `yaml:"database"`
+	AuthToken string `yaml:"authToken"`
 }
 
 type Providers struct {
@@ -99,11 +106,22 @@ func (c *C) Validate() error {
 		return err
 	}
 
-	if c.DB.Mysql.Enable && c.DB.Sqlite.Enable {
-		return fmt.Errorf("multiple databases enabled")
+	var dbEnabled int
+
+	if c.DB.Mysql.Enable {
+		dbEnabled ++
+	}
+	if c.DB.Sqlite.Enable {
+		dbEnabled ++
+	}
+	if c.DB.Turso.Enable {
+		dbEnabled ++
 	}
 
-	if !c.DB.Mysql.Enable && !c.DB.Sqlite.Enable {
+	if dbEnabled > 1 {
+		return fmt.Errorf("multiple databases enabled")
+	}
+	if dbEnabled == 0 {
 		return fmt.Errorf("no databases enabled")
 	}
 
@@ -122,6 +140,15 @@ func (c *C) Validate() error {
 	if c.DB.Sqlite.Enable {
 		if c.DB.Sqlite.Path == "" {
 			return fmt.Errorf("missing sqlite file path")
+		}
+	}
+
+	if c.DB.Turso.Enable {
+		if c.DB.Turso.Database == "" {
+			return fmt.Errorf("missing turso database")
+		}
+		if c.DB.Turso.AuthToken == "" {
+			return fmt.Errorf("missing turso auth token")
 		}
 	}
 
