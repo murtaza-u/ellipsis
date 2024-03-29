@@ -85,7 +85,10 @@ func New(c conf.C) (*Server, error) {
 }
 
 func (s Server) Start() error {
-	s.app.Static("/static", "static")
+	err := Static(s.app)
+	if err != nil {
+		return fmt.Errorf("failed to serve static files: %w", err)
+	}
 
 	auth := middleware.NewAuthMiddleware(s.queries)
 

@@ -14,7 +14,7 @@
           pname = "ellipsis";
           version = version;
           src = ./.;
-          vendorHash = "sha256-HieSQxFYcfzp+WCv4JxgpTRf+A/HbGK6qAy7hDgnAZs=";
+          vendorHash = "sha256-QlFzvD8PuNy7j6h+AdFFHNjXSRHNdE8gIu8HXqaluQY=";
           CGO_ENABLED = 1;
           subPackages = [ "cmd/ellipsis" ];
         };
