@@ -29,7 +29,7 @@ func (a API) JWKs(c echo.Context) error {
 				Alg: "EdDSA",
 				Use: "sig",
 				Crv: "Ed25519",
-				X:   base64.StdEncoding.EncodeToString(a.Key.Pub),
+				X:   base64.RawStdEncoding.EncodeToString(a.Key.Pub),
 			},
 		},
 	})
