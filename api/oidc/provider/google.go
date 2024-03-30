@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/api/util"
 	"github.com/murtaza-u/ellipsis/fs"
@@ -64,32 +65,32 @@ func NewGoogleProvider(db *sqlc.Queries, fs fs.Storage, c Credentials) (Provider
 func (p ProviderGoogle) Login(c echo.Context) error {
 	sess, err := session.Get("session", c)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusExpectationFailed,
+			fmt.Errorf("failed to read session cookie store: %w", err),
+			layout.Base(
 				"Login - Google | Ellipsis",
 				view.Error(
-					"failed to get session",
+					"an internal error occured",
 					http.StatusExpectationFailed,
 				),
 			),
-			Status: http.StatusExpectationFailed,
-		})
+		)
 	}
 
 	state, err := util.GenerateRandom(25)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to generate random string: %w", err),
+			layout.Base(
 				"Login - Google | Ellipsis",
 				view.Error(
 					"failed to generate state",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	returnTo := c.QueryParam("return_to")
@@ -100,17 +101,17 @@ func (p ProviderGoogle) Login(c echo.Context) error {
 	sess.Values["state"] = state
 	sess.Values["return_to"] = returnTo
 	if err := sess.Save(c.Request(), c.Response()); err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to save to session cookie: %w", err),
+			layout.Base(
 				"Login - Google | Ellipsis",
 				view.Error(
-					"failed to save to session",
+					"an internal error occured",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	return c.Redirect(http.StatusSeeOther, p.AuthCodeURL(state))
@@ -149,17 +150,17 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 
 	sess, err := session.Get("session", c)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusExpectationFailed,
+			fmt.Errorf("failed to read session cookie store: %w", err),
+			layout.Base(
 				"Callback - Google | Ellipsis",
 				view.Error(
-					"failed to get session",
+					"an internal error occured",
 					http.StatusExpectationFailed,
 				),
 			),
-			Status: http.StatusExpectationFailed,
-		})
+		)
 	}
 
 	state, ok := sess.Values["state"].(string)
@@ -194,17 +195,17 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 
 	tkn, err := p.Exchange(c.Request().Context(), q.Code)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusExpectationFailed,
+			fmt.Errorf("[Google] failed to exchange code for token: %w", err),
+			layout.Base(
 				"Callback - Google | Ellipsis",
 				view.Error(
 					"failed to exchange code for token",
 					http.StatusExpectationFailed,
 				),
 			),
-			Status: http.StatusExpectationFailed,
-		})
+		)
 	}
 
 	rawIDTkn, ok := tkn.Extra("id_token").(string)
@@ -270,32 +271,32 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 
 	userID, err := p.InsertUser(c.Request().Context(), user)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusExpectationFailed,
+			fmt.Errorf("failed to insert user into db: %w", err),
+			layout.Base(
 				"Callback - GitHub | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	sessID, err := util.GenerateRandom(25)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to generate random string: %w", err),
+			layout.Base(
 				"Callback - Google | Ellipsis",
 				view.Error(
 					"failed to generate session ID",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	var ua useragent.UserAgent
@@ -324,17 +325,17 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		Os:        os,
 	})
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to insert session into db: %w", err),
+			layout.Base(
 				"Callback - Google | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	c.SetCookie(&http.Cookie{

@@ -3,7 +3,10 @@ package api
 import (
 	"database/sql"
 	"fmt"
+	"log/slog"
+	"os"
 
+	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/console"
 	"github.com/murtaza-u/ellipsis/api/me"
 	"github.com/murtaza-u/ellipsis/api/middleware"
@@ -58,7 +61,7 @@ func New(c conf.C) (*Server, error) {
 
 	if c.DB.Turso.Enable {
 		conn, err = db.NewTurso(db.TursoConfig{
-			Database: c.DB.Turso.Database,
+			Database:  c.DB.Turso.Database,
 			AuthToken: c.DB.Turso.AuthToken,
 		})
 		if err != nil {
@@ -71,10 +74,20 @@ func New(c conf.C) (*Server, error) {
 	app.Pre(echoMiddleware.RemoveTrailingSlash())
 	app.Use(session.Middleware(sessions.NewCookieStore([]byte(c.SessionEncryptionKey))))
 
+	// set custom error handler
+	app.HTTPErrorHandler = apierr.Handler
+
 	s3, err := fs.NewS3Store(c.S3.Region, c.S3.Bucket)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize s3: %w", err)
 	}
+
+	opt := &slog.HandlerOptions{Level: slog.LevelInfo}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, opt))
+	if c.JsonLogger {
+		logger = slog.New(slog.NewJSONHandler(os.Stdout, opt))
+	}
+	slog.SetDefault(logger)
 
 	return &Server{
 		C:       c,

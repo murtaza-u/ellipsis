@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/api/util"
@@ -84,14 +85,14 @@ func (a API) consent(c echo.Context) error {
 				Status: http.StatusBadRequest,
 			})
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read client from db: %w", err),
+			view.Error(
 				"Database operation failed",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	var userID string
@@ -107,14 +108,14 @@ func (a API) consent(c echo.Context) error {
 		},
 	)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to insert authz history in db: %w", err),
+			view.Error(
 				"Database operation failed",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	if !isBoosted {
@@ -167,17 +168,17 @@ func (a API) authorize(c echo.Context) error {
 				Status: http.StatusBadRequest,
 			})
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read client from db: %w", err),
+			layout.Base(
 				"Authorization | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	p.RedirectURI = strings.TrimSpace(p.RedirectURI)
@@ -224,17 +225,17 @@ func (a API) authorize(c echo.Context) error {
 	}
 	u, err := a.DB.GetUser(c.Request().Context(), userID)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read user from db: %w", err),
+			layout.Base(
 				"Authorization | Ellipsis",
 				view.Error(
 					"An internal error occured",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	_, err = a.DB.GetAuthzHistory(
@@ -254,17 +255,17 @@ func (a API) authorize(c echo.Context) error {
 				),
 			})
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read authz history from db: %w", err),
+			layout.Base(
 				"Authorization | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	redirectStat := http.StatusTemporaryRedirect

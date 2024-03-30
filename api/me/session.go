@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/oidc"
 	"github.com/murtaza-u/ellipsis/api/render"
@@ -48,9 +49,10 @@ func (a API) SessionPage(c echo.Context) error {
 			h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
 			return h.Component.Render(c.Request().Context(), r)
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read session with client from db: %w", err),
+			layout.Base(
 				"My Account - Sessions | Ellipsis",
 				view.Me(
 					"/session",
@@ -61,8 +63,7 @@ func (a API) SessionPage(c echo.Context) error {
 					),
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 	return render.Do(render.Params{
 		Ctx: c,
@@ -94,17 +95,17 @@ func (a API) DeleteSessionPage(c echo.Context) error {
 				Status: http.StatusBadRequest,
 			})
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read session with optional client: %w", err),
+			layout.Base(
 				"Revoke Session | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 	return render.Do(render.Params{
 		Ctx: c,
@@ -165,17 +166,17 @@ func (a API) DeleteSession(c echo.Context) error {
 				Status: http.StatusBadRequest,
 			})
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read session with optional client: %w", err),
+			layout.Base(
 				"Revoke Session | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	if form.Force || !sess.ClientID.Valid {
@@ -194,17 +195,17 @@ func (a API) DeleteSession(c echo.Context) error {
 					Status: http.StatusBadRequest,
 				})
 			}
-			return render.Do(render.Params{
-				Ctx: c,
-				Component: layout.Base(
+			return apierr.New(
+				http.StatusInternalServerError,
+				fmt.Errorf("failed to delete session from db: %w", err),
+				layout.Base(
 					"Revoke Session | Ellipsis",
 					view.Error(
 						"database operation failed",
 						http.StatusInternalServerError,
 					),
 				),
-				Status: http.StatusInternalServerError,
-			})
+			)
 		}
 
 		isBoosted := c.Request().Header.Get("HX-Boosted") != ""
@@ -235,17 +236,17 @@ func (a API) DeleteSession(c echo.Context) error {
 
 	tkn, err := a.createLogoutTkn(sess.ID, sess.ClientID.String)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to generate logout token: %w", err),
+			layout.Base(
 				"Revoke Session | Ellipsis",
 				view.Error(
 					"failed to generate logout token",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	err = a.backchannelLogout(
@@ -269,17 +270,17 @@ func (a API) DeleteSession(c echo.Context) error {
 
 	err = a.db.DeleteSession(c.Request().Context(), form.ID)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to delete session from db: %w", err),
+			layout.Base(
 				"Revoke Session | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	isBoosted := c.Request().Header.Get("HX-Boosted") != ""

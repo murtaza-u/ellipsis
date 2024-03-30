@@ -14,6 +14,7 @@ import (
 )
 
 type C struct {
+	JsonLogger           bool      `yaml:"jsonLogger"`
 	BaseURL              string    `yaml:"baseURL"`
 	Port                 uint16    `yaml:"port"`
 	KeyStore             string    `yaml:"keyStore"`
@@ -109,13 +110,13 @@ func (c *C) Validate() error {
 	var dbEnabled int
 
 	if c.DB.Mysql.Enable {
-		dbEnabled ++
+		dbEnabled++
 	}
 	if c.DB.Sqlite.Enable {
-		dbEnabled ++
+		dbEnabled++
 	}
 	if c.DB.Turso.Enable {
-		dbEnabled ++
+		dbEnabled++
 	}
 
 	if dbEnabled > 1 {

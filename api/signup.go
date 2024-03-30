@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/mail"
 
+	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/api/util"
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
@@ -53,17 +55,17 @@ func (s Server) SignUp(c echo.Context) error {
 	}
 	exists, err := s.userExists(c.Request().Context(), params.Email)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read user from db: %w", err),
+			layout.Base(
 				"Sign Up | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 	if exists {
 		errMap["email"] = errors.New("user already exists")
@@ -90,32 +92,32 @@ func (s Server) SignUp(c echo.Context) error {
 
 	hash, err := argon2id.CreateHash(params.Password, argon2id.DefaultParams)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to create argon2id hash: %w", err),
+			layout.Base(
 				"Sign Up | Ellipsis",
 				view.Error(
 					"Failed to hash password",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	userID, err := util.GenerateRandom(25)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to generate random string: %w", err),
+			layout.Base(
 				"Sign Up | Ellipsis",
 				view.Error(
 					"failed to generate user id",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	_, err = s.queries.CreateUser(c.Request().Context(), sqlc.CreateUserParams{
@@ -124,17 +126,17 @@ func (s Server) SignUp(c echo.Context) error {
 		HashedPassword: sql.NullString{String: hash, Valid: true},
 	})
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to insert new user in db: %w", err),
+			layout.Base(
 				"Sign Up | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	returnTo := params.ReturnTo

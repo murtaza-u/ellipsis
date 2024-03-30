@@ -3,9 +3,11 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/api/util"
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
@@ -80,17 +82,17 @@ func (s Server) Login(c echo.Context) error {
 				Status: http.StatusBadRequest,
 			})
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read user from db: %w", err),
+			layout.Base(
 				"Login | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 	if !u.HashedPassword.Valid {
 		errMap["email"] = errors.New("invalid E-Mail or password")
@@ -108,17 +110,17 @@ func (s Server) Login(c echo.Context) error {
 	hash := u.HashedPassword.String
 	match, err := argon2id.ComparePasswordAndHash(params.Password, hash)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to compare argon2id hash with plain-text: %w", err),
+			layout.Base(
 				"Login | Ellipsis",
 				view.Error(
 					"Failed to validate credentials",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 	if !match {
 		errMap["email"] = errors.New("invalid E-Mail or password")
@@ -135,17 +137,17 @@ func (s Server) Login(c echo.Context) error {
 
 	sessionID, err := util.GenerateRandom(25)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to generate random string: %w", err),
+			layout.Base(
 				"Login | Ellipsis",
 				view.Error(
 					"Failed to generate session id",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	var ua useragent.UserAgent
@@ -172,17 +174,17 @@ func (s Server) Login(c echo.Context) error {
 		},
 	)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to insert session into db: %w", err),
+			layout.Base(
 				"Login | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	c.SetCookie(&http.Cookie{

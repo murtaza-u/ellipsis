@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/api/util"
@@ -77,9 +78,10 @@ func (a API) ChangeAvatar(c echo.Context) error {
 
 	file, err := avatar.Open()
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to open form file: %w", err),
+			layout.Base(
 				"My Account | Ellipsis",
 				view.Me(
 					"/", avatarURL,
@@ -89,15 +91,15 @@ func (a API) ChangeAvatar(c echo.Context) error {
 					),
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 	defer file.Close()
 
 	if err := a.fs.Put(userID, file); err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to upload avatar to file storage: %w", err),
+			layout.Base(
 				"My Account | Ellipsis",
 				view.Me(
 					"/", avatarURL,
@@ -107,15 +109,15 @@ func (a API) ChangeAvatar(c echo.Context) error {
 					),
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	url, err := a.fs.GetURL(userID)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to fetch avatar url from file storage: %w", err),
+			layout.Base(
 				"My Account | Ellipsis",
 				view.Me(
 					"/", avatarURL,
@@ -125,8 +127,7 @@ func (a API) ChangeAvatar(c echo.Context) error {
 					),
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	err = a.db.UpdateUserAvatar(
@@ -137,9 +138,10 @@ func (a API) ChangeAvatar(c echo.Context) error {
 		},
 	)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to update user avatar in db: %w", err),
+			layout.Base(
 				"My Account | Ellipsis",
 				view.Me(
 					"/", avatarURL,
@@ -149,8 +151,7 @@ func (a API) ChangeAvatar(c echo.Context) error {
 					),
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	return render.Do(render.Params{
@@ -180,17 +181,17 @@ func (a API) ChangePasswordPage(c echo.Context) error {
 			h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
 			return h.Component.Render(c.Request().Context(), r)
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read user from db: %w", err),
+			layout.Base(
 				"My Account - Change Password | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	return render.Do(render.Params{
@@ -246,30 +247,28 @@ func (a API) ChangePassword(c echo.Context) error {
 			h := templ.Handler(view.Empty(), templ.WithStatus(http.StatusOK))
 			return h.Component.Render(c.Request().Context(), r)
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read user from db: %w", err),
+			view.Error(
 				"database operation failed",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	var match bool
 	hash := u.HashedPassword
 	if hash.Valid {
 		match, err = argon2id.ComparePasswordAndHash(form.OldPassword, hash.String)
-		if err != nil {
-			return render.Do(render.Params{
-				Ctx: c,
-				Component: view.Error(
-					"failed to validate old password",
-					http.StatusInternalServerError,
-				),
-				Status: http.StatusInternalServerError,
-			})
-		}
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to compare argon2id hash with plain-text: %w", err),
+			view.Error(
+				"failed to validate old password",
+				http.StatusInternalServerError,
+			),
+		)
 	}
 
 	errMap := make(map[string]error)
@@ -296,14 +295,14 @@ func (a API) ChangePassword(c echo.Context) error {
 
 	newHash, err := argon2id.CreateHash(form.NewPassword, argon2id.DefaultParams)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to create argon2id hash: %w", err),
+			view.Error(
 				"failed to hash new password",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	err = a.db.UpdateUserPasswordHash(
@@ -314,14 +313,14 @@ func (a API) ChangePassword(c echo.Context) error {
 		},
 	)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to update user's password hash in db: %w", err),
+			view.Error(
 				"database operation failed",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	return render.Do(render.Params{

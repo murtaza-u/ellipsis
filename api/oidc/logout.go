@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/view"
 	"github.com/murtaza-u/ellipsis/view/layout"
@@ -146,17 +147,17 @@ func (a API) Logout(c echo.Context) error {
 
 	err = a.DB.DeleteSession(c.Request().Context(), claims.SID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to delete session from db: %w", err),
+			layout.Base(
 				"Logout | Ellipsis",
 				view.Error(
 					"database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	if q.State != "" {

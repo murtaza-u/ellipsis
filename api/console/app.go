@@ -3,8 +3,10 @@ package console
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 
+	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/api/util"
@@ -21,17 +23,17 @@ import (
 func (a API) appsPage(c echo.Context) error {
 	clients, err := a.db.GetClients(c.Request().Context())
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read clients from db: %w", err),
+			layout.Base(
 				"Console - Apps | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	var avatarURL string
@@ -79,17 +81,17 @@ func (a API) appPage(c echo.Context) error {
 				Status: http.StatusBadRequest,
 			})
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: layout.Base(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read client from db: %w", err),
+			layout.Base(
 				"Console - App | Ellipsis",
 				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	var avatarURL string
@@ -138,14 +140,14 @@ func (a API) createApp(c echo.Context) error {
 	if errMap["name"] == nil {
 		_, err := a.db.GetClientByName(c.Request().Context(), params.Name)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return render.Do(render.Params{
-				Ctx: c,
-				Component: view.Error(
+			return apierr.New(
+				http.StatusInternalServerError,
+				fmt.Errorf("faield to read client by name: %w", err),
+				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
-				Status: http.StatusInternalServerError,
-			})
+			)
 		}
 		if err == nil {
 			errMap["name"] = errors.New("name already in use")
@@ -162,38 +164,38 @@ func (a API) createApp(c echo.Context) error {
 	// generating client credentials
 	id, err := util.GenerateRandom(25)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to generate random string: %w", err),
+			view.Error(
 				"Failed to generate client id",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	secret, err := util.GenerateRandom(70)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to generate random string: %w", err),
+			view.Error(
 				"Failed to generate client secret",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	hash, err := argon2id.CreateHash(secret, argon2id.DefaultParams)
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to create argon2id hash: %w", err),
+			view.Error(
 				"Failed to hash secret",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	var pictureUrl sql.NullString
@@ -219,14 +221,14 @@ func (a API) createApp(c echo.Context) error {
 		TokenExpiration:      int64(params.IDTokenExpiration),
 	})
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to insert client into db: %w", err),
+			view.Error(
 				"Database operation failed",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	return render.Do(render.Params{
@@ -271,14 +273,14 @@ func (a API) updateApp(c echo.Context) error {
 				Status: http.StatusNotFound,
 			})
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to read client from db: %w", err),
+			view.Error(
 				"Database operation failed",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	v := newAppValidator(*params)
@@ -292,14 +294,14 @@ func (a API) updateApp(c echo.Context) error {
 			},
 		)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return render.Do(render.Params{
-				Ctx: c,
-				Component: view.Error(
+			return apierr.New(
+				http.StatusInternalServerError,
+				fmt.Errorf("failed to read client from db: %w", err),
+				view.Error(
 					"Database operation failed",
 					http.StatusInternalServerError,
 				),
-				Status: http.StatusInternalServerError,
-			})
+			)
 		}
 		if err == nil {
 			errMap["name"] = errors.New("name already in use")
@@ -335,14 +337,14 @@ func (a API) updateApp(c echo.Context) error {
 		TokenExpiration:      int64(params.IDTokenExpiration),
 	})
 	if err != nil {
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to update client in db: %w", err),
+			view.Error(
 				"Database operation failed",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	return render.Do(render.Params{
@@ -366,14 +368,14 @@ func (a API) deleteApp(c echo.Context) error {
 				Status: http.StatusNotFound,
 			})
 		}
-		return render.Do(render.Params{
-			Ctx: c,
-			Component: view.Error(
+		return apierr.New(
+			http.StatusInternalServerError,
+			fmt.Errorf("faield to delete client from db: %w", err),
+			view.Error(
 				"Database operation failed",
 				http.StatusInternalServerError,
 			),
-			Status: http.StatusInternalServerError,
-		})
+		)
 	}
 
 	// redirect to "/console/app"
