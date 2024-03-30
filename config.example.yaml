@@ -1,3 +1,4 @@
+jsonLogger: false
 baseURL: https://example.com # used as the issuer
 port: 3000
 keyStore: /etc/ellipsis/keys
