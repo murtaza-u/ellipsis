@@ -7,6 +7,7 @@ templ Base(title string, children ...templ.Component) {
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title }</title>
+			@seo()
 			<!-- Google fonts -->
 			@fonts()
 			<!-- favicon -->
@@ -34,4 +35,13 @@ templ fonts() {
 	<link rel="preconnect" href="https://fonts.googleapis.com"/>
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 	<link href="https://fonts.googleapis.com/css2?family=Roboto&family=Ubuntu+Mono&display=swap" rel="stylesheet"/>
+}
+
+templ seo() {
+	<meta name="description" content="Identity in motion, sessions in control"/>
+	<meta property="og:title" content="Ellipsis"/>
+	<meta property="og:type" content="website"/>
+	<!--  Non-Essential, But Recommended -->
+	<meta property="og:site_name" content="Ellipsis"/>
+	<meta property="og:description" content="Identity in motion, sessions in control"/>
 }
