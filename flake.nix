@@ -21,6 +21,9 @@
         dockerImage = pkgs.dockerTools.buildImage {
           name = "murtazau/ellipsis";
           tag = version;
+          copyToRoot = with pkgs.dockerTools; [
+            caCertificates
+          ];
           config = {
             Cmd = [ "${ellipsis}/bin/ellipsis" ];
             WorkingDir = "/data";
