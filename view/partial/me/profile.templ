@@ -57,7 +57,7 @@ templ ChangeAvatar(avatarURL string, err map[string]error) {
 }
 
 templ crop() {
-	<dialog id="crop" class="modal modal-bottom sm:modal-middle">
+	<dialog id="crop-modal" class="modal modal-bottom sm:modal-middle">
 		<div class="modal-box">
 			<div class="w-full">
 				<div>
@@ -70,14 +70,16 @@ templ crop() {
 				</div>
 			</div>
 			<div class="modal-action">
-				<form method="dialog">
-					<!-- if there is a button in form, it will close the modal -->
-					<button class="btn">Cancel</button>
-				</form>
-				<button id="crop-button" class="btn btn-success">Crop</button>
+				<button class="btn" onclick={ closeModal() }>Cancel</button>
+				<button id="crop-button" class="btn btn-primary">Crop</button>
 			</div>
 		</div>
 	</dialog>
+}
+
+script closeModal() {
+	const modal = document.getElementById("crop-modal")
+	modal.classList.remove("modal-open")
 }
 
 script initCropper() {
@@ -157,7 +159,7 @@ script initCropper() {
 	const input = document.getElementById("avatar-input")
 	const btn = document.getElementById("crop-button")
 	const image = document.getElementById("crop-image")
-	const modal = document.getElementById("crop")
+	const modal = document.getElementById("crop-modal")
 	setupCropper(input, btn, image, modal)
 }
 
