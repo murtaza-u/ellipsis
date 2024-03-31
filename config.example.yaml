@@ -1,4 +1,5 @@
-jsonLogger: false
+jsonLogger: false # structure logs in json
+rateLimiting: true # enable rate limiting
 baseURL: https://example.com # used as the issuer
 port: 3000
 keyStore: /etc/ellipsis/keys

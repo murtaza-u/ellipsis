@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 
 	"github.com/murtaza-u/ellipsis/api/apierr"
@@ -11,10 +12,12 @@ import (
 	"github.com/murtaza-u/ellipsis/api/me"
 	"github.com/murtaza-u/ellipsis/api/middleware"
 	"github.com/murtaza-u/ellipsis/api/oidc"
+	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/db"
 	"github.com/murtaza-u/ellipsis/fs"
 	"github.com/murtaza-u/ellipsis/internal/conf"
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/view"
 
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
@@ -71,8 +74,40 @@ func New(c conf.C) (*Server, error) {
 	}
 
 	app := echo.New()
+
+	// trim trailing slash
 	app.Pre(echoMiddleware.RemoveTrailingSlash())
+
+	// session cookie store (used for storing oauth2 state)
 	app.Use(session.Middleware(sessions.NewCookieStore([]byte(c.SessionEncryptionKey))))
+
+	// rate limiting
+	if c.RateLimiting {
+		cfg := echoMiddleware.RateLimiterConfig{
+			Store: echoMiddleware.NewRateLimiterMemoryStore(5),
+			DenyHandler: func(c echo.Context, id string, err error) error {
+				return render.Do(render.Params{
+					Ctx: c,
+					Component: view.Error(
+						"Too many request. You are being rate limited",
+						http.StatusTooManyRequests,
+					),
+					Status: http.StatusTooManyRequests,
+				})
+			},
+			ErrorHandler: func(c echo.Context, err error) error {
+				return render.Do(render.Params{
+					Ctx: c,
+					Component: view.Error(
+						"Failed to extract identifier",
+						http.StatusForbidden,
+					),
+					Status: http.StatusForbidden,
+				})
+			},
+		}
+		app.Use(echoMiddleware.RateLimiterWithConfig(cfg))
+	}
 
 	// set custom error handler
 	app.HTTPErrorHandler = apierr.Handler

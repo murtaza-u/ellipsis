@@ -5,7 +5,7 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      version = "24.03";
+      version = "24.03.31";
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;

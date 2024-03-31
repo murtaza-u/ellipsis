@@ -15,6 +15,7 @@ import (
 
 type C struct {
 	JsonLogger           bool      `yaml:"jsonLogger"`
+	RateLimiting         bool      `yaml:"rateLimiting"`
 	BaseURL              string    `yaml:"baseURL"`
 	Port                 uint16    `yaml:"port"`
 	KeyStore             string    `yaml:"keyStore"`
