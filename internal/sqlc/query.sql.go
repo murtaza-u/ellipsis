@@ -18,19 +18,21 @@ INSERT INTO authorization_code (
     client_id,
     scopes,
     os,
-    browser
+    browser,
+    expires_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?
 )
 `
 
 type CreateAuthzCodeParams struct {
-	ID       string
-	UserID   string
-	ClientID string
-	Scopes   string
-	Os       sql.NullString
-	Browser  sql.NullString
+	ID        string
+	UserID    string
+	ClientID  string
+	Scopes    string
+	Os        sql.NullString
+	Browser   sql.NullString
+	ExpiresAt sql.NullTime
 }
 
 func (q *Queries) CreateAuthzCode(ctx context.Context, arg CreateAuthzCodeParams) (sql.Result, error) {
@@ -41,6 +43,7 @@ func (q *Queries) CreateAuthzCode(ctx context.Context, arg CreateAuthzCodeParams
 		arg.Scopes,
 		arg.Os,
 		arg.Browser,
+		arg.ExpiresAt,
 	)
 }
 
@@ -171,9 +174,29 @@ func (q *Queries) DeleteClient(ctx context.Context, id string) error {
 	return err
 }
 
+const deleteExpiredAuthzCode = `-- name: DeleteExpiredAuthzCode :exec
+DELETE FROM authorization_code
+WHERE expires_at <= CURRENT_TIMESTAMP
+`
+
+func (q *Queries) DeleteExpiredAuthzCode(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, deleteExpiredAuthzCode)
+	return err
+}
+
+const deleteExpiredSessions = `-- name: DeleteExpiredSessions :exec
+DELETE FROM session
+WHERE expires_at <= CURRENT_TIMESTAMP
+`
+
+func (q *Queries) DeleteExpiredSessions(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, deleteExpiredSessions)
+	return err
+}
+
 const deleteSession = `-- name: DeleteSession :exec
 DELETE FROM session
-WHERE id = ? OR expires_at <= CURRENT_TIMESTAMP
+WHERE id = ?
 `
 
 func (q *Queries) DeleteSession(ctx context.Context, id string) error {

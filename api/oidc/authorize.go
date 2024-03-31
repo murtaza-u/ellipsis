@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/murtaza-u/ellipsis/api/apierr"
 	"github.com/murtaza-u/ellipsis/api/middleware"
@@ -18,7 +19,6 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
-	"github.com/mileusna/useragent"
 )
 
 func (a API) consent(c echo.Context) error {
@@ -319,20 +319,7 @@ func (a API) authorize(c echo.Context) error {
 		return c.Redirect(redirectStat, err.AttachTo(redirectTo))
 	}
 
-	var ua useragent.UserAgent
-	uaRaw := c.Request().Header.Get("User-Agent")
-	if uaRaw != "" {
-		ua = useragent.Parse(uaRaw)
-	}
-	var browser, os sql.NullString
-	if b := util.BrowserFromUA(ua); b != "" {
-		browser.String = b
-		browser.Valid = true
-	}
-	if ua.OS == "" {
-		os.String = ua.OS
-		os.Valid = true
-	}
+	fingerprint := util.ParseUA(c.Request().Header.Get("User-Agent"))
 
 	_, err = a.DB.CreateAuthzCode(
 		c.Request().Context(),
@@ -341,8 +328,12 @@ func (a API) authorize(c echo.Context) error {
 			UserID:   userID,
 			ClientID: client.ID,
 			Scopes:   p.Scope,
-			Os:       os,
-			Browser:  browser,
+			Browser:  fingerprint.Browser,
+			Os:       fingerprint.OS,
+			ExpiresAt: sql.NullTime{
+				Time:  time.Now().Add(time.Minute * 5),
+				Valid: true,
+			},
 		},
 	)
 	if err != nil {

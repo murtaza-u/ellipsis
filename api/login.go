@@ -17,7 +17,6 @@ import (
 	"github.com/a-h/templ"
 	"github.com/alexedwards/argon2id"
 	"github.com/labstack/echo/v4"
-	"github.com/mileusna/useragent"
 )
 
 func (s Server) LoginPage(c echo.Context) error {
@@ -150,17 +149,7 @@ func (s Server) Login(c echo.Context) error {
 		)
 	}
 
-	var ua useragent.UserAgent
-	uaRaw := c.Request().Header.Get("User-Agent")
-	if uaRaw != "" {
-		ua = useragent.Parse(uaRaw)
-	}
-	var browser sql.NullString
-	if b := util.BrowserFromUA(ua); b != "" {
-		browser.String = b
-		browser.Valid = true
-	}
-
+	fingerprint := util.ParseUA(c.Request().Header.Get("User-Agent"))
 	expiresAt := time.Now().Add(time.Hour * 4)
 
 	_, err = s.queries.CreateSession(
@@ -169,8 +158,8 @@ func (s Server) Login(c echo.Context) error {
 			ID:        sessionID,
 			UserID:    u.ID,
 			ExpiresAt: expiresAt,
-			Os:        sql.NullString{String: ua.OS, Valid: true},
-			Browser:   browser,
+			Browser:   fingerprint.Browser,
+			Os:        fingerprint.OS,
 		},
 	)
 	if err != nil {

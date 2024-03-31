@@ -21,7 +21,6 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
-	"github.com/mileusna/useragent"
 	"golang.org/x/oauth2"
 )
 
@@ -299,30 +298,15 @@ func (p ProviderGoogle) Callback(c echo.Context) error {
 		)
 	}
 
-	var ua useragent.UserAgent
-	uaRaw := c.Request().Header.Get("User-Agent")
-	if uaRaw != "" {
-		ua = useragent.Parse(uaRaw)
-	}
-	var browser sql.NullString
-	if b := util.BrowserFromUA(ua); b != "" {
-		browser.String = b
-		browser.Valid = true
-	}
-	var os sql.NullString
-	if ua.OS != "" {
-		os.String = ua.OS
-		os.Valid = true
-	}
-
+	fingerprint := util.ParseUA(c.Request().Header.Get("User-Agent"))
 	expiresAt := time.Now().Add(time.Hour * 4)
 
 	_, err = p.db.CreateSession(c.Request().Context(), sqlc.CreateSessionParams{
 		ID:        sessID,
 		UserID:    userID,
 		ExpiresAt: expiresAt,
-		Browser:   browser,
-		Os:        os,
+		Browser:   fingerprint.Browser,
+		Os:        fingerprint.OS,
 	})
 	if err != nil {
 		return apierr.New(

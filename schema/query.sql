@@ -149,9 +149,10 @@ INSERT INTO authorization_code (
     client_id,
     scopes,
     os,
-    browser
+    browser,
+    expires_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?
 );
 
 
@@ -182,8 +183,16 @@ WHERE id = ?;
 
 -- name: DeleteSession :exec
 DELETE FROM session
-WHERE id = ? OR expires_at <= CURRENT_TIMESTAMP;
+WHERE id = ?;
+
+-- name: DeleteExpiredSessions :exec
+DELETE FROM session
+WHERE expires_at <= CURRENT_TIMESTAMP;
 
 -- name: DeleteAuthzCode :exec
 DELETE FROM authorization_code
 WHERE id = ?;
+
+-- name: DeleteExpiredAuthzCode :exec
+DELETE FROM authorization_code
+WHERE expires_at <= CURRENT_TIMESTAMP;

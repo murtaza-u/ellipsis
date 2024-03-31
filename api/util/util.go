@@ -6,6 +6,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/x509"
+	"database/sql"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -63,7 +64,36 @@ func PEMToEd25519PubKey(data []byte) (ed25519.PublicKey, error) {
 	return ed25519Pub, nil
 }
 
-func BrowserFromUA(ua useragent.UserAgent) string {
+type Fingerprint struct {
+	Browser sql.NullString
+	OS      sql.NullString
+}
+
+func ParseUA(raw string) Fingerprint {
+	if raw == "" {
+		return Fingerprint{}
+	}
+	ua := useragent.Parse(raw)
+
+	var browser sql.NullString
+	if b := browserFromUA(ua); b != "" {
+		browser.String = b
+		browser.Valid = true
+	}
+
+	var os sql.NullString
+	if ua.OS != "" {
+		os.String = ua.OS
+		os.Valid = true
+	}
+
+	return Fingerprint{
+		Browser: browser,
+		OS:      os,
+	}
+}
+
+func browserFromUA(ua useragent.UserAgent) string {
 	if ua.IsChrome() {
 		return "Chrome"
 	}
