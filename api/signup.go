@@ -12,6 +12,7 @@ import (
 	"github.com/murtaza-u/ellipsis/api/render"
 	"github.com/murtaza-u/ellipsis/api/util"
 	"github.com/murtaza-u/ellipsis/internal/sqlc"
+	"github.com/murtaza-u/ellipsis/turnstile"
 	"github.com/murtaza-u/ellipsis/view"
 	"github.com/murtaza-u/ellipsis/view/layout"
 
@@ -28,6 +29,7 @@ func (s Server) SignUpPage(c echo.Context) error {
 			view.SignUp(view.SignUpParams{
 				ReturnTo:  c.QueryParam("return_to"),
 				Providers: s.Providers,
+				Captcha:   s.Captcha,
 			}, map[string]error{}),
 		),
 	})
@@ -47,6 +49,14 @@ func (s Server) SignUp(c echo.Context) error {
 	}
 	params.ReturnTo = c.QueryParam("return_to")
 	params.Providers = s.Providers
+	params.Captcha = s.Captcha
+
+	if s.Captcha.Turnstile.Enable {
+		err := s.verifyTurnstileCaptcha(c, params.TurnstileToken)
+		if err != nil {
+			return err
+		}
+	}
 
 	errMap := make(map[string]error)
 
@@ -166,6 +176,51 @@ func (s Server) userExists(ctx context.Context, email string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func (s Server) verifyTurnstileCaptcha(c echo.Context, tkn string) error {
+	if tkn == "" {
+		return render.Do(render.Params{
+			Ctx: c,
+			Component: layout.Base(
+				"Sign Up | Ellipsis",
+				view.Error("Failed to verify captcha", http.StatusBadRequest),
+			),
+			Status: http.StatusBadRequest,
+		})
+	}
+
+	res, err := turnstile.VerifyCaptcha(
+		c.Request().Context(),
+		turnstile.Request{
+			Secret: s.Captcha.Turnstile.SecretKey,
+			Token:  tkn,
+			IP:     c.RealIP(),
+		},
+	)
+	if err != nil {
+		return apierr.New(
+			http.StatusBadRequest,
+			fmt.Errorf("failed to verify captcha: %w", err),
+			layout.Base(
+				"Sign Up | Ellipsis",
+				view.Error("Failed to verify captcha", http.StatusBadRequest),
+			),
+		)
+	}
+
+	if res.Success {
+		return nil
+	}
+
+	return apierr.New(
+		http.StatusBadRequest,
+		fmt.Errorf("failed to verify captcha: %w", errors.Join(res.Errors...)),
+		layout.Base(
+			"Sign Up | Ellipsis",
+			view.Error("Failed to verify captcha", http.StatusBadRequest),
+		),
+	)
 }
 
 func validateEmail(email string) error {

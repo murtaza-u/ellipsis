@@ -11,8 +11,10 @@ type SignUpParams struct {
 	Email           string `form:"email"`
 	Password        string `form:"password"`
 	ConfirmPassword string `form:"confirm_password"`
+	TurnstileToken  string `form:"cf-turnstile-response"`
 	ReturnTo        string
 	Providers       conf.Providers
+	Captcha         conf.Captcha
 }
 
 templ SignUpForm(values SignUpParams, err map[string]error) {
@@ -104,6 +106,13 @@ templ SignUpForm(values SignUpParams, err map[string]error) {
 					<span class="label-text-alt">Must be same as above</span>
 				</div>
 			</label>
+			if values.Captcha.Turnstile.Enable {
+				<div
+					class="cf-turnstile"
+					data-sitekey={ values.Captcha.Turnstile.SiteKey }
+					data-theme="light"
+				></div>
+			}
 			<div class="flex items-center justify-end">
 				<button class="my-4 btn btn-primary w-full md:w-fit">
 					Sign Up
@@ -122,6 +131,10 @@ templ SignUpForm(values SignUpParams, err map[string]error) {
 }
 
 templ SignUp(values SignUpParams, err map[string]error) {
+	if values.Captcha.Turnstile.Enable {
+		<!-- cloudflare turnstile -->
+		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+	}
 	<main class="min-h-screen flex flex-col justify-center items-center mx-3 lg:mx-3 lg:flex-row lg:justify-evenly">
 		@SignUpForm(values, err)
 		<div class="divider my-8 lg:my-0 lg:divider-horizontal">OR</div>

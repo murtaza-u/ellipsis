@@ -88,6 +88,7 @@ templ LoginForm(values LoginParams, err map[string]error) {
 				<a
 					href={ templ.URL(signupWithReturnTo(loginWithReturnTo(values.ReturnTo))) }
 					class="link link-primary"
+					hx-boost="false"
 				>Sign Up</a>
 			</div>
 		</form>

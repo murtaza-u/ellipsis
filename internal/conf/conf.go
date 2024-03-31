@@ -23,6 +23,7 @@ type C struct {
 	DB                   DB        `yaml:"db"`
 	Providers            Providers `yaml:"providers"`
 	S3                   S3        `yaml:"s3"`
+	Captcha              Captcha   `yaml:"captcha"`
 
 	Key Key
 }
@@ -70,6 +71,16 @@ type S3 struct {
 type Key struct {
 	Priv ed25519.PrivateKey
 	Pub  ed25519.PublicKey
+}
+
+type Captcha struct {
+	Turnstile Turnstile `yaml:"turnstile"`
+}
+
+type Turnstile struct {
+	Enable    bool   `yaml:"enable"`
+	SiteKey   string `yaml:"siteKey"`
+	SecretKey string `yaml:"secretKey"`
 }
 
 func New(path string) (*C, error) {
@@ -175,6 +186,15 @@ func (c *C) Validate() error {
 	}
 	if c.S3.Region == "" {
 		return fmt.Errorf("missing s3 region")
+	}
+
+	if c.Captcha.Turnstile.Enable {
+		if c.Captcha.Turnstile.SiteKey == "" {
+			return fmt.Errorf("missing turnstile site key")
+		}
+		if c.Captcha.Turnstile.SecretKey == "" {
+			return fmt.Errorf("missing turnstile secret key")
+		}
 	}
 
 	return nil

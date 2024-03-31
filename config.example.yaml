@@ -29,3 +29,8 @@ providers:
 s3:
   region: AWS_REGION # change me
   bucket: S3_BUCKET_NAME # change me
+captcha:
+  turnstile:
+    enable: false
+    siteKey: CHANGE_ME
+    secretKey: CHANGE_ME
