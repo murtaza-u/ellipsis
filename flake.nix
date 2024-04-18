@@ -8,7 +8,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        version = "24.04.10";
+        version = "24.04.19";
       in
       {
         formatter = pkgs.nixpkgs-fmt;
@@ -17,7 +17,7 @@
             pname = "ellipsis";
             version = version;
             src = ./.;
-            vendorHash = "sha256-c4Ti6Tve06tPNF5k8Yhl6fFVkGayijK5xvOs2/mxSes=";
+            vendorHash = "sha256-T9oxaRyjUseSKEITGaQx91oUAdz4fifHu3dbWVaJujM=";
             CGO_ENABLED = 1;
             subPackages = [ "cmd/ellipsis" ];
           };

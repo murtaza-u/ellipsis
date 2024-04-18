@@ -5,16 +5,16 @@ go 1.21.5
 require (
 	github.com/a-h/templ v0.2.663
 	github.com/alexedwards/argon2id v1.0.0
-	github.com/aws/aws-sdk-go v1.51.18
+	github.com/aws/aws-sdk-go v1.51.24
 	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/gorilla/sessions v1.2.2
-	github.com/labstack/echo-contrib v0.16.0
-	github.com/labstack/echo/v4 v4.11.4
+	github.com/labstack/echo-contrib v0.17.0
+	github.com/labstack/echo/v4 v4.12.0
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/mileusna/useragent v1.3.4
-	github.com/tursodatabase/libsql-client-go v0.0.0-20240410091947-6fedad9244f7
+	github.com/tursodatabase/libsql-client-go v0.0.0-20240416075003-747366ff79c4
 	github.com/wagslane/go-password-validator v0.3.0
 	github.com/xeonx/timeago v1.0.0-rc5
 	golang.org/x/oauth2 v0.19.0
@@ -36,7 +36,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/exp v0.0.0-20240409090435-93d18d7e34b8 // indirect
+	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
