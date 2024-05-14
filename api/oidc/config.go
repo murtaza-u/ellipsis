@@ -50,7 +50,7 @@ func (a API) configuration(c echo.Context) error {
 		RequestURIParamSupported:          false,
 		RequestParamSupported:             false,
 		EndSessionEndpoint:                a.BaseURL + "/oidc/logout",
-		BackchannelLogoutSupported:        false,
-		BackchannelLogoutSessionSupported: false,
+		BackchannelLogoutSupported:        true,
+		BackchannelLogoutSessionSupported: true,
 	})
 }
